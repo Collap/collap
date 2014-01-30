@@ -1,0 +1,16 @@
+archivesBaseName = 'collap-api'
+version = '0.1'
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src'
+        }
+    }
+}
+
+jar {
+    manifest {
+        attributes 'Implementation-Title': 'collap-api', 'Implementation-Version': version
+    }
+}
