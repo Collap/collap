@@ -9,3 +9,7 @@
 
 # Project
 *build/
+
+# Local Scripts
+build.bat
+clean.bat
