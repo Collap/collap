@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Context>
+    <WatchedResource>web.xml</WatchedResource>
+
+    <!-- Exclude jars that do not hold TLDs. -->
+    <JarScanner>
+        <JarScanFilter tldSkip="${tomcat.util.scan.StandardJarScanFilter.jarsToSkip},jasper.jar,tomcat-websocket.jar"/>
+    </JarScanner>
+</Context>

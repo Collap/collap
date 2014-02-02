@@ -1,0 +1,29 @@
+apply plugin: 'war'
+
+archivesBaseName = 'collap-app'
+version = '0.1'
+
+dependencies {
+    providedCompile group: 'javax.servlet', name: 'javax.servlet-api', version: '3.1.0'
+    compile project (':api')
+}
+
+war {
+    from ('res') {
+        into ('WEB-INF/classes/res')
+    }
+    webXml = file('src/main/web/web.xml')
+    webInf { from 'src/main/web/context.xml' }
+    archiveName = 'collap.war'
+}
+
+task tomcatCopy (type: Copy) {
+    from war
+    into ("$rootProject.projectDir/$tomcatHome/webapps")
+    include ('*.war')
+}
+
+/* Clears the tomcat cache to ensure reload. */
+task tomcatClean (type: Delete) {
+    delete "$rootProject.projectDir/$tomcatHome/webapps/collap"
+}
