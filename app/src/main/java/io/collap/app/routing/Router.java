@@ -1,6 +1,11 @@
 package io.collap.app.routing;
 
 import io.collap.Collap;
+import io.collap.StandardDirectories;
+import io.collap.entity.User;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.thymeleaf.context.WebContext;
 
 import javax.servlet.ServletException;
@@ -24,9 +29,8 @@ public class Router extends HttpServlet {
 
         WebContext context = new WebContext (request, response, this.getServletContext (), request.getLocale ());
 
-        File file = new File (Collap.getInstance ().getConfig ().getBaseDirectory () + "test.txt");
+        File file = new File (StandardDirectories.base, "test.txt");
         try {
-            file.getParentFile ().mkdirs ();
             file.createNewFile ();
             context.setVariable ("fileState", "File created successfully!");
         }catch (IOException ex) {
@@ -38,8 +42,25 @@ public class Router extends HttpServlet {
         long diff = System.nanoTime () - time;
 
         BufferedWriter writer = new BufferedWriter (new FileWriter (file));
-        writer.write ("" + diff);
+        writer.write ("" + diff + "\n");
+        writer.write (request.getRequestURI ());
         writer.close ();
+
+        Session session = Collap.getInstance ().getSessionFactory ().openSession ();
+        Transaction trans = null;
+        try {
+            trans = session.beginTransaction ();
+            User user = new User ("Marco");
+            session.save (user);
+            trans.commit ();
+        }catch (HibernateException ex) {
+            if (trans != null) {
+                trans.rollback ();
+            }
+            ex.printStackTrace ();
+        }finally {
+            session.close ();
+        }
     }
 
 }

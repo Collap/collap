@@ -3,13 +3,21 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
          version="3.1">
+    <filter>
+        <filter-name>filter</filter-name>
+        <filter-class>io.collap.app.routing.RequestFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>filter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
     <servlet>
         <servlet-name>Router</servlet-name>
         <servlet-class>io.collap.app.routing.Router</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>Router</servlet-name>
-        <url-pattern>/*</url-pattern>
+        <url-pattern>/servlet/*</url-pattern>
     </servlet-mapping>
     <listener>
         <listener-class>io.collap.app.StartupListener</listener-class>

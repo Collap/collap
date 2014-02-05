@@ -13,7 +13,7 @@ public class StartupListener implements javax.servlet.ServletContextListener {
 
     @Override
     public void contextDestroyed (ServletContextEvent sce) {
-
+        Collap.getInstance ().destroy ();
     }
 
 }

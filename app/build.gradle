@@ -10,10 +10,10 @@ dependencies {
 
 war {
     from ('res') {
-        into ('WEB-INF/classes/res')
+        into ('WEB-INF/classes')
     }
     webXml = file('src/main/web/web.xml')
-    webInf { from 'src/main/web/context.xml' }
+    webInf { from 'src/main/web' }
     archiveName = 'collap.war'
 }
 
