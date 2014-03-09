@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.logging.Logger;
 
 public class Collap {
 
@@ -23,6 +24,8 @@ public class Collap {
     public static Collap getInstance () {
         return instance;
     }
+
+    private static final Logger logger = Logger.getLogger (Collap.class.getName ());
 
     private Config config;
     private TemplateEngine templateEngine;
@@ -57,6 +60,9 @@ public class Collap {
             File customConfig = new File ("collap.properties");
             if (customConfig.exists ()) {
                 customStream = new FileInputStream (customConfig);
+            }else {
+                logger.severe ("Custom Config does not exist!"
+                        + "\nSearched for: " + customConfig.getAbsolutePath ());
             }
 
             config.load (defaultStream, customStream);
