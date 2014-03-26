@@ -1,0 +1,1 @@
+- Create an abstract class "Entity" that provides standard save and load methods to save/load with Hibernate.
