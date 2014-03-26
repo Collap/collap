@@ -1,4 +1,4 @@
-package io.collap.config;
+package io.collap;
 
 import io.collap.util.FileUtils;
 

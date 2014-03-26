@@ -1,4 +1,4 @@
-package io.collap.plugin;
+package io.collap.resource;
 
 public abstract class Plugin {
 
