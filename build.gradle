@@ -1,0 +1,34 @@
+apply plugin: 'idea'
+
+idea {
+    project {
+        languageLevel = '1.7'
+    }
+}
+
+subprojects {
+    apply plugin: 'java'
+	apply plugin: 'idea'
+	
+	sourceCompatibility = 1.7
+
+    repositories {
+        mavenCentral ()
+        mavenLocal ()
+    }
+
+    dependencies {
+        compile 'collap-core:collap-api:0.1.1'
+    }
+    
+    jar {
+    	destinationDir = file ("$rootDir/$pluginFolder")
+        from ('res') {
+            into ('/resource/')
+        }
+        from ('plugin.properties') {
+            into ('/')
+        }
+    }
+    
+}
