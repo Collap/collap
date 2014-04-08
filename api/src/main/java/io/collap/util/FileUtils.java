@@ -1,10 +1,15 @@
 package io.collap.util;
 
-import java.io.File;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.logging.Logger;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
 
 public class FileUtils {
+
+    private static final Logger logger = Logger.getLogger (FileUtils.class.getName ());
 
     public static String appendDirectorySeparator (String path) {
         char lastChar = path.charAt (path.length () - 1);
@@ -51,6 +56,40 @@ public class FileUtils {
                 }
             }
         }
+    }
+
+    /**
+     *  Copies all files from a zip file 'file' with a specific path prefix 'sourcePrefix' to a directory 'target'.
+     */
+    public static void copyZipFilesToDirectory (File file, String sourcePrefix, File target) throws IOException {
+        ZipInputStream zipInput = new ZipInputStream (new FileInputStream (file));
+        ZipFile zip = new ZipFile (file);
+        ZipEntry entry;
+        while ((entry = zipInput.getNextEntry ()) != null) {
+            String name = entry.getName ();
+            logger.info (name);
+            if (name.startsWith (sourcePrefix) && !entry.isDirectory ()) {
+                logger.info ("Copy " + name);
+                File destination = new File (target, name.substring (sourcePrefix.length ()));
+                destination.getParentFile ().mkdirs ();
+                if (!destination.exists ()) {
+                    destination.createNewFile ();
+                }else {
+                    logger.info (name + " already exists. Overwriting...");
+                }
+                OutputStream out = new FileOutputStream (destination);
+                InputStream in = zip.getInputStream (entry);
+
+                // TODO: Copy in data chunks to allow bigger files / reduce memory usage / reduce pressure on the GC.
+                byte[] data = new byte[(int) entry.getSize ()];
+                in.read (data);
+                out.write (data);
+                in.close ();
+                out.close ();
+            }
+            zipInput.closeEntry ();
+        }
+        zipInput.close ();
     }
 
 }

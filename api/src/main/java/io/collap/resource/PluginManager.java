@@ -1,5 +1,6 @@
 package io.collap.resource;
 
+import io.collap.StandardDirectories;
 import io.collap.util.FileUtils;
 
 import java.io.File;
@@ -13,9 +14,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Properties;
 import java.util.jar.JarFile;
+import java.util.jar.JarInputStream;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 
+/**
+ * In order to use a plugin, it must first be registered. After all plugins have been registered, they are initialized.
+ */
 public class PluginManager {
 
     private static Logger logger = Logger.getLogger (PluginManager.class.toString ());
@@ -52,26 +57,29 @@ public class PluginManager {
         }
 
         /* Load the plugin config from the jar file. */
-        InputStream stream = null;
         String mainClassName = null;
-        try {
-            JarFile jar = new JarFile (file);
-            ZipEntry entry = jar.getEntry ("plugin.properties");
-            if (entry == null) {
-                return false;
-            }
-            stream = jar.getInputStream (entry);
-            Properties properties = new Properties ();
-            properties.load (stream);
-            mainClassName = properties.getProperty ("mainClass");
-        }catch (IOException e) {
-            e.printStackTrace ();
-        }finally {
-            if (stream != null) {
-                try {
-                    stream.close ();
-                } catch (IOException e) {
-                    e.printStackTrace ();
+        JarFile pluginJar = null;
+        {
+            InputStream stream = null;
+            try {
+                pluginJar = new JarFile (file);
+                ZipEntry entry = pluginJar.getEntry ("plugin.properties");
+                if (entry == null) {
+                    return false;
+                }
+                stream = pluginJar.getInputStream (entry);
+                Properties properties = new Properties ();
+                properties.load (stream);
+                mainClassName = properties.getProperty ("mainClass");
+            } catch (IOException e) {
+                e.printStackTrace ();
+            } finally {
+                if (stream != null) {
+                    try {
+                        stream.close ();
+                    } catch (IOException e) {
+                        e.printStackTrace ();
+                    }
                 }
             }
         }
@@ -117,12 +125,38 @@ public class PluginManager {
         plugin.setName (pluginName);
         register (plugin);
 
+        /* Populate the resource cache. */
+        {
+            JarInputStream stream = null;
+            try {
+                File pluginResourceCache = new File (StandardDirectories.resourceCache, pluginName);
+                FileUtils.copyZipFilesToDirectory (file, "resource", pluginResourceCache);
+            } catch (IOException e) {
+                e.printStackTrace ();
+            }finally {
+                if (stream != null) {
+                    try {
+                        stream.close ();
+                    } catch (IOException e) {
+                        e.printStackTrace ();
+                    }
+                }
+            }
+        }
+
         return true;
     }
 
     public void register (Plugin plugin) {
         plugins.put (plugin.getName (), plugin);
         logger.info ("Plugin '" + plugin.getName () + "' registered");
+    }
+
+    public void initializeAllPlugins () {
+        // TODO: Clarify order of initialization and provide a method to affect this order (implicit or explicit).
+        for (Plugin plugin : plugins.values ()) {
+            plugin.initializeWithCheck ();
+        }
     }
 
 }

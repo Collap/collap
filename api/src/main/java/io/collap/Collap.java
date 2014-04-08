@@ -1,7 +1,5 @@
 package io.collap;
 
-import io.collap.controller.Controller;
-import io.collap.controller.DefaultController;
 import io.collap.controller.Dispatcher;
 import io.collap.entity.User;
 import io.collap.resource.PluginManager;
@@ -11,11 +9,8 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.cfg.Configuration;
 import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.WebContext;
-import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
+import org.thymeleaf.templateresolver.FileTemplateResolver;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -23,6 +18,8 @@ import java.io.InputStream;
 import java.util.logging.Logger;
 
 public class Collap {
+
+    // TODO: This singleton approach might hurt the scalability and testability of the system.
 
     private static Collap instance = new Collap ();
 
@@ -42,52 +39,25 @@ public class Collap {
         config = new Config ();
     }
 
+    public void initialize () {
+        readPropertyFile ();
+        StandardDirectories.initialize ();
+
+        rootDispatcher = new Dispatcher ();
+        initializeTemplateEngine ();
+        initializeSessionFactory ();
+
+        /* Register and initialize plugins. */
+        pluginManager = new PluginManager ();
+        pluginManager.registerDirectory (StandardDirectories.plugin);
+        pluginManager.initializeAllPlugins ();
+    }
+
     /*
      * Loads the 'collap.properties' file. Make sure that the file is located in the same directory as
      *   the one where the servlet container is executed. If the file can not be found, the 'default.properties'
      *   file that is located in the root of the .war is loaded instead.
      */
-    public void initialize () {
-        readPropertyFile ();
-        StandardDirectories.initialize ();
-
-        rootDispatcher = new Dispatcher (new DefaultController ());
-
-        // TODO: Only an example
-        Controller controllerMarco = new Controller () {
-            @Override
-            public void execute (String remainingPath, HttpServletRequest request, HttpServletResponse response) throws IOException {
-                WebContext context = new WebContext (request, response, request.getServletContext (), request.getLocale ());
-                Collap.getInstance ().getTemplateEngine ().process ("user/Marco", context, response.getWriter ());
-            }
-        };
-        Controller controllerDamien = new Controller () {
-            @Override
-            public void execute (String remainingPath, HttpServletRequest request, HttpServletResponse response) throws IOException {
-                WebContext context = new WebContext (request, response, request.getServletContext (), request.getLocale ());
-                Collap.getInstance ().getTemplateEngine ().process ("user/Damien", context, response.getWriter ());
-            }
-        };
-        Controller controllerDefault = new Controller () {
-            @Override
-            public void execute (String remainingPath, HttpServletRequest request, HttpServletResponse response) throws IOException {
-                WebContext context = new WebContext (request, response, request.getServletContext (), request.getLocale ());
-                Collap.getInstance ().getTemplateEngine ().process ("user/NotFound", context, response.getWriter ());
-            }
-        };
-        Dispatcher userDispatcher = new Dispatcher (controllerDefault);
-        userDispatcher.registerController ("marco", controllerMarco);
-        userDispatcher.registerController ("damien", controllerDamien);
-        rootDispatcher.registerController ("user", userDispatcher);
-
-        /* Initialize plugins. */
-        pluginManager = new PluginManager ();
-        pluginManager.registerDirectory (StandardDirectories.plugin);
-
-        initializeTemplateEngine ();
-        initializeSessionFactory ();
-    }
-
     private void readPropertyFile () {
         try {
             InputStream defaultStream = this.getClass ().getClassLoader ().getResourceAsStream ("default.properties");
@@ -110,9 +80,9 @@ public class Collap {
     }
 
     private void initializeTemplateEngine () {
-        ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver ();
+        FileTemplateResolver templateResolver = new FileTemplateResolver ();
         templateResolver.setTemplateMode ("HTML5");
-        templateResolver.setPrefix ("template/");
+        templateResolver.setPrefix (StandardDirectories.resourceCache.getPath () + File.separator);
         templateResolver.setSuffix (".html");
         templateResolver.setCacheTTLMs (0L);
         templateResolver.setCacheable (false);
