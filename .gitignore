@@ -9,13 +9,3 @@
 
 # Project
 *build/
-
-# Local Scripts
-build.bat
-clean.bat
-
-# Tomcat
-tomcat/
-
-# Logs
-*log.txt
