@@ -16,8 +16,11 @@ database information (see 'collap-core/app/res/default.properties').
 4. Download Gradle and put the gradle command in your execution path. Just make sure you can execute it from the command line.
 5. Build the core by going into the 'collap-core' directory and executing the command 'gradle build tomcatCopy tomcatClean'.
 6. Build any other plugin repository.
-7. Start tomcat.
-8. Open a browser window and type in 'http://127.0.0.1:8080/collap'. This default URL is not changeable at this point of development.
+7. Make sure that the MySQL server is running. Start tomcat.
+8. Open a browser window and type in 'http://127.0.0.1:8080/collap'. This default URL is not changeable at this point of development (i.e. 'collap').
+
+*Note*: You can use the scripts from the 'scripts' repository to optimize your workflow. Be aware, though, that these scripts
+require the standard directory names (tomcat, plugin) as well as collap-std.
 
 
 ## Development Directory Structure
@@ -27,8 +30,8 @@ The directory structure for development (plugin or core) is the following:
     root
         collap-core
         collap-std
-        libs
-        plugins
+        plugin
+        scripts
         tomcat
 
 Any additional plugin projects/repositories should be placed in the root directory.

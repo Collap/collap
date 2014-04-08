@@ -1,3 +1,5 @@
+apply plugin: 'maven'
+
 archivesBaseName = 'collap-api'
 version = '0.1.1'
 
@@ -6,9 +8,8 @@ dependencies {
 }
 
 jar {
-    destinationDir = file ("$rootDir/$libsFolder")
     manifest {
-        attributes 'Implementation-Title': 'collap-api', 'Implementation-Version': version
+        attributes 'Implementation-Title': archivesBaseName, 'Implementation-Version': version
     }
 }
 
