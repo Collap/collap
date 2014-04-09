@@ -5,14 +5,19 @@ version = '0.1.1'
 
 dependencies {
     compile project (':api')
+    providedCompile 'org.apache.tomcat:tomcat-jdbc:8.0.5'
+    providedCompile 'org.apache.tomcat:tomcat-servlet-api:8.0.5'
 }
 
 war {
     from ('res') {
         into ('WEB-INF/classes')
     }
-    webXml = file('src/main/web/web.xml')
-    webInf { from 'src/main/web' }
+    webXml = file('web.xml')
+    webInf { from 'web.xml' }
+    from ('context.xml') {
+        into ('META-INF/')
+    }
     archiveName = 'collap.war'
 }
 

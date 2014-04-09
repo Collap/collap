@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Collap {
@@ -66,8 +67,7 @@ public class Collap {
             if (customConfig.exists ()) {
                 customStream = new FileInputStream (customConfig);
             }else {
-                logger.severe ("Custom Config does not exist!"
-                        + "\nSearched for: " + customConfig.getAbsolutePath ());
+                logger.info ("Custom Config does not exist. Using default configuration!");
             }
 
             config.load (defaultStream, customStream);
@@ -92,20 +92,22 @@ public class Collap {
     }
 
     private void initializeSessionFactory () {
-        Configuration cfg = new Configuration ();
-        cfg.setProperty (AvailableSettings.DRIVER, "com.mysql.jdbc.Driver"); // TODO: Make Collap MySQL independent
-        cfg.setProperty (AvailableSettings.DIALECT, "org.hibernate.dialect.MySQLDialect");
-        cfg.setProperty (AvailableSettings.HBM2DDL_AUTO, "update"); /* Create tables that do not exist automatically and update existing ones. */
-        cfg.setProperty (AvailableSettings.URL, config.getDatabaseConnectionUrl ());
-        cfg.setProperty (AvailableSettings.USER, config.getDatabaseUserName ());
-        cfg.setProperty (AvailableSettings.PASS, config.getDatabaseUserPassword ());
+        try {
+            Configuration cfg = new Configuration ();
+            cfg.setProperty (AvailableSettings.DRIVER, "com.mysql.jdbc.Driver");
+            cfg.setProperty (AvailableSettings.DATASOURCE, "java:comp/env/jdbc/collap");
+            cfg.setProperty (AvailableSettings.DIALECT, "org.hibernate.dialect.MySQLDialect");
+            cfg.setProperty (AvailableSettings.HBM2DDL_AUTO, "update"); /* Create tables that do not exist automatically and update existing ones. */
 
-        cfg.addAnnotatedClass (User.class);
+            cfg.addAnnotatedClass (User.class);
 
-        StandardServiceRegistryBuilder ssrb = new StandardServiceRegistryBuilder ();
-        ssrb.applySettings (cfg.getProperties ());
-        StandardServiceRegistry registry = ssrb.build ();
-        sessionFactory = cfg.buildSessionFactory (registry);
+            StandardServiceRegistryBuilder ssrb = new StandardServiceRegistryBuilder ();
+            ssrb.applySettings (cfg.getProperties ());
+            StandardServiceRegistry registry = ssrb.build ();
+            sessionFactory = cfg.buildSessionFactory (registry);
+        }catch (Exception e) {
+            logger.log (Level.SEVERE, "Error: ", e);
+        }
     }
 
     public void destroy () {

@@ -60,6 +60,7 @@ public class FileUtils {
 
     /**
      *  Copies all files from a zip file 'file' with a specific path prefix 'sourcePrefix' to a directory 'target'.
+     *  Overwrites existing files.
      */
     public static void copyZipFilesToDirectory (File file, String sourcePrefix, File target) throws IOException {
         ZipInputStream zipInput = new ZipInputStream (new FileInputStream (file));
@@ -67,16 +68,13 @@ public class FileUtils {
         ZipEntry entry;
         while ((entry = zipInput.getNextEntry ()) != null) {
             String name = entry.getName ();
-            logger.info (name);
             if (name.startsWith (sourcePrefix) && !entry.isDirectory ()) {
-                logger.info ("Copy " + name);
                 File destination = new File (target, name.substring (sourcePrefix.length ()));
                 destination.getParentFile ().mkdirs ();
                 if (!destination.exists ()) {
                     destination.createNewFile ();
-                }else {
-                    logger.info (name + " already exists. Overwriting...");
                 }
+
                 OutputStream out = new FileOutputStream (destination);
                 InputStream in = zip.getInputStream (entry);
 

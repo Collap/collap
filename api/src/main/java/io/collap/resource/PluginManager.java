@@ -33,12 +33,12 @@ public class PluginManager {
 
     public void registerDirectory (File directory) {
         ArrayList<File> files = FileUtils.crawlDirectory (directory, "jar");
-        logger.severe (files.size () + " files in " + directory.getAbsolutePath ());
+        logger.info (files.size () + " files in " + directory.getAbsolutePath ());
         for (int i = 0; i < files.size (); ++i) {
             File file = files.get (i);
             boolean success = registerFile (file);
             if (!success) {
-                logger.severe ("Loading plugin from file '" + file.getAbsolutePath ().substring (directory.getAbsolutePath ().length ()) + "' failed");
+                logger.warning ("Loading plugin from file '" + file.getAbsolutePath ().substring (directory.getAbsolutePath ().length ()) + "' failed");
             }
         }
     }

@@ -13,10 +13,6 @@ public class Config {
      */
     private String baseDirectory = "";
 
-    private String databaseConnectionUrl = "";
-    private String databaseUserName = "";
-    private String databaseUserPassword = "";
-
     /*
      * 'customStream' and 'defaultStream' must be InputStreams to a .properties file!
      * 'customStream' may be null.
@@ -32,11 +28,6 @@ public class Config {
 
         /* Application. */
         baseDirectory = FileUtils.appendDirectorySeparator (properties.getProperty ("baseDirectory"));
-
-        /* Database. */
-        databaseConnectionUrl = properties.getProperty ("databaseConnectionUrl");
-        databaseUserName = properties.getProperty ("databaseUserName");
-        databaseUserPassword = properties.getProperty ("databaseUserPassword");
     }
 
     public String getBaseDirectory () {
@@ -45,30 +36,6 @@ public class Config {
 
     public void setBaseDirectory (String baseDirectory) {
         this.baseDirectory = baseDirectory;
-    }
-
-    public String getDatabaseConnectionUrl () {
-        return databaseConnectionUrl;
-    }
-
-    public void setDatabaseConnectionUrl (String databaseConnectionUrl) {
-        this.databaseConnectionUrl = databaseConnectionUrl;
-    }
-
-    public String getDatabaseUserName () {
-        return databaseUserName;
-    }
-
-    public void setDatabaseUserName (String databaseUserName) {
-        this.databaseUserName = databaseUserName;
-    }
-
-    public String getDatabaseUserPassword () {
-        return databaseUserPassword;
-    }
-
-    public void setDatabaseUserPassword (String databaseUserPassword) {
-        this.databaseUserPassword = databaseUserPassword;
     }
 
 }
