@@ -12,7 +12,7 @@ To set up a general collap development environment, follow these steps:
 Repeat this step with any other plugin repository you wish to add (including the 'collap-std' repository).
 3. Download Tomcat 8.0.5, rename the folder to "tomcat" (or change the dozen gradle.properties files of every repository),
 and put it inside the root directory. Add the following line of code to the GlobalNamingResources of tomcat's
-'server.xml' file: ´<Resource name="io.collap.datasource.MySQLDataSource" auth="Container" driverClassName="com.mysql.jdbc.Driver" type="javax.sql.DataSource" password="" url="" username="" />´.
+'server.xml' file: `<Resource name="io.collap.datasource.MySQLDataSource" auth="Container" driverClassName="com.mysql.jdbc.Driver" type="javax.sql.DataSource" password="" url="" username="" />`.
 Specify the database login information. Download the MySQL JDBC connector jar (https://dev.mysql.com/downloads/connector/j/) and put it into tomcat's 'lib' folder.
 4. Download Gradle and put the gradle command in your execution path. Just make sure you can execute it from the command line.
 5. Build the core by going into the 'collap-core' directory and executing the command 'gradle build tomcatCopy tomcatClean'.
