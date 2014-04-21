@@ -3,18 +3,16 @@ package io.collap;
 import io.collap.controller.Dispatcher;
 import io.collap.entity.User;
 import io.collap.resource.PluginManager;
+import io.collap.util.FileUtils;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.cfg.Configuration;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.templateresolver.FileTemplateResolver;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -41,8 +39,22 @@ public class Collap {
     }
 
     public void initialize () {
-        readPropertyFile ();
         StandardDirectories.initialize ();
+
+        /* Check whether collap has already been installed. */
+        File installFile = new File (StandardDirectories.base, "install");
+        if (!installFile.exists ()) {
+            // TODO: Enable install file generation in production.
+            /* try {
+                installFile.createNewFile ();
+            } catch (IOException e) {
+                logger.severe ("Could not create installation notice file 'install'.");
+                e.printStackTrace ();
+            } */
+            install ();
+        }
+
+        readConfigFiles ();
 
         rootDispatcher = new Dispatcher ();
         initializeTemplateEngine ();
@@ -55,15 +67,38 @@ public class Collap {
     }
 
     /*
-     * Loads the 'collap.properties' file. Make sure that the file is located in the same directory as
+     * Sets up the collap directory.
+     */
+    private void install () {
+        StandardDirectories.install ();
+
+        /* Copy the 'default' directory contents from the WAR. */
+        // TODO: Copy the whole directory.
+        /* Only copy the hibernate config if it was not created yet. */
+        File cpConfig = new File (StandardDirectories.config, "hibernate.properties");
+        if (!cpConfig.exists ()) {
+            try {
+                FileUtils.copy (getClass ().getResourceAsStream ("/default/config/hibernate.properties"),
+                        new FileOutputStream (cpConfig));
+            } catch (IOException e) {
+                logger.severe ("Could not copy the default hibernate.properties file!");
+                e.printStackTrace ();
+            }
+        }
+    }
+
+    /*
+     * Loads the 'config/collap.properties' file. Make sure that the file is located in the same directory as
      *   the one where the servlet container is executed. If the file can not be found, the 'default.properties'
      *   file that is located in the root of the .war is loaded instead.
      */
-    private void readPropertyFile () {
+    private void readConfigFiles () {
+        // TODO: Adapt to the new configuration standards.
+        /*
         try {
             InputStream defaultStream = this.getClass ().getClassLoader ().getResourceAsStream ("default.properties");
             InputStream customStream = null;
-            File customConfig = new File ("collap.properties");
+            File customConfig = new File (StandardDirectories.config, "collap.properties");
             if (customConfig.exists ()) {
                 customStream = new FileInputStream (customConfig);
             }else {
@@ -77,6 +112,7 @@ public class Collap {
         }catch (IOException ex) {
             ex.printStackTrace ();
         }
+        */
     }
 
     private void initializeTemplateEngine () {
@@ -93,11 +129,12 @@ public class Collap {
 
     private void initializeSessionFactory () {
         try {
+            File configFile = new File (StandardDirectories.config, "hibernate.properties");
+            Properties properties = new Properties ();
+            properties.load (new FileInputStream (configFile));
+
             Configuration cfg = new Configuration ();
-            cfg.setProperty (AvailableSettings.DRIVER, "com.mysql.jdbc.Driver");
-            cfg.setProperty (AvailableSettings.DATASOURCE, "java:comp/env/jdbc/collap");
-            cfg.setProperty (AvailableSettings.DIALECT, "org.hibernate.dialect.MySQLDialect");
-            cfg.setProperty (AvailableSettings.HBM2DDL_AUTO, "update"); /* Create tables that do not exist automatically and update existing ones. */
+            cfg.addProperties (properties);
 
             cfg.addAnnotatedClass (User.class);
 

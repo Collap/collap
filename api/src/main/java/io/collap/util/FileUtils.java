@@ -59,10 +59,16 @@ public class FileUtils {
     }
 
     /**
-     *  Copies all files from a zip file 'file' with a specific path prefix 'sourcePrefix' to a directory 'target'.
      *  Overwrites existing files.
      */
     public static void copyZipFilesToDirectory (File file, String sourcePrefix, File target) throws IOException {
+        copyZipFilesToDirectory (file, sourcePrefix, target, true);
+    }
+
+    /**
+     * Copies all files from a zip file 'file' with a specific path prefix 'sourcePrefix' to a directory 'target'.
+     */
+    public static void copyZipFilesToDirectory (File file, String sourcePrefix, File target, boolean overwrite) throws IOException {
         ZipInputStream zipInput = new ZipInputStream (new FileInputStream (file));
         ZipFile zip = new ZipFile (file);
         ZipEntry entry;
@@ -71,23 +77,34 @@ public class FileUtils {
             if (name.startsWith (sourcePrefix) && !entry.isDirectory ()) {
                 File destination = new File (target, name.substring (sourcePrefix.length ()));
                 destination.getParentFile ().mkdirs ();
-                if (!destination.exists ()) {
+                boolean exists = destination.exists ();
+                if (!exists) {
                     destination.createNewFile ();
                 }
 
-                OutputStream out = new FileOutputStream (destination);
-                InputStream in = zip.getInputStream (entry);
+                if (!exists || overwrite) {
+                    OutputStream out = new FileOutputStream (destination);
+                    InputStream in = zip.getInputStream (entry);
 
-                // TODO: Copy in data chunks to allow bigger files / reduce memory usage / reduce pressure on the GC.
-                byte[] data = new byte[(int) entry.getSize ()];
-                in.read (data);
-                out.write (data);
-                in.close ();
-                out.close ();
+                    copy (in, out);
+                }
             }
             zipInput.closeEntry ();
         }
         zipInput.close ();
+    }
+
+    /**
+     * Writes all contents of an input stream to an output stream.
+     * Closes 'in' and 'out'.
+     */
+    public static void copy (InputStream in, OutputStream out) throws IOException {
+        // TODO: Copy in data chunks to allow bigger files / reduce memory usage / reduce pressure on the GC.
+        byte[] data = new byte[in.available ()];
+        in.read (data);
+        out.write (data);
+        in.close ();
+        out.close ();
     }
 
 }

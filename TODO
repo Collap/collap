@@ -1,1 +1,2 @@
 - Create an abstract class "Entity" that provides standard save and load methods to save/load with Hibernate.
+- Copy default config files to tomcat/collap/config if this folder has not been created yet.

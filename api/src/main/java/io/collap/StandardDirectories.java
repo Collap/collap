@@ -14,7 +14,7 @@ public class StandardDirectories {
     public static File plugin;
 
     public static void initialize () {
-        base = new File (Collap.getInstance ().getConfig ().getBaseDirectory ());
+        base = new File ("collap");
 
         cache = new File (base, "cache" + File.separator);
         resourceCache = new File (cache, "resource" + File.separator);
@@ -22,7 +22,9 @@ public class StandardDirectories {
         config = new File (base, "config" + File.separator);
         pack = new File (base, "pack" + File.separator);
         plugin = new File (base, "plugin" + File.separator);
+    }
 
+    public static void install () {
         base.mkdir ();
 
         cache.mkdir ();

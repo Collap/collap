@@ -6,7 +6,4 @@
     <JarScanner>
         <JarScanFilter tldSkip="${tomcat.util.scan.StandardJarScanFilter.jarsToSkip},jasper.jar,tomcat-websocket.jar"/>
     </JarScanner>
-
-    <!-- Link the database connection details. -->
-    <ResourceLink name="jdbc/collap" global="io.collap.datasource.MySQLDataSource" />
 </Context>
