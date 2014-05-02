@@ -68,7 +68,6 @@ public class RegisterController implements Controller {
         }
 
         User newUser = new User (name);
-        long time = System.nanoTime ();
         // TODO: Handle exceptions properly.
         try {
             newUser.setPasswordHash (PasswordHash.createHash (password));
@@ -77,8 +76,6 @@ public class RegisterController implements Controller {
         } catch (InvalidKeySpecException e) {
             e.printStackTrace ();
         }
-        long delta = System.nanoTime () - time;
-        response.getWriter ().write ("Hashing the password took " + delta + "ns.<br />");
 
         /* Catch problems with the generated password hash. */
         if (newUser.getPasswordHash ().length () <= 0) {
