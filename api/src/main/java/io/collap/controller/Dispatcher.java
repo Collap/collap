@@ -39,7 +39,7 @@ public class Dispatcher implements Controller {
     }
 
     @Override
-    public void execute (String remainingPath, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void execute (Type type, String remainingPath, HttpServletRequest request, HttpServletResponse response) throws IOException {
         /* Extract the next controller name. */
         int substringEnd = -1;
         {
@@ -80,7 +80,7 @@ public class Dispatcher implements Controller {
 
         /* Execute the controller or throw a 404 error. */
         if (controller != null) {
-            controller.execute (remainingPath, request, response);
+            controller.execute (type, remainingPath, request, response);
         }else {
             response.sendError (404);
         }

@@ -6,6 +6,11 @@ import java.io.IOException;
 
 public interface Controller {
 
-    public void execute (String remainingPath, HttpServletRequest request, HttpServletResponse response) throws IOException;
+    public enum Type {
+        get,
+        post
+    }
+
+    public void execute (Type type, String remainingPath, HttpServletRequest request, HttpServletResponse response) throws IOException;
 
 }
