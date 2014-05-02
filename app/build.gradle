@@ -1,10 +1,7 @@
 apply plugin: 'war'
 
-archivesBaseName = 'collap-app'
-version = '0.1.1'
-
 dependencies {
-    compile project (':api')
+    providedCompile project (':api')
     providedCompile 'org.apache.tomcat:tomcat-jdbc:8.0.5'
     providedCompile 'org.apache.tomcat:tomcat-servlet-api:8.0.5'
 }
@@ -23,11 +20,11 @@ war {
 
 task tomcatCopy (type: Copy) {
     from war
-    into ("$rootProject.projectDir/$tomcatHome/webapps")
+    into ("$rootDir/../tomcat/webapps")
     include ('*.war')
 }
 
 /* Clears the tomcat cache to ensure reload. */
 task tomcatClean (type: Delete) {
-    delete "$rootProject.projectDir/$tomcatHome/webapps/collap"
+    delete "$rootDir/../tomcat/webapps/collap"
 }

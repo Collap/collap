@@ -87,7 +87,8 @@ public class PluginManager {
         /* Jar file is not a valid plugin. */
         if (mainClassName == null) return false;
 
-        /* Load the main class from the jar. This will also load other classes on demand. */
+        /* Load the main class from the jar.
+         * Although the classes are in the classpath we need a plugin instance. */
         URL fileUrl = null;
         try {
             fileUrl = file.toURI ().toURL ();
@@ -96,10 +97,9 @@ public class PluginManager {
         }
         if (fileUrl == null) return false;
 
-        URLClassLoader child = new URLClassLoader (new URL[] { fileUrl }, this.getClass ().getClassLoader ());
         Class mainClass = null;
         try {
-            mainClass = Class.forName (mainClassName, true, child);
+            mainClass = Class.forName (mainClassName);
         }catch (ClassNotFoundException e) {
             e.printStackTrace ();
         }
@@ -157,6 +157,10 @@ public class PluginManager {
         for (Plugin plugin : plugins.values ()) {
             plugin.initializeWithCheck ();
         }
+    }
+
+    public HashMap<String, Plugin> getPlugins () {
+        return plugins;
     }
 
 }

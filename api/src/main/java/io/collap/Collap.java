@@ -1,7 +1,7 @@
 package io.collap;
 
 import io.collap.controller.Dispatcher;
-import io.collap.entity.User;
+import io.collap.resource.Plugin;
 import io.collap.resource.PluginManager;
 import io.collap.util.FileUtils;
 import org.hibernate.SessionFactory;
@@ -12,6 +12,8 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.templateresolver.FileTemplateResolver;
 
 import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -56,13 +58,15 @@ public class Collap {
 
         readConfigFiles ();
 
+        /* Register plugins. */
+        pluginManager = new PluginManager ();
+        pluginManager.registerDirectory (StandardDirectories.plugin);
+
         rootDispatcher = new Dispatcher ();
         initializeTemplateEngine ();
         initializeSessionFactory ();
 
-        /* Register and initialize plugins. */
-        pluginManager = new PluginManager ();
-        pluginManager.registerDirectory (StandardDirectories.plugin);
+        /* Initialize plugins. */
         pluginManager.initializeAllPlugins ();
     }
 
@@ -136,7 +140,10 @@ public class Collap {
             Configuration cfg = new Configuration ();
             cfg.addProperties (properties);
 
-            cfg.addAnnotatedClass (User.class);
+            /* Let plugins configure Hibernate. */
+            for (Plugin plugin : pluginManager.getPlugins ().values ()) {
+                plugin.configureHibernate (cfg);
+            }
 
             StandardServiceRegistryBuilder ssrb = new StandardServiceRegistryBuilder ();
             ssrb.applySettings (cfg.getProperties ());

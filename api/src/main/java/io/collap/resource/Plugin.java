@@ -1,13 +1,11 @@
 package io.collap.resource;
 
+import org.hibernate.cfg.Configuration;
+
 public abstract class Plugin {
 
     private boolean initialized = false;
     protected String name;
-
-    public Class<?>[] getEntityClasses () {
-        return new Class<?>[0];
-    }
 
     public final void initializeWithCheck () {
         if (!initialized) {
@@ -19,11 +17,17 @@ public abstract class Plugin {
     public abstract void initialize ();
     public abstract void destroy ();
 
-    public String getName () {
+    /**
+     * This method is called before the main session factory is created.
+     * It is called *before* initialize.
+     */
+    public void configureHibernate (Configuration cfg) { }
+
+    public final String getName () {
         return name;
     }
 
-    public void setName (String name) {
+    public final void setName (String name) {
         this.name = name;
     }
 
