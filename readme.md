@@ -21,8 +21,6 @@ to the 'common.loader' property.
 9. Specify the database login information in 'tomcat/collap/config/hikari.properties'.
 10. Execute the run script again. Open a browser window and type in 'http://127.0.0.1:8080/collap'. This default URL is not changeable at this point of development (i.e. 'collap').
 
-TODO: Add "add collap-api.jar to collap/lib/", "change tomcat classpath (catalina.properties) to include tomcat/collap/plugin and tomcat/collap/lib"
-
 
 ## Development Directory Structure
 
