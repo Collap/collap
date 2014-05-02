@@ -16,11 +16,11 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 
-public class RegisterController implements Controller {
+public class Register implements Controller {
 
     private UserPlugin plugin;
 
-    public RegisterController (UserPlugin plugin) {
+    public Register (UserPlugin plugin) {
         this.plugin = plugin;
     }
 
