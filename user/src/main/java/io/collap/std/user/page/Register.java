@@ -15,10 +15,19 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Register implements Controller {
 
     private UserPlugin plugin;
+
+    /**
+     * This list contains all user names that are currently reserved for registration.
+     * This ensures that two users that are registering together in a very short time frame can not share a name.
+     * TODO: The feature is currently UNTESTED.
+     */
+    private List<String> reservedUserNames = new ArrayList<String> ();
 
     public Register (UserPlugin plugin) {
         this.plugin = plugin;
@@ -56,15 +65,10 @@ public class Register implements Controller {
 
         /* Check if the requested name is already taken. */
         // TODO: Figure out how not to give out valid user names this way (Probably via email).
-        {
-            Session session = Collap.getInstance ().getSessionFactory ().openSession ();
-            User user = (User) session.createQuery ("from User as user where user.name = ?").setString (0, name).uniqueResult ();
-            session.close ();
-
-            if (user != null) {
-                registerError ("User " + name + " already exists!", response);
-                return;
-            }
+        boolean reserved = isUserNameReserved (name);
+        if (reserved) {
+            registerError ("User " + name + " already exists!", response);
+            return;
         }
 
         User newUser = new User (name);
@@ -80,9 +84,11 @@ public class Register implements Controller {
         /* Catch problems with the generated password hash. */
         if (newUser.getPasswordHash ().length () <= 0) {
             registerError ("An unexpected error occurred. Please try again.", response);
+            removeReservedUserNameFromList (name);
             return;
         }
 
+        /* Commit new user to the database. */
         boolean success = true;
         {
             Session session = Collap.getInstance ().getSessionFactory ().openSession ();
@@ -102,8 +108,41 @@ public class Register implements Controller {
             }
         }
 
+        removeReservedUserNameFromList (name);
+
         if (success) {
             response.getWriter ().write ("User " + name + " created!");
+        }
+    }
+
+    /**
+     * Registers the user name as reserved when returning false.
+     */
+    private boolean isUserNameReserved (String name) {
+        String nameLowercase = name.toLowerCase ();
+        /* Note: This needs to be *one* sync block to exclude any possibility that two users with the same name can register at once.
+         * So DO NOT split this up. */
+        synchronized (reservedUserNames) {
+            if (reservedUserNames.contains (nameLowercase)) {
+                return true;
+            }
+
+            Session session = Collap.getInstance ().getSessionFactory ().openSession ();
+            User user = (User) session.createQuery ("from User as user where user.name = ?").setString (0, name).uniqueResult ();
+            session.close ();
+            if (user != null) {
+                return true;
+            }
+
+            reservedUserNames.add (name.toLowerCase ());
+        }
+
+        return false;
+    }
+
+    private void removeReservedUserNameFromList (String name) {
+        synchronized (reservedUserNames) {
+            reservedUserNames.remove (name.toLowerCase ());
         }
     }
 
