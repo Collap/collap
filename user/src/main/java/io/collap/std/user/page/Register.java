@@ -17,6 +17,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Register implements Controller {
 
@@ -51,9 +53,9 @@ public class Register implements Controller {
         String name = request.getParameter ("name");
         String password = request.getParameter ("password");
 
-        final int minimumNameLength = 1;
-        if (name.length () < minimumNameLength) { // TODO: Minimum threshold in config
-            registerError ("The name must at least be " + minimumNameLength + " characters long!", response);
+        ValidationResult userNameValidation = validateUserName (name);
+        if (!userNameValidation.passed) {
+            registerError (userNameValidation.error, response);
             return;
         }
 
@@ -113,6 +115,34 @@ public class Register implements Controller {
         if (success) {
             response.getWriter ().write ("User " + name + " created!");
         }
+    }
+
+    private class ValidationResult {
+        public boolean passed;
+        public String error;
+    }
+
+    private static Pattern userNamePattern = Pattern.compile ("\\A(\\w)+\\z"); // TODO: Make the pattern configurable
+
+    private ValidationResult validateUserName (String name) {
+        ValidationResult result = new ValidationResult ();
+        result.passed = true;
+
+        final int minimumNameLength = 1;
+        if (name.length () < minimumNameLength) { // TODO: Minimum threshold in config
+            result.passed = false;
+            result.error = "The name must be at least " + minimumNameLength + " characters long!";
+            return result;
+        }
+
+        Matcher matcher = userNamePattern.matcher (name);
+        if (!matcher.find ()) {
+            result.passed = false;
+            result.error = "The name may only consist of alphabetic characters, digits and underscores.";
+            return result;
+        }
+
+        return result;
     }
 
     /**
