@@ -22,7 +22,7 @@ subprojects {
     }
     
     jar {
-    	destinationDir = file ("$rootDir/$pluginFolder")
+    	destinationDir = file ("$rootDir/../plugin")
         from ('res') {
             into ('/resource/')
         }

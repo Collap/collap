@@ -16,21 +16,21 @@ public class Pages extends Plugin {
     public void initialize () {
         Controller controllerMarco = new Controller () {
             @Override
-            public void execute (String remainingPath, HttpServletRequest request, HttpServletResponse response) throws IOException {
+            public void execute (Type type, String remainingPath, HttpServletRequest request, HttpServletResponse response) throws IOException {
                 WebContext context = new WebContext (request, response, request.getServletContext (), request.getLocale ());
                 Collap.getInstance ().getTemplateEngine ().process (getTemplatePath ("Marco"), context, response.getWriter ());
             }
         };
         Controller controllerDamien = new Controller () {
             @Override
-            public void execute (String remainingPath, HttpServletRequest request, HttpServletResponse response) throws IOException {
+            public void execute (Type type, String remainingPath, HttpServletRequest request, HttpServletResponse response) throws IOException {
                 WebContext context = new WebContext (request, response, request.getServletContext (), request.getLocale ());
                 Collap.getInstance ().getTemplateEngine ().process (getTemplatePath ("Damien"), context, response.getWriter ());
             }
         };
         Controller controllerDefault = new Controller () {
             @Override
-            public void execute (String remainingPath, HttpServletRequest request, HttpServletResponse response) throws IOException {
+            public void execute (Type type, String remainingPath, HttpServletRequest request, HttpServletResponse response) throws IOException {
                 WebContext context = new WebContext (request, response, request.getServletContext (), request.getLocale ());
                 Collap.getInstance ().getTemplateEngine ().process (getTemplatePath ("NotFound"), context, response.getWriter ());
             }
