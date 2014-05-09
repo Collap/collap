@@ -1,9 +1,0 @@
-archivesBaseName = 'collap-std-page-example'
-version = '0.1.1'
-
-jar {
-    manifest {
-        attributes 'Implementation-Title': archivesBaseName, 'Implementation-Version': version
-    }
-}
-
