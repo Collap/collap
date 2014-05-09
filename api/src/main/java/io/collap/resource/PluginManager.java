@@ -1,5 +1,6 @@
 package io.collap.resource;
 
+import io.collap.Collap;
 import io.collap.StandardDirectories;
 import io.collap.util.FileUtils;
 
@@ -9,7 +10,6 @@ import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Properties;
@@ -27,8 +27,11 @@ public class PluginManager {
 
     private HashMap<String, Plugin> plugins;
 
-    public PluginManager () {
+    private Collap collap;
+
+    public PluginManager (Collap collap) {
         plugins = new HashMap<> ();
+        this.collap = collap;
     }
 
     public void registerDirectory (File directory) {
@@ -123,6 +126,7 @@ public class PluginManager {
         /* Cast to Plugin. */
         Plugin plugin = (Plugin) obj;
         plugin.setName (pluginName);
+        plugin.setCollap (collap);
         register (plugin);
 
         /* Populate the resource cache. */

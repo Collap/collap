@@ -15,6 +15,9 @@ import java.io.*;
  */
 public class Router extends HttpServlet {
 
+    /** This field is set once by the StartupListener. */
+    public static Collap collap; // TODO: This is ugly, but the only quick solution I can come up with right now.
+
     @Override
     protected void doGet (HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         configureResponse (response);
@@ -27,8 +30,8 @@ public class Router extends HttpServlet {
         dispatch (Controller.Type.post, request, response);
     }
 
-    private void dispatch (Controller.Type type, HttpServletRequest request, HttpServletResponse response)  throws ServletException, IOException{
-        Collap.getInstance ().getRootDispatcher ().execute (type, getRemainingRequestPart (request), request, response);
+    private void dispatch (Controller.Type type, HttpServletRequest request, HttpServletResponse response)  throws ServletException, IOException {
+        collap.getRootDispatcher ().execute (type, getRemainingRequestPart (request), request, response);
     }
 
     private void configureResponse (HttpServletResponse response) {
