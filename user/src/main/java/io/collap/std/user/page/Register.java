@@ -1,6 +1,9 @@
 package io.collap.std.user.page;
 
+import de.neuland.jade4j.JadeConfiguration;
+import de.neuland.jade4j.template.JadeTemplate;
 import io.collap.Collap;
+import io.collap.StandardDirectories;
 import io.collap.controller.Controller;
 import io.collap.std.entity.User;
 import io.collap.std.user.UserPlugin;
@@ -8,15 +11,17 @@ import io.collap.util.PasswordHash;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.thymeleaf.context.WebContext;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -45,11 +50,12 @@ public class Register implements Controller {
     }
 
     private void showRegistrationForm (HttpServletRequest request, HttpServletResponse response) throws IOException {
-        WebContext context = new WebContext (request, response, request.getServletContext (), request.getLocale ());
-        Collap.getInstance ().getTemplateEngine ().process (plugin.getName () + "/template/user/Register", context, response.getWriter ());
+        plugin.renderAndWriteTemplate ("Register", response.getWriter ());
     }
 
     private void registerUser (HttpServletRequest request, HttpServletResponse response) throws IOException {
+        // TODO: Only register user when no user is currently logged in.
+
         String name = request.getParameter ("name");
         String password = request.getParameter ("password");
 
@@ -93,7 +99,7 @@ public class Register implements Controller {
         /* Commit new user to the database. */
         boolean success = true;
         {
-            Session session = Collap.getInstance ().getSessionFactory ().openSession ();
+            Session session = plugin.getCollap ().getSessionFactory ().openSession ();
             Transaction transaction = null;
             try {
                 transaction = session.beginTransaction ();
@@ -157,7 +163,7 @@ public class Register implements Controller {
                 return true;
             }
 
-            Session session = Collap.getInstance ().getSessionFactory ().openSession ();
+            Session session = plugin.getCollap ().getSessionFactory ().openSession ();
             User user = (User) session.createQuery ("from User as user where user.name = ?").setString (0, name).uniqueResult ();
             session.close ();
             if (user != null) {
