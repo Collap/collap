@@ -2,17 +2,14 @@ package io.collap.std.entity;
 
 import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Table;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 @Table (name = "users")
 public class User {
 
     private Long id;
-    private String name;
+    private String username;
 
     private String passwordHash;
 
@@ -20,8 +17,8 @@ public class User {
 
     }
 
-    public User (String name) {
-        this.name = name;
+    public User (String username) {
+        this.username = username;
     }
 
     @Id
@@ -35,12 +32,13 @@ public class User {
         this.id = id;
     }
 
-    public String getName () {
-        return name;
+    @Column(unique = true)
+    public String getUsername () {
+        return username;
     }
 
-    public void setName (String name) {
-        this.name = name;
+    public void setUsername (String username) {
+        this.username = username;
     }
 
     public String getPasswordHash () {

@@ -1,0 +1,34 @@
+//-
+  | Optional:
+  |   errors: List<String>
+  |   A list of errors to be displayed above the login form.
+
+!!! 5
+html
+  head
+    title Login
+    style(type="text/css").
+      .error {
+        color: #EE0000;
+      }
+
+  body
+    h1 Login
+
+    //- Outputs possible login errors
+    if errors != null
+      each error in errors
+        p(class="error")= error
+
+    form(name="login", action="login", method="post")
+      label(for="username") Username:
+      input(type="text", id="username", name="username")
+
+      br
+
+      label(for="password") Password:
+      input(type="password", id="password", name="password")
+
+      br
+
+      input(type="submit", value="Login")

@@ -1,12 +1,10 @@
 package io.collap.std.user.page;
 
-import de.neuland.jade4j.JadeConfiguration;
-import de.neuland.jade4j.template.JadeTemplate;
-import io.collap.Collap;
-import io.collap.StandardDirectories;
-import io.collap.controller.Controller;
+import io.collap.controller.TemplateController;
+import io.collap.resource.TemplatePlugin;
 import io.collap.std.entity.User;
 import io.collap.std.user.UserPlugin;
+import io.collap.std.user.util.Validator;
 import io.collap.util.PasswordHash;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -14,30 +12,23 @@ import org.hibernate.Transaction;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-public class Register implements Controller {
-
-    private UserPlugin plugin;
+public class Register extends TemplateController {
 
     /**
      * This list contains all user names that are currently reserved for registration.
      * This ensures that two users that are registering together in a very short time frame can not share a name.
      * TODO: The feature is currently UNTESTED.
      */
-    private List<String> reservedUserNames = new ArrayList<String> ();
+    private List<String> reservedUsernames = new ArrayList<> ();
 
-    public Register (UserPlugin plugin) {
-        this.plugin = plugin;
+    public Register (TemplatePlugin plugin) {
+        super (plugin);
     }
 
     @Override
@@ -56,10 +47,10 @@ public class Register implements Controller {
     private void registerUser (HttpServletRequest request, HttpServletResponse response) throws IOException {
         // TODO: Only register user when no user is currently logged in.
 
-        String name = request.getParameter ("name");
+        String username = request.getParameter ("username");
         String password = request.getParameter ("password");
 
-        ValidationResult userNameValidation = validateUserName (name);
+        Validator.ValidationResult userNameValidation = ((UserPlugin) plugin).getValidator ().validateUserName (username);
         if (!userNameValidation.passed) {
             registerError (userNameValidation.error, response);
             return;
@@ -72,14 +63,13 @@ public class Register implements Controller {
         }
 
         /* Check if the requested name is already taken. */
-        // TODO: Figure out how not to give out valid user names this way (Probably via email).
-        boolean reserved = isUserNameReserved (name);
+        boolean reserved = isUsernameReserved (username);
         if (reserved) {
-            registerError ("User " + name + " already exists!", response);
+            registerError ("User " + username + " already exists!", response);
             return;
         }
 
-        User newUser = new User (name);
+        User newUser = new User (username);
         // TODO: Handle exceptions properly.
         try {
             newUser.setPasswordHash (PasswordHash.createHash (password));
@@ -92,7 +82,7 @@ public class Register implements Controller {
         /* Catch problems with the generated password hash. */
         if (newUser.getPasswordHash ().length () <= 0) {
             registerError ("An unexpected error occurred. Please try again.", response);
-            removeReservedUserNameFromList (name);
+            removeReservedUsernameFromList (username);
             return;
         }
 
@@ -116,69 +106,41 @@ public class Register implements Controller {
             }
         }
 
-        removeReservedUserNameFromList (name);
+        removeReservedUsernameFromList (username);
 
         if (success) {
-            response.getWriter ().write ("User " + name + " created!");
+            response.getWriter ().write ("User " + username + " created!");
         }
-    }
-
-    private class ValidationResult {
-        public boolean passed;
-        public String error;
-    }
-
-    private static Pattern userNamePattern = Pattern.compile ("\\A(\\w)+\\z"); // TODO: Make the pattern configurable
-
-    private ValidationResult validateUserName (String name) {
-        ValidationResult result = new ValidationResult ();
-        result.passed = true;
-
-        final int minimumNameLength = 1;
-        if (name.length () < minimumNameLength) { // TODO: Minimum threshold in config
-            result.passed = false;
-            result.error = "The name must be at least " + minimumNameLength + " characters long!";
-            return result;
-        }
-
-        Matcher matcher = userNamePattern.matcher (name);
-        if (!matcher.find ()) {
-            result.passed = false;
-            result.error = "The name may only consist of alphabetic characters, digits and underscores.";
-            return result;
-        }
-
-        return result;
     }
 
     /**
      * Registers the user name as reserved when returning false.
      */
-    private boolean isUserNameReserved (String name) {
-        String nameLowercase = name.toLowerCase ();
+    private boolean isUsernameReserved (String username) {
+        String usernameLowercase = username.toLowerCase ();
         /* Note: This needs to be *one* sync block to exclude any possibility that two users with the same name can register at once.
          * So DO NOT split this up. */
-        synchronized (reservedUserNames) {
-            if (reservedUserNames.contains (nameLowercase)) {
+        synchronized (reservedUsernames) {
+            if (reservedUsernames.contains (usernameLowercase)) {
                 return true;
             }
 
             Session session = plugin.getCollap ().getSessionFactory ().openSession ();
-            User user = (User) session.createQuery ("from User as user where user.name = ?").setString (0, name).uniqueResult ();
+            User user = (User) session.createQuery ("from User as user where user.username = ?").setString (0, username).uniqueResult ();
             session.close ();
             if (user != null) {
                 return true;
             }
 
-            reservedUserNames.add (name.toLowerCase ());
+            reservedUsernames.add (username.toLowerCase ());
         }
 
         return false;
     }
 
-    private void removeReservedUserNameFromList (String name) {
-        synchronized (reservedUserNames) {
-            reservedUserNames.remove (name.toLowerCase ());
+    private void removeReservedUsernameFromList (String username) {
+        synchronized (reservedUsernames) {
+            reservedUsernames.remove (username.toLowerCase ());
         }
     }
 
