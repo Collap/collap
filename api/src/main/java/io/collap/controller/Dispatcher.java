@@ -9,13 +9,14 @@ import java.util.HashMap;
  * The Dispatcher acts as a controller that dispatches the request to a sub-controller
  *   or a default controller.
  */
-public class Dispatcher implements Controller {
+public class Dispatcher extends Controller {
 
     private HashMap<String, Controller> controllers;
 
     /**
-     * This controller is executed when no match has been found in the "controllers" map.
-     * When this is null, nothing is executed and a page not found error is sent back.
+     * This controller is executed when the dispatcher is the last element in the
+     * command chain (i.e. nothing after its name in the remaining path).
+     * When this is null, a page not found error is sent back.
      */
     private Controller defaultController;
 
@@ -73,9 +74,11 @@ public class Dispatcher implements Controller {
         }
 
         /* Find the appropriate controller. */
-        Controller controller = controllers.get (controllerName);
-        if (controller == null) {
+        Controller controller;
+        if (controllerName.length () == 0) { /* The dispatcher is the last controller in the command chain. */
             controller = defaultController;
+        }else {
+            controller = controllers.get (controllerName);
         }
 
         /* Execute the controller or throw a 404 error. */

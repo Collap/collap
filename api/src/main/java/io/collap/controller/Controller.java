@@ -4,13 +4,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-public interface Controller {
+public abstract class Controller {
 
     public enum Type {
         get,
         post
     }
 
-    public void execute (Type type, String remainingPath, HttpServletRequest request, HttpServletResponse response) throws IOException;
+    public abstract void execute (Type type, String remainingPath, HttpServletRequest request, HttpServletResponse response) throws IOException;
 
 }

@@ -10,13 +10,14 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The template loader points to the 'res/template' directory of a plugin.
  */
-public abstract class JadePlugin extends Plugin {
+public abstract class TemplatePlugin extends Plugin {
 
-    private static final HashMap<String, Object> EMPTY_MODEL = new HashMap<> ();
+    private static final Map<String, Object> EMPTY_MODEL = new HashMap<> ();
 
     protected JadeConfiguration jadeConfiguration;
 
@@ -34,7 +35,7 @@ public abstract class JadePlugin extends Plugin {
         return renderTemplate (name, EMPTY_MODEL);
     }
 
-    public String renderTemplate (String name, HashMap<String, Object> model) throws IOException {
+    public String renderTemplate (String name, Map<String, Object> model) throws IOException {
         JadeTemplate template = jadeConfiguration.getTemplate (name);
         return jadeConfiguration.renderTemplate (template, model);
     }
@@ -43,7 +44,7 @@ public abstract class JadePlugin extends Plugin {
         renderAndWriteTemplate (name, EMPTY_MODEL, writer);
     }
 
-    public void renderAndWriteTemplate (String name, HashMap<String, Object> model, Writer writer) throws IOException {
+    public void renderAndWriteTemplate (String name, Map<String, Object> model, Writer writer) throws IOException {
         JadeTemplate template = jadeConfiguration.getTemplate (name);
         jadeConfiguration.renderTemplate (template, model, writer);
     }
