@@ -24,10 +24,10 @@ public class Profile extends TemplateController {
 
     @Override
     public void execute (Type type, String remainingPath, HttpServletRequest request, HttpServletResponse response) throws IOException {
-        int id = -1;
+        long id = -1;
         if (remainingPath.length () > 0) {
             try {
-                id = Integer.parseInt (remainingPath);
+                id = Long.parseLong (remainingPath);
             } catch (NumberFormatException ex) {
                 ex.printStackTrace ();
             }
@@ -44,7 +44,7 @@ public class Profile extends TemplateController {
             }
         }else { /* Fetch user from DB. */
             Session session = plugin.getCollap ().getSessionFactory ().openSession ();
-            User user = (User) session.createQuery ("from User as user where user.id = ?").setInteger (0, id).uniqueResult ();
+            User user = (User) session.createQuery ("from User as user where user.id = ?").setLong (0, id).uniqueResult ();
             if (user != null) {
                 displayUser (user, request, response);
                 return;
