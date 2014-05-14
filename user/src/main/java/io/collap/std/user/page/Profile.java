@@ -29,7 +29,7 @@ public class Profile extends TemplateController {
             try {
                 id = Long.parseLong (remainingPath);
             } catch (NumberFormatException ex) {
-                ex.printStackTrace ();
+                /* Expected. */
             }
         }
 
@@ -45,6 +45,7 @@ public class Profile extends TemplateController {
         }else { /* Fetch user from DB. */
             Session session = plugin.getCollap ().getSessionFactory ().openSession ();
             User user = (User) session.createQuery ("from User as user where user.id = ?").setLong (0, id).uniqueResult ();
+            session.close ();
             if (user != null) {
                 displayUser (user, request, response);
                 return;
