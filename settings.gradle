@@ -1,1 +1,1 @@
-include 'user'
+include 'post', 'user'
