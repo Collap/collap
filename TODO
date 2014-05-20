@@ -1,3 +1,6 @@
 - Create an abstract class "Entity" that provides standard save and load methods to save/load with Hibernate.
 - Copy default config files to tomcat/collap/config if this folder has not been created yet.
 - "Of course, there's no way to test http or https in the template". Make that happen.
+- Markdown Editor:
+  - Custom tags (addable by every plugin) like <wowhead item="1234" />
+  - The editor should have a plain text editing field and a preview, but also buttons to add custom tags.
