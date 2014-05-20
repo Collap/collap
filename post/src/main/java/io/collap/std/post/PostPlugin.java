@@ -28,7 +28,7 @@ public class PostPlugin extends TemplatePlugin {
         collap.getRootDispatcher ().registerController ("post", postDispatcher);
 
         /* Add the posts section to the profile page! */
-        UserPlugin userPlugin = (UserPlugin) collap.getPluginManager ().getPlugins ().get ("user");
+        UserPlugin userPlugin = (UserPlugin) collap.getPluginManager ().getPlugins ().get ("std-user");
         Profile profilePage = userPlugin.getProfilePage ();
         if (profilePage != null) {
             profilePage.addSection (new Profile.Section () {

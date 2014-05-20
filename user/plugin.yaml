@@ -1,2 +1,2 @@
-name: user
+name: std-user
 mainClass: io.collap.std.user.UserPlugin
