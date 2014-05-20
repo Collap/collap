@@ -22,6 +22,8 @@ public class Collap {
     private PluginManager pluginManager;
     private Dispatcher rootDispatcher;
 
+    private String basePath;
+
     public void initialize () {
         StandardDirectories.initialize ();
 
@@ -36,6 +38,18 @@ public class Collap {
                 e.printStackTrace ();
             } */
             install ();
+        }
+
+        /* Read collap config. */
+        Properties properties = new Properties ();
+        try {
+            properties.load (new FileInputStream (new File (StandardDirectories.config, "collap.properties")));
+            basePath = properties.getProperty ("basePath");
+            /* Put trailing slashes. */
+            if (!basePath.startsWith ("/")) basePath = "/" + basePath;
+            if (!basePath.endsWith ("/")) basePath = basePath + "/";
+        } catch (IOException e) {
+            logger.log (Level.SEVERE, "Error loading 'collap.properties': ", e);
         }
 
         /* Register plugins. */
@@ -55,16 +69,25 @@ public class Collap {
     private void install () {
         StandardDirectories.install ();
 
-        /* Copy the 'default' directory contents from the WAR. */
-        // TODO: Copy the whole directory.
-        /* Only copy the hibernate config if it was not created yet. */
-        File cpConfig = new File (StandardDirectories.config, "hibernate.properties");
+        // TODO: Copy the 'default' directory contents from the WAR.
+
+        /* Copy config files. */
+        copyConfigFile ("collap.properties");
+        copyConfigFile ("hibernate.properties");
+    }
+
+    /**
+     * Only copies the config file if it was not created yet.
+     */
+    private void copyConfigFile (String name) {
+        File cpConfig = new File (StandardDirectories.config, name);
         if (!cpConfig.exists ()) {
+            ClassLoader classLoader = Thread.currentThread ().getContextClassLoader (); /* getClass ()... does not work! */
             try {
-                FileUtils.copy (getClass ().getResourceAsStream ("/default/config/hibernate.properties"),
+                FileUtils.copy (classLoader.getResourceAsStream ("default/config/" + name),
                         new FileOutputStream (cpConfig));
             } catch (IOException e) {
-                logger.severe ("Could not copy the default hibernate.properties file!");
+                logger.severe ("Could not copy '" + name + "'!");
                 e.printStackTrace ();
             }
         }
@@ -84,9 +107,9 @@ public class Collap {
                 plugin.configureHibernate (cfg);
             }
 
-            StandardServiceRegistryBuilder ssrb = new StandardServiceRegistryBuilder ();
-            ssrb.applySettings (cfg.getProperties ());
-            StandardServiceRegistry registry = ssrb.build ();
+            StandardServiceRegistryBuilder standardServiceRegistryBuilder = new StandardServiceRegistryBuilder ();
+            standardServiceRegistryBuilder.applySettings (cfg.getProperties ());
+            StandardServiceRegistry registry = standardServiceRegistryBuilder.build ();
             sessionFactory = cfg.buildSessionFactory (registry);
         }catch (Exception e) {
             logger.log (Level.SEVERE, "Error: ", e);
@@ -109,4 +132,7 @@ public class Collap {
         return rootDispatcher;
     }
 
+    public String getBasePath () {
+        return basePath;
+    }
 }

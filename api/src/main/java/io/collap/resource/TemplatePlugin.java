@@ -29,6 +29,10 @@ public abstract class TemplatePlugin extends Plugin {
         String path = new File (StandardDirectories.resourceCache, name + "/template").getAbsolutePath ();
         FileTemplateLoader loader = new FileTemplateLoader (FileUtils.appendDirectorySeparator (path), "UTF-8");
         jadeConfiguration.setTemplateLoader (loader);
+
+        /* Set shared variables. */
+        Map<String, Object> defaultModel = jadeConfiguration.getSharedVariables ();
+        defaultModel.put ("basePath", collap.getBasePath ());
     }
 
     public String renderTemplate (String name) throws IOException {
