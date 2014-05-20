@@ -1,5 +1,6 @@
 package io.collap.resource;
 
+import com.esotericsoftware.yamlbeans.YamlReader;
 import io.collap.Collap;
 import io.collap.StandardDirectories;
 import io.collap.util.FileUtils;
@@ -7,12 +8,11 @@ import io.collap.util.FileUtils;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Properties;
+import java.util.*;
 import java.util.jar.JarFile;
 import java.util.jar.JarInputStream;
 import java.util.logging.Logger;
@@ -50,30 +50,27 @@ public class PluginManager {
      * @return Whether the file was registered as a plugin.
      */
     public boolean registerFile (File file) {
-        /* Check if plugin with the name is already registered. */
-        String fileName = file.getName ();
-        int extensionStart = fileName.lastIndexOf ('.');
-        String pluginName = fileName.substring (0, extensionStart);
-        if (plugins.containsKey (pluginName)) {
-            logger.severe ("Plugin '" + pluginName + "' is already registered");
-            return false;
-        }
-
         /* Load the plugin config from the jar file. */
         String mainClassName = null;
+        String pluginName = null;
+        List<String> dependencies = null;
         JarFile pluginJar = null;
         {
             InputStream stream = null;
             try {
                 pluginJar = new JarFile (file);
-                ZipEntry entry = pluginJar.getEntry ("plugin.properties");
+                ZipEntry entry = pluginJar.getEntry ("plugin.yaml");
                 if (entry == null) {
                     return false;
                 }
                 stream = pluginJar.getInputStream (entry);
-                Properties properties = new Properties ();
-                properties.load (stream);
-                mainClassName = properties.getProperty ("mainClass");
+
+                YamlReader reader = new YamlReader (new InputStreamReader (stream));
+                Map<String, Object> values = (Map<String, Object>) reader.read ();
+
+                mainClassName = (String) values.get ("mainClass");
+                pluginName = (String) values.get ("name");
+                dependencies = (List<String>) values.get ("dependencies"); /* Note: May be null! */
             } catch (IOException e) {
                 e.printStackTrace ();
             } finally {
@@ -89,6 +86,13 @@ public class PluginManager {
 
         /* Jar file is not a valid plugin. */
         if (mainClassName == null) return false;
+        if (pluginName == null) return false;
+
+        /* Check if plugin with the name is already registered. */
+        if (plugins.containsKey (pluginName)) {
+            logger.severe ("Plugin '" + pluginName + "' is already registered");
+            return false;
+        }
 
         /* Load the main class from the jar.
          * Although the classes are in the classpath we need a plugin instance. */
@@ -127,6 +131,7 @@ public class PluginManager {
         Plugin plugin = (Plugin) obj;
         plugin.setName (pluginName);
         plugin.setCollap (collap);
+        if (dependencies != null) plugin.setDependencies (dependencies);
         register (plugin);
 
         /* Populate the resource cache. */
@@ -157,7 +162,6 @@ public class PluginManager {
     }
 
     public void initializeAllPlugins () {
-        // TODO: Clarify order of initialization and provide a method to affect this order (implicit or explicit).
         for (Plugin plugin : plugins.values ()) {
             plugin.initializeWithCheck ();
         }
