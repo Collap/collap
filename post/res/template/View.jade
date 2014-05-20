@@ -11,7 +11,7 @@
 
 h1= post.title
 p Published on #{formattedPublishingDate}. Last edit: #{formattedLastEdit}.
-p= post.content
+div!= post.compiledContent
 p Written by
   a(href=basePath + "user/profile/" + author.id) #{author.username}
   | .

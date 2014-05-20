@@ -41,7 +41,7 @@ public class PostPlugin extends TemplatePlugin {
                             .list ();
                     session.close ();
 
-                    List<Post> posts = new ArrayList<Post> ();
+                    List<Post> posts = new ArrayList<> ();
                     for (Object[] row : rows) {
                         Post post = new Post ();
                         post.setId ((Long) row[0]);

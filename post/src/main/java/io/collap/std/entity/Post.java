@@ -19,6 +19,7 @@ public class Post {
     private Date lastEdit;
     private String title;
     private String content;
+    private String compiledContent;
 
     public Post () {
 
@@ -73,6 +74,14 @@ public class Post {
 
     public void setContent (String content) {
         this.content = content;
+    }
+
+    public String getCompiledContent () {
+        return compiledContent;
+    }
+
+    public void setCompiledContent (String compiledContent) {
+        this.compiledContent = compiledContent;
     }
 
 }

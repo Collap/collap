@@ -4,6 +4,7 @@ import io.collap.controller.TemplateController;
 import io.collap.resource.TemplatePlugin;
 import io.collap.std.entity.Post;
 import io.collap.std.entity.User;
+import io.collap.std.markdown.MarkdownPlugin;
 import io.collap.std.post.util.PostUtil;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -101,6 +102,9 @@ public class Edit extends TemplateController {
         post.setTitle (request.getParameter ("title"));
         post.setContent (request.getParameter ("content"));
         post.setLastEdit (now);
+
+        MarkdownPlugin markdownPlugin = (MarkdownPlugin) plugin.getCollap ().getPluginManager ().getPlugins ().get ("std-markdown");
+        post.setCompiledContent (markdownPlugin.convertMarkdownToHTML (post.getContent ()));
 
         /* Update post. */
         Session session = plugin.getCollap ().getSessionFactory ().openSession ();
