@@ -9,8 +9,6 @@ import java.util.zip.ZipInputStream;
 
 public class FileUtils {
 
-    private static final Logger logger = Logger.getLogger (FileUtils.class.getName ());
-
     public static String appendDirectorySeparator (String path) {
         char lastChar = path.charAt (path.length () - 1);
         if (lastChar != '/' && lastChar != '\\') {
@@ -38,19 +36,14 @@ public class FileUtils {
             return;
         }
 
-        Logger logger = Logger.getLogger (FileUtils.class.toString ());
-
         boolean anyExtension = expectedFileExtension.isEmpty ();
         final File[] directoryFiles = directory.listFiles ();
-        logger.severe ("" + directoryFiles.length);
         for (int i = 0; i < directoryFiles.length; ++i) {
             File file = directoryFiles[i];
-            logger.severe (file.getAbsolutePath ());
             if (file.isDirectory ()) {
                 crawlDirectory (file, expectedFileExtension, files);
             }else {
                 String extension = FileUtils.getFileExtension (file.getName ());
-                logger.severe (extension);
                 if (anyExtension || extension.equals (expectedFileExtension)) {
                     files.add (file);
                 }
