@@ -1,6 +1,5 @@
 package io.collap.std.user;
 
-import io.collap.controller.Controller;
 import io.collap.controller.Dispatcher;
 import io.collap.resource.TemplatePlugin;
 import io.collap.std.entity.User;
@@ -13,17 +12,19 @@ import org.hibernate.cfg.Configuration;
 public class UserPlugin extends TemplatePlugin {
 
     private Validator validator;
+    private Profile profilePage;
 
     @Override
     public void initialize () {
         super.initialize ();
 
         validator = new Validator ();
+        profilePage = new Profile (this);
 
         Dispatcher userDispatcher = new Dispatcher ();
         userDispatcher.registerController ("register", new Register (this));
         userDispatcher.registerController ("login", new Login (this));
-        userDispatcher.registerController ("profile", new Profile (this));
+        userDispatcher.registerController ("profile", profilePage);
         collap.getRootDispatcher ().registerController ("user", userDispatcher);
     }
 
@@ -39,6 +40,10 @@ public class UserPlugin extends TemplatePlugin {
 
     public Validator getValidator () {
         return validator;
+    }
+
+    public Profile getProfilePage () {
+        return profilePage;
     }
 
 }

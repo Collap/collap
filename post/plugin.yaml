@@ -1,0 +1,5 @@
+name: post
+mainClass: io.collap.std.post.PostPlugin
+dependencies:
+  - user
+  - markdown

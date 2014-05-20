@@ -9,7 +9,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -18,8 +20,24 @@ import java.util.Map;
  */
 public class Profile extends TemplateController {
 
+    public interface Section {
+
+        // TODO: Sorting could be done in a tiered alphabetic system (tier id before name).
+
+        public String getSectionContent (User user);
+
+        /**
+         * Sections are sorted with the name in alphabetic order.
+         */
+        public String getName ();
+
+    }
+
+    private List<Section> sections;
+
     public Profile (TemplatePlugin plugin) {
         super (plugin);
+        sections = new ArrayList<> ();
     }
 
     @Override
@@ -56,10 +74,40 @@ public class Profile extends TemplateController {
         response.getWriter ().write ("User not found.");
     }
 
+    public class SectionContent {
+
+        private String name;
+        private String content;
+
+        private SectionContent (String name, String content) {
+            this.name = name;
+            this.content = content;
+        }
+
+        public String getName () {
+            return name;
+        }
+
+        public String getContent () {
+            return content;
+        }
+
+    }
+
     public void displayUser (User user, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        List<SectionContent> sectionContents = new ArrayList<> ();
+        for (Section section : sections) {
+            sectionContents.add (new SectionContent (section.getName (), section.getSectionContent (user)));
+        }
+
         Map<String, Object> model = new HashMap<> ();
         model.put ("user", user);
+        model.put ("sections", sectionContents);
         plugin.renderAndWriteTemplate ("Profile", model, response.getWriter ());
+    }
+
+    public void addSection (Section section) {
+        sections.add (section);
     }
 
 }

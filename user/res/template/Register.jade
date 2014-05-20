@@ -4,7 +4,7 @@ html
     title Register
   body
     h2 Register
-    form(name="register", action="register", method="post")
+    form(name="register", action=basePath + "user/register", method="post")
       label(for="username") Username:
       input(type="text", id="username", name="username")
 

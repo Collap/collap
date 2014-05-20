@@ -1,0 +1,17 @@
+//-
+  | Mandatory:
+  |   post: Post
+  |     The viewed post.
+  |   author: User
+  |     The author of the post.
+  |   formattedPublishingDate: String
+  |     The publishing date of the post, properly formatted.
+  |   formattedLastEdit: String
+  |     The last edit of the post, properly formatted.
+
+h1= post.title
+p Published on #{formattedPublishingDate}. Last edit: #{formattedLastEdit}.
+p= post.content
+p Written by
+  a(href=basePath + "user/profile/" + author.id) #{author.username}
+  | .

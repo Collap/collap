@@ -4,6 +4,7 @@ import io.collap.controller.TemplateController;
 import io.collap.resource.TemplatePlugin;
 import io.collap.std.entity.Post;
 import io.collap.std.entity.User;
+import io.collap.std.post.util.PostUtil;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -40,7 +41,7 @@ public class Edit extends TemplateController {
         }
 
         if (type == Type.get) {
-            Post post = getPostFromDatabaseOrCreate (remainingPath, request);
+            Post post = PostUtil.getPostFromDatabase (plugin.getCollap (), remainingPath, true);
             if (post != null) {
                 User author = (User) session.getAttribute ("user");
                 if (post.getId () == -1 || author.getId () == post.getAuthorId ()) {
@@ -57,27 +58,6 @@ public class Edit extends TemplateController {
         }else if (type == Type.post) {
             editPost (request, response);
         }
-    }
-
-    private Post getPostFromDatabaseOrCreate (String remainingPath, HttpServletRequest request) {
-        long id = -1;
-        try {
-            id = Long.parseLong (remainingPath);
-        } catch (NumberFormatException ex) {
-            /* Expected. */
-        }
-
-        if (id == -1) { /* Post not found. */
-            Post post = new Post ();
-            post.setId (-1L);
-            return post;
-        }
-
-        /* Fetch post from DB. */
-        Session session = plugin.getCollap ().getSessionFactory ().openSession ();
-        Post post = (Post) session.createQuery ("from Post as post where post.id = ?").setLong (0, id).uniqueResult ();
-        session.close ();
-        return post;
     }
 
     private void editPost (HttpServletRequest request, HttpServletResponse response) throws IOException {

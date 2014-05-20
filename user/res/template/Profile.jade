@@ -1,7 +1,9 @@
 //-
   | Mandatory:
   |   user: User
-  |   The User this profile belongs to.
+  |     The User this profile belongs to.
+  |   sections: List<Profile.SectionContent>
+  |     A list of sections that are displayed on the user profile page.
 
 !!! 5
 html
@@ -9,3 +11,9 @@ html
     title= user.username
   body
     h1= user.username
+
+    each section in sections
+      div
+        h2= section.name
+        span!= section.content
+

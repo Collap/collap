@@ -12,6 +12,7 @@ import java.util.Date;
 @Table(name = "posts")
 public class Post {
 
+    /* Table fields. */
     private Long id;
     private Long authorId; // TODO: Allow multiple authors? After all, it's called COLLABORATION.
     private Date publishingDate;

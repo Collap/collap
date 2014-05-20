@@ -1,7 +1,7 @@
 //-
   | Optional:
   |   errors: List<String>
-  |   A list of errors to be displayed above the login form.
+  |     A list of errors to be displayed above the login form.
 
 !!! 5
 html
@@ -20,7 +20,7 @@ html
       each error in errors
         p(class="error")= error
 
-    form(name="login", action="login", method="post")
+    form(name="login", action=basePath + "user/login", method="post")
       label(for="username") Username:
       input(type="text", id="username", name="username")
 
