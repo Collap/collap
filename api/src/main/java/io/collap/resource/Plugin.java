@@ -4,8 +4,11 @@ import io.collap.Collap;
 import org.hibernate.cfg.Configuration;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 public abstract class Plugin {
+
+    private static final Logger logger = Logger.getLogger (Plugin.class.getName ());
 
     private boolean initialized = false;
     private List<String> dependencies = null;
@@ -22,6 +25,8 @@ public abstract class Plugin {
                     Plugin plugin = collap.getPluginManager ().getPlugins ().get (dependencyName);
                     if (plugin != null) {
                         plugin.initializeWithCheck ();
+                    }else {
+                        logger.warning ("Plugin '" + name + "': " + "Dependency '" + dependencyName + "' not found!");
                     }
                 }
             }
