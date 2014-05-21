@@ -2,7 +2,6 @@ package io.collap.std.post.util;
 
 import io.collap.Collap;
 import io.collap.std.entity.Post;
-import org.hibernate.Session;
 
 public class PostUtil {
 
@@ -21,16 +20,10 @@ public class PostUtil {
                 post.setId (-1L);
             }
         }else {
-            /* Fetch post from DB. */
-            Session session = collap.getSessionFactory ().openSession ();
-            post = (Post) session.createQuery ("from Post as post where post.id = ?").setLong (0, id).uniqueResult ();
-            session.close ();
+            post = collap.getTransactionHelper ().load (id, Post.class);
         }
+
         return post;
     }
-
-
-
-
 
 }

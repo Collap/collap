@@ -61,9 +61,7 @@ public class Profile extends TemplateController {
                 }
             }
         }else { /* Fetch user from DB. */
-            Session session = plugin.getCollap ().getSessionFactory ().openSession ();
-            User user = (User) session.createQuery ("from User as user where user.id = ?").setLong (0, id).uniqueResult ();
-            session.close ();
+            User user = plugin.getCollap ().getTransactionHelper ().load (id, User.class);
             if (user != null) {
                 displayUser (user, request, response);
                 return;

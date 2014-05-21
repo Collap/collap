@@ -6,9 +6,7 @@ import io.collap.std.entity.Post;
 import io.collap.std.entity.User;
 import io.collap.std.markdown.MarkdownPlugin;
 import io.collap.std.post.util.PostUtil;
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
+import io.collap.util.TransactionHelper;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -74,6 +72,7 @@ public class Edit extends TemplateController {
         /* Note: It is assumed that a check whether a user is logged in already passed. */
         User author = (User) request.getSession ().getAttribute ("user");
 
+        TransactionHelper transactionHelper = plugin.getCollap ().getTransactionHelper ();
         Date now = new Date ();
         Post post = null;
         boolean update = false;
@@ -82,16 +81,14 @@ public class Edit extends TemplateController {
             post.setAuthorId (author.getId ());
             post.setPublishingDate (now);
         }else {
-            Session session = plugin.getCollap ().getSessionFactory ().openSession ();
-            post = (Post) session.createQuery ("from Post as post where post.id = ?").setLong (0, id).uniqueResult ();
-            session.close ();
+            post = transactionHelper.load (id, Post.class);
             if (post == null) {
                 response.getWriter ().write ("Post to edit could not be found!");
                 return;
             }
 
             /* Validate author. */
-            if (post.getAuthorId () != author.getId ()) {
+            if (!post.getAuthorId ().equals (author.getId ())) {
                 response.getWriter ().write ("Insufficient rights to edit the post!");
                 return;
             }
@@ -107,24 +104,17 @@ public class Edit extends TemplateController {
         post.setCompiledContent (markdownPlugin.convertMarkdownToHTML (post.getContent ()));
 
         /* Update post. */
-        Session session = plugin.getCollap ().getSessionFactory ().openSession ();
-        Transaction transaction = null;
-        try {
-            transaction = session.beginTransaction ();
-            if (update) {
-                session.update (post);
-            }else {
-                session.save (post);
-            }
-            transaction.commit ();
+        boolean success;
+        if (update) {
+            success = transactionHelper.update (post);
+        }else {
+            success = transactionHelper.save (post);
+        }
+
+        if (success) {
             response.getWriter ().write ("Post successfully created or updated!");
-        } catch (HibernateException ex) {
-            if (transaction != null) {
-                transaction.rollback ();
-            }
+        }else {
             response.getWriter ().write ("An error occurred while creating or updating the post!");
-        } finally {
-            session.close ();
         }
     }
 

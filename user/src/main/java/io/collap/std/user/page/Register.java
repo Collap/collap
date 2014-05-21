@@ -6,9 +6,8 @@ import io.collap.std.entity.User;
 import io.collap.std.user.UserPlugin;
 import io.collap.std.user.util.Validator;
 import io.collap.util.PasswordHash;
-import org.hibernate.HibernateException;
+import io.collap.util.TransactionHelper;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -87,29 +86,14 @@ public class Register extends TemplateController {
         }
 
         /* Commit new user to the database. */
-        boolean success = true;
-        {
-            Session session = plugin.getCollap ().getSessionFactory ().openSession ();
-            Transaction transaction = null;
-            try {
-                transaction = session.beginTransaction ();
-                session.save (newUser);
-                transaction.commit ();
-            } catch (HibernateException ex) {
-                if (transaction != null) {
-                    transaction.rollback ();
-                }
-                registerError ("An unexpected error occurred while saving the newly created user object. Please try again.", response);
-                success = false;
-            } finally {
-                session.close ();
-            }
-        }
-
+        TransactionHelper transactionHelper = plugin.getCollap ().getTransactionHelper ();
+        boolean success = transactionHelper.save (newUser);
         removeReservedUsernameFromList (username);
 
         if (success) {
             response.getWriter ().write ("User " + username + " created!");
+        }else {
+            registerError ("An unexpected error occurred while saving the newly created user object. Please try again.", response);
         }
     }
 

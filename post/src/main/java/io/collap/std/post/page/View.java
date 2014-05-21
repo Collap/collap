@@ -5,7 +5,6 @@ import io.collap.resource.TemplatePlugin;
 import io.collap.std.entity.Post;
 import io.collap.std.entity.User;
 import io.collap.std.post.util.PostUtil;
-import org.hibernate.Session;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -34,9 +33,7 @@ public class View extends TemplateController {
         }
 
         /* Get author. */
-        Session session = plugin.getCollap ().getSessionFactory ().openSession ();
-        User author = (User) session.createQuery ("from User as user where user.id = ?").setLong (0, post.getAuthorId ()).uniqueResult ();
-        session.close ();
+        User author = plugin.getCollap ().getTransactionHelper ().load (post.getAuthorId (), User.class);
         if (author == null) {
             response.getWriter ().write ("Author not found!");
             return; // TODO: When the author is null, use a "unknown" dummy object instead, so the post is still viewable.
