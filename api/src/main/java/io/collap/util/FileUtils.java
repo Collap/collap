@@ -2,7 +2,6 @@ package io.collap.util;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
