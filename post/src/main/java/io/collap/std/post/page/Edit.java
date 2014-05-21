@@ -2,6 +2,7 @@ package io.collap.std.post.page;
 
 import io.collap.controller.TemplateController;
 import io.collap.resource.TemplatePlugin;
+import io.collap.std.entity.Category;
 import io.collap.std.entity.Post;
 import io.collap.std.entity.User;
 import io.collap.std.markdown.MarkdownPlugin;
@@ -12,9 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * GET:
@@ -46,6 +45,24 @@ public class Edit extends TemplateController {
                 if (post.getId () == -1 || author.getId () == post.getAuthorId ()) {
                     Map<String, Object> model = new HashMap<> ();
                     model.put ("post", post);
+                    List<Category> categories = new ArrayList<> ();
+                    Category category1 = new Category ();
+                    category1.setId (1L);
+                    category1.setName ("Foo");
+                    categories.add (category1);
+                    Category category2 = new Category ();
+                    category2.setId (2L);
+                    category2.setName ("Bar");
+                    categories.add (category2);
+                    model.put ("categories", categories);
+                    String categoryString = "";
+                    for (Category category : categories) {
+                        if (!categoryString.isEmpty ()) {
+                            categoryString += ",";
+                        }
+                        categoryString += category.getName ();
+                    }
+                    model.put ("categoryString", categoryString);
                     plugin.renderAndWriteTemplate ("Edit", model, response.getWriter ());
                 }else {
                     response.getWriter ().write ("Insufficient editing permissions!");
@@ -61,7 +78,7 @@ public class Edit extends TemplateController {
 
     private void editPost (HttpServletRequest request, HttpServletResponse response) throws IOException {
         // TODO: Possible validation.
-        long id = -1;
+        long id;
         try {
             id = Long.parseLong (request.getParameter ("id"));
         } catch (NumberFormatException ex) {

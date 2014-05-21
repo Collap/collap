@@ -15,6 +15,7 @@ public class Post {
     /* Table fields. */
     private Long id;
     private Long authorId; // TODO: Allow multiple authors? After all, it's called COLLABORATION.
+    private Long categoryId;
     private Date publishingDate;
     private Date lastEdit;
     private String title;
