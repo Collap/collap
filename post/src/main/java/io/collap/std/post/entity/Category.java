@@ -15,6 +15,16 @@ public class Category {
 
     }
 
+    /**
+     * Creates an empty category that has not been added to the database yet.
+     */
+    public static Category createTransientCategory () {
+        Category category = new Category ();
+        category.setId (-1L);
+        category.setName ("");
+        return category;
+    }
+
     @Id
     @GeneratedValue(generator = "increment")
     @GenericGenerator(name = "increment", strategy = "increment")

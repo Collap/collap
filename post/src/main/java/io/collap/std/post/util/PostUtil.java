@@ -1,30 +1,24 @@
 package io.collap.std.post.util;
 
-import io.collap.std.post.entity.Category;
 import io.collap.std.post.entity.Post;
+import io.collap.util.ParseUtils;
 import org.hibernate.Session;
-
-import java.util.HashSet;
 
 public class PostUtil {
 
     public static Post getPostFromDatabaseOrCreate (Session session, String remainingPath, boolean create) {
-        long id = -1;
-        try {
-            id = Long.parseLong (remainingPath);
-        } catch (NumberFormatException ex) {
-            /* Expected. */
+        Long id = ParseUtils.parseLong (remainingPath);
+        if (id == null) {
+            id = -1L;
         }
 
         Post post = null;
-        if (id == -1) { /* Post not found. */
+        if (id.equals (-1L)) { /* Post not found. */
             if (create) {
-                post = new Post ();
-                post.setId (-1L);
-                post.setCategories (new HashSet<Category> ());
+                post = Post.createTransientPost ();
             }
         }else {
-            post = (Post) session.load (Post.class, id);
+            post = (Post) session.get (Post.class, id);
         }
 
         return post;

@@ -33,6 +33,7 @@ public class EditPost extends TemplateController {
 
     @Override
     public void execute (String remainingPath, Request request, Response response) throws IOException {
+        // TODO: Perform this permission check as method/annotation (See collap-core TODO).
         HttpSession httpSession = request.getHttpRequest ().getSession ();
         if (httpSession == null || httpSession.getAttribute ("user") == null) {
             response.getWriter ().write ("You need to be logged in!");
@@ -73,10 +74,8 @@ public class EditPost extends TemplateController {
 
     private void editPost (Session session, Request request, Response response) throws IOException {
         // TODO: Possible validation.
-        long id;
-        try {
-            id = Long.parseLong (request.getHttpRequest ().getParameter ("id"));
-        } catch (NumberFormatException ex) {
+        Long id = request.getLongParameter ("id");
+        if (id == null) {
             response.getWriter ().write ("Hidden 'id' input field supplied a wrong number!");
             return;
         }
@@ -86,14 +85,15 @@ public class EditPost extends TemplateController {
 
         Date now = new Date ();
         Post post;
-        if (id == -1) { /* Create new post! */
+        if (id.equals (-1L)) { /* Create new post! */
             post = new Post ();
+            post.setCategories (new HashSet<Category> ());
             post.setAuthor (author);
             post.setPublishingDate (now);
         }else {
             post = (Post) session.get (Post.class, id);
             if (post == null) {
-                response.getWriter ().write ("Post to edit could not be found!");
+                response.getWriter ().write ("Post could not be found!");
                 return;
             }
 

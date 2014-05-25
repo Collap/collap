@@ -5,13 +5,16 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 @Table(name = "posts")
 public class Post {
 
-    /* Table fields. */
+    /**
+     * An ID of -1 indicates a post that has not been added to the database yet.
+     */
     private Long id;
     private User author; // TODO: Allow multiple authors? After all, it's called COLLABORATION.
     private Set<Category> categories;
@@ -23,6 +26,18 @@ public class Post {
 
     public Post () {
 
+    }
+
+    /**
+     * Creates an empty post that has not been added to the database yet and is associated with no authors.
+     */
+    public static Post createTransientPost () {
+        Post post = new Post ();
+        post.setId (-1L);
+        post.setCategories (new HashSet<Category> ());
+        post.setTitle ("");
+        post.setContent ("");
+        return post;
     }
 
     @Id
