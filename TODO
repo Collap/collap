@@ -3,3 +3,7 @@
 - Markdown Editor:
   - Custom tags (addable by every plugin) like <wowhead item="1234" />
   - The editor should have a plain text editing field and a preview, but also buttons to add custom tags.
+- Core:
+  - Filters that wrap around controllers (for example to implement a main page).
+  - Section content on some pages supplied by other controllers (see Posts section on user profile page)
+  - General permission management and access restriction on a per-controller base (Possibly with annotations?)
