@@ -1,4 +1,4 @@
-package io.collap.std.entity;
+package io.collap.std.user.entity;
 
 import org.hibernate.annotations.GenericGenerator;
 

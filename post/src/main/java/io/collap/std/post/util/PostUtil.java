@@ -1,11 +1,14 @@
 package io.collap.std.post.util;
 
-import io.collap.Collap;
-import io.collap.std.entity.Post;
+import io.collap.std.post.entity.Category;
+import io.collap.std.post.entity.Post;
+import org.hibernate.Session;
+
+import java.util.HashSet;
 
 public class PostUtil {
 
-    public static Post getPostFromDatabase (Collap collap, String remainingPath, boolean create) {
+    public static Post getPostFromDatabaseOrCreate (Session session, String remainingPath, boolean create) {
         long id = -1;
         try {
             id = Long.parseLong (remainingPath);
@@ -18,9 +21,10 @@ public class PostUtil {
             if (create) {
                 post = new Post ();
                 post.setId (-1L);
+                post.setCategories (new HashSet<Category> ());
             }
         }else {
-            post = collap.getTransactionHelper ().load (id, Post.class);
+            post = (Post) session.load (Post.class, id);
         }
 
         return post;

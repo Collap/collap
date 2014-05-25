@@ -1,0 +1,17 @@
+//-
+  | Mandatory:
+  |   category: Category
+  |     The category that is edited.
+  |     An id of -1 indicates a non-existent category that will be newly created.
+
+h1 Edit Category
+
+form(name="edit", action=basePath + "post/category/edit", method="post")
+  input(type="hidden", name="id", value=category.id)
+
+  label(for="name") Name:
+  input(type="text", name="name", value=category.name)
+
+  br
+
+  input(type="submit", value="Edit")

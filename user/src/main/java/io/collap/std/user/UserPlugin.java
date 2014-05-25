@@ -2,7 +2,7 @@ package io.collap.std.user;
 
 import io.collap.controller.Dispatcher;
 import io.collap.resource.TemplatePlugin;
-import io.collap.std.entity.User;
+import io.collap.std.user.entity.User;
 import io.collap.std.user.page.Login;
 import io.collap.std.user.page.Profile;
 import io.collap.std.user.page.Register;
@@ -21,7 +21,7 @@ public class UserPlugin extends TemplatePlugin {
         validator = new Validator ();
         profilePage = new Profile (this);
 
-        Dispatcher userDispatcher = new Dispatcher ();
+        Dispatcher userDispatcher = new Dispatcher (collap);
         userDispatcher.registerController ("register", new Register (this));
         userDispatcher.registerController ("login", new Login (this));
         userDispatcher.registerController ("profile", profilePage);

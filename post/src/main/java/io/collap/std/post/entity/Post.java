@@ -1,12 +1,11 @@
-package io.collap.std.entity;
+package io.collap.std.post.entity;
 
+import io.collap.std.user.entity.User;
 import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Date;
+import java.util.Set;
 
 @Entity
 @Table(name = "posts")
@@ -14,8 +13,8 @@ public class Post {
 
     /* Table fields. */
     private Long id;
-    private Long authorId; // TODO: Allow multiple authors? After all, it's called COLLABORATION.
-    private Long categoryId;
+    private User author; // TODO: Allow multiple authors? After all, it's called COLLABORATION.
+    private Set<Category> categories;
     private Date publishingDate;
     private Date lastEdit;
     private String title;
@@ -37,12 +36,27 @@ public class Post {
         this.id = id;
     }
 
-    public Long getAuthorId () {
-        return authorId;
+    // TODO: Eager loading to improve performance?
+    // TODO: The author may be nonexistent (After account deletion for example).
+    //       Use an "unknown" dummy object instead, so posts are still viewable.
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "authorId")
+    public User getAuthor () {
+        return author;
     }
 
-    public void setAuthorId (Long authorId) {
-        this.authorId = authorId;
+    public void setAuthor (User author) {
+        this.author = author;
+    }
+
+    @ManyToMany /* Note: No cascade here. Categories are saved separately. */
+    @JoinTable(name = "post_category_links")
+    public Set<Category> getCategories () {
+        return categories;
+    }
+
+    public void setCategories (Set<Category> categories) {
+        this.categories = categories;
     }
 
     public String getTitle () {

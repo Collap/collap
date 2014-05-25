@@ -1,11 +1,8 @@
-package io.collap.std.entity;
+package io.collap.std.post.entity;
 
 import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "post_categories")
@@ -29,6 +26,7 @@ public class Category {
         this.id = id;
     }
 
+    @Column(unique = true)
     public String getName () {
         return name;
     }

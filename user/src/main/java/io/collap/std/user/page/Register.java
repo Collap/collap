@@ -1,16 +1,15 @@
 package io.collap.std.user.page;
 
 import io.collap.controller.TemplateController;
+import io.collap.controller.communication.Request;
+import io.collap.controller.communication.Response;
 import io.collap.resource.TemplatePlugin;
-import io.collap.std.entity.User;
+import io.collap.std.user.entity.User;
 import io.collap.std.user.UserPlugin;
 import io.collap.std.user.util.Validator;
 import io.collap.util.PasswordHash;
-import io.collap.util.TransactionHelper;
 import org.hibernate.Session;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
@@ -31,23 +30,23 @@ public class Register extends TemplateController {
     }
 
     @Override
-    public void execute (Type type, String remainingPath, HttpServletRequest request, HttpServletResponse response) throws IOException {
-        if (type == Type.get) {
+    public void execute (String remainingPath, Request request, Response response) throws IOException {
+        if (request.getMethod () == Request.Method.get) {
             showRegistrationForm (request, response);
-        }else if (type == Type.post) {
+        }else if (request.getMethod () == Request.Method.post) {
             registerUser (request, response);
         }
     }
 
-    private void showRegistrationForm (HttpServletRequest request, HttpServletResponse response) throws IOException {
+    private void showRegistrationForm (Request request, Response response) throws IOException {
         plugin.renderAndWriteTemplate ("Register", response.getWriter ());
     }
 
-    private void registerUser (HttpServletRequest request, HttpServletResponse response) throws IOException {
+    private void registerUser (Request request, Response response) throws IOException {
         // TODO: Only register user when no user is currently logged in.
 
-        String username = request.getParameter ("username");
-        String password = request.getParameter ("password");
+        String username = request.getHttpRequest ().getParameter ("username");
+        String password = request.getHttpRequest ().getParameter ("password");
 
         Validator.ValidationResult userNameValidation = ((UserPlugin) plugin).getValidator ().validateUserName (username);
         if (!userNameValidation.passed) {
@@ -86,15 +85,10 @@ public class Register extends TemplateController {
         }
 
         /* Commit new user to the database. */
-        TransactionHelper transactionHelper = plugin.getCollap ().getTransactionHelper ();
-        boolean success = transactionHelper.save (newUser);
+        Session session = plugin.getCollap ().getSessionFactory ().getCurrentSession ();
+        session.persist (newUser);
         removeReservedUsernameFromList (username);
-
-        if (success) {
-            response.getWriter ().write ("User " + username + " created!");
-        }else {
-            registerError ("An unexpected error occurred while saving the newly created user object. Please try again.", response);
-        }
+        response.getWriter ().write ("User " + username + " created!");
     }
 
     /**
@@ -109,9 +103,10 @@ public class Register extends TemplateController {
                 return true;
             }
 
-            Session session = plugin.getCollap ().getSessionFactory ().openSession ();
-            User user = (User) session.createQuery ("from User as user where user.username = ?").setString (0, username).uniqueResult ();
-            session.close ();
+            Session session = plugin.getCollap ().getSessionFactory ().getCurrentSession ();
+            User user = (User) session
+                    .createQuery ("from User as user where user.username = :username")
+                    .setString ("username", username).uniqueResult ();
             if (user != null) {
                 return true;
             }
@@ -128,7 +123,7 @@ public class Register extends TemplateController {
         }
     }
 
-    private void registerError (String error, HttpServletResponse response) throws IOException {
+    private void registerError (String error, Response response) throws IOException {
         // TODO: Proper error response (Special field in user/Register.html)
         response.getWriter ().write (error);
     }

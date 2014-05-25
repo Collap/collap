@@ -3,7 +3,7 @@
   |   post: Post
   |     The post that is edited.
   |     May be empty (but not null) to allow creating new posts, in which case the id must be -1.
-  |   categories: List<Category>
+  |   categories: Set<Category>
   |     A list of categories associated with this post.
   |   categoryString: String
   |     A string of all categories, comma-separated.
@@ -31,7 +31,7 @@ html
 
       br
 
-      textarea(name="content")= post.content
+      textarea(name="content", rows="6", cols="50")= post.content
 
       br
 

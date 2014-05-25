@@ -1,12 +1,13 @@
 package io.collap.std.user.page;
 
 import io.collap.controller.TemplateController;
+import io.collap.controller.communication.HttpStatus;
+import io.collap.controller.communication.Request;
+import io.collap.controller.communication.Response;
 import io.collap.resource.TemplatePlugin;
-import io.collap.std.entity.User;
+import io.collap.std.user.entity.User;
 import org.hibernate.Session;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -22,6 +23,7 @@ public class Profile extends TemplateController {
 
     public interface Section {
 
+        // TODO: The controller API is perfect for this.
         // TODO: Sorting could be done in a tiered alphabetic system (tier id before name).
 
         public String getSectionContent (User user);
@@ -41,7 +43,7 @@ public class Profile extends TemplateController {
     }
 
     @Override
-    public void execute (Type type, String remainingPath, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void execute (String remainingPath, Request request, Response response) throws IOException {
         long id = -1;
         if (remainingPath.length () > 0) {
             try {
@@ -52,7 +54,7 @@ public class Profile extends TemplateController {
         }
 
         if (id == -1) { /* Display logged in user. */
-            HttpSession httpSession = request.getSession ();
+            HttpSession httpSession = request.getHttpRequest ().getSession ();
             if (httpSession != null) {
                 User user = (User) httpSession.getAttribute ("user");
                 if (user != null) {
@@ -61,7 +63,8 @@ public class Profile extends TemplateController {
                 }
             }
         }else { /* Fetch user from DB. */
-            User user = plugin.getCollap ().getTransactionHelper ().load (id, User.class);
+            Session session = plugin.getCollap ().getSessionFactory ().getCurrentSession ();
+            User user = (User) session.get (User.class, id);
             if (user != null) {
                 displayUser (user, request, response);
                 return;
@@ -69,7 +72,17 @@ public class Profile extends TemplateController {
         }
 
         /* Can't display any user. */
-        response.getWriter ().write ("User not found.");
+        response.setStatus (HttpStatus.notFound);
+    }
+
+    @Override
+    public boolean handleError (Request request, Response response) throws IOException {
+        if (response.getStatus () == HttpStatus.notFound) {
+            response.getWriter ().write ("User not found.");
+            return true;
+        }
+
+        return false;
     }
 
     public class SectionContent {
@@ -92,7 +105,7 @@ public class Profile extends TemplateController {
 
     }
 
-    public void displayUser (User user, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void displayUser (User user, Request request, Response response) throws IOException {
         List<SectionContent> sectionContents = new ArrayList<> ();
         for (Section section : sections) {
             sectionContents.add (new SectionContent (section.getName (), section.getSectionContent (user)));
