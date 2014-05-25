@@ -4,7 +4,6 @@ import io.collap.controller.Dispatcher;
 import io.collap.resource.Plugin;
 import io.collap.resource.PluginManager;
 import io.collap.util.FileUtils;
-import io.collap.util.TransactionHelper;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
@@ -20,7 +19,6 @@ public class Collap {
     private static final Logger logger = Logger.getLogger (Collap.class.getName ());
 
     private SessionFactory sessionFactory;
-    private TransactionHelper transactionHelper;
     private PluginManager pluginManager;
     private Dispatcher rootDispatcher;
 
@@ -59,9 +57,8 @@ public class Collap {
         pluginManager.registerDirectory (StandardDirectories.plugin);
 
         /* Miscellaneous initializations. */
-        rootDispatcher = new Dispatcher ();
+        rootDispatcher = new Dispatcher (this);
         initializeSessionFactory ();
-        transactionHelper = new TransactionHelper (this);
 
         /* Initialize plugins. */
         pluginManager.initializeAllPlugins ();
@@ -126,10 +123,6 @@ public class Collap {
 
     public SessionFactory getSessionFactory () {
         return sessionFactory;
-    }
-
-    public TransactionHelper getTransactionHelper () {
-        return transactionHelper;
     }
 
     public PluginManager getPluginManager () {

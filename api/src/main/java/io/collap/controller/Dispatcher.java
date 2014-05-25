@@ -1,15 +1,27 @@
 package io.collap.controller;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import io.collap.Collap;
+import io.collap.controller.communication.HttpStatus;
+import io.collap.controller.communication.Request;
+import io.collap.controller.communication.Response;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * The Dispatcher acts as a controller that dispatches the request to a sub-controller
  *   or a default controller.
  */
 public class Dispatcher extends Controller {
+
+    private static final Logger logger = Logger.getLogger (Dispatcher.class.getName ());
+
+    private Collap collap;
 
     private HashMap<String, Controller> controllers;
 
@@ -20,17 +32,13 @@ public class Dispatcher extends Controller {
      */
     private Controller defaultController;
 
-    public Dispatcher () {
-        this.defaultController = null;
-        init ();
+    public Dispatcher (Collap collap) {
+        this (collap, null);
     }
 
-    public Dispatcher (Controller defaultController) {
+    public Dispatcher (Collap collap, Controller defaultController) {
+        this.collap = collap;
         this.defaultController = defaultController;
-        init ();
-    }
-
-    private void init () {
         controllers = new HashMap<> ();
     }
 
@@ -40,22 +48,20 @@ public class Dispatcher extends Controller {
     }
 
     @Override
-    public void execute (Type type, String remainingPath, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void execute (String remainingPath, Request request, Response response) throws IOException {
         /* Extract the next controller name. */
         int substringEnd = -1;
-        {
-            int nextSlash = remainingPath.indexOf ('/'); /* Until next controller name. */
-            if (nextSlash >= 0) {
-                substringEnd = nextSlash;
+        int nextSlash = remainingPath.indexOf ('/'); /* Until next controller name. */
+        if (nextSlash >= 0) {
+            substringEnd = nextSlash;
+        }else {
+            int queryPos = remainingPath.indexOf ('?'); /* Until query string. */
+            if (queryPos >= 0) {
+                substringEnd = queryPos;
             }else {
-                int queryPos = remainingPath.indexOf ('?'); /* Until query string. */
-                if (queryPos >= 0) {
-                    substringEnd = queryPos;
-                }else {
-                    int fragmentPos = remainingPath.indexOf ('#'); /* Until fragment string. */
-                    if (fragmentPos >= 0) {
-                        substringEnd = fragmentPos;
-                    }
+                int fragmentPos = remainingPath.indexOf ('#'); /* Until fragment string. */
+                if (fragmentPos >= 0) {
+                    substringEnd = fragmentPos;
                 }
             }
         }
@@ -83,9 +89,15 @@ public class Dispatcher extends Controller {
 
         /* Execute the controller or throw a 404 error. */
         if (controller != null) {
-            controller.execute (type, remainingPath, request, response);
+            controller.execute (remainingPath, request, response);
+            if (response.getStatus () != HttpStatus.ok) {
+                if (controller.handleError (request, response)) {
+                    /* The error has been handled. */
+                    response.setStatus (HttpStatus.ok);
+                }
+            }
         }else {
-            response.sendError (404);
+            response.setStatus (HttpStatus.notFound);
         }
     }
 

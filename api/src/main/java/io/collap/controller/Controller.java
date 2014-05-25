@@ -1,16 +1,25 @@
 package io.collap.controller;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import io.collap.controller.communication.Request;
+import io.collap.controller.communication.Response;
+
 import java.io.IOException;
 
 public abstract class Controller {
 
-    public enum Type {
-        get,
-        post
-    }
+    /**
+     * When this method is called, it is guaranteed that a transaction is currently in action and the current session
+     * stored in the SessionFactory on a per-thread basis is active.
+     */
+    public abstract void execute (String remainingPath, Request request, Response response) throws IOException;
 
-    public abstract void execute (Type type, String remainingPath, HttpServletRequest request, HttpServletResponse response) throws IOException;
+    /**
+     * The Controller is given the opportunity to handle an error individually. If and only if 'false' is returned,
+     * the default error handling is executed (once the Dispatcher chain reaches the root).
+     * @return Whether the error was processed successfully.
+     */
+    public boolean handleError (Request request, Response response) throws IOException {
+        return false;
+    }
 
 }
