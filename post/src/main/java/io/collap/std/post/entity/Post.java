@@ -98,6 +98,7 @@ public class Post {
         this.lastEdit = lastEdit;
     }
 
+    @Column(columnDefinition="mediumtext")
     public String getContent () {
         return content;
     }
@@ -106,6 +107,7 @@ public class Post {
         this.content = content;
     }
 
+    @Column(columnDefinition="mediumtext")
     public String getCompiledContent () {
         return compiledContent;
     }
