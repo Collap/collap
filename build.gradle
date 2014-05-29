@@ -17,10 +17,19 @@ subprojects {
         mavenLocal ()
     }
 
+    configurations {
+        includedJars
+    }
+
     dependencies {
         compile 'collap-core:collap-api:0.1.1'
     }
-    
+
+    task copyDependencies (type: Copy) {
+        from configurations.includedJars
+        into "$rootDir/../lib"
+    }
+
     jar {
     	destinationDir = file ("$rootDir/../plugin")
         from ('res') {
