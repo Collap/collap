@@ -3,7 +3,6 @@ package io.collap.std.markdown;
 import org.parboiled.Action;
 import org.parboiled.Context;
 import org.parboiled.Rule;
-import org.parboiled.annotations.BuildParseTree;
 import org.parboiled.support.StringVar;
 import org.pegdown.Parser;
 import org.pegdown.PegDownProcessor;
@@ -14,7 +13,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-@BuildParseTree
 public class TagParser extends Parser implements InlinePluginParser {
 
     private static final String[] tagPrefixes = {

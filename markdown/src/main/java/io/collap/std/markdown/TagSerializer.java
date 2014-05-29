@@ -8,8 +8,11 @@ import org.pegdown.plugins.ToHtmlSerializerPlugin;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 public class TagSerializer implements ToHtmlSerializerPlugin {
+
+    private static final Logger logger = Logger.getLogger (TagSerializer.class.getName ());
 
     private MarkdownPlugin plugin;
 
@@ -31,9 +34,11 @@ public class TagSerializer implements ToHtmlSerializerPlugin {
         if (node.getPrefix ().equals ("wow")) {
             if (node.getName ().equals ("item")) {
                 try {
+                    long time = System.nanoTime ();
                     Map<String, Object> model = new HashMap<> ();
                     model.put ("attributes", node.getAttributes ());
                     printer.print (plugin.renderTemplate ("wowhead/ItemLink", model));
+                    logger.info ("Template execution took " + (System.nanoTime () - time) + "ns.");
                 } catch (IOException e) {
                     e.printStackTrace ();
                 }

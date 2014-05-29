@@ -2,10 +2,12 @@ package io.collap.std.markdown;
 
 import io.collap.resource.TemplatePlugin;
 import org.parboiled.Parboiled;
+import org.parboiled.parserunners.ProfilingParseRunner;
 import org.pegdown.LinkRenderer;
 import org.pegdown.Parser;
 import org.pegdown.PegDownProcessor;
 import org.pegdown.ToHtmlSerializer;
+import org.pegdown.ast.Node;
 import org.pegdown.ast.RootNode;
 import org.pegdown.plugins.PegDownPlugins;
 import org.pegdown.plugins.ToHtmlSerializerPlugin;
@@ -23,7 +25,8 @@ public class MarkdownPlugin extends TemplatePlugin {
      * TODO: Pool multiple Parsers and Serializers based on the expected demand.
      */
     private Parser parser;
-    private ToHtmlSerializer serializer;
+    private List<ToHtmlSerializerPlugin> serializerPlugins;
+    private ProfilingParseRunner<Node> parseRunner;
 
     @Override
     public void initialize () {
@@ -43,8 +46,11 @@ public class MarkdownPlugin extends TemplatePlugin {
 
         long time = System.nanoTime ();
         RootNode rootNode = parser.parse (prepareSource (markdown));
-        String html = serializer.toHtml (rootNode);
-        logger.info ("Markdown generation took " + (System.nanoTime () - time) + "ns.");
+        logger.info ("Parsing took " + (System.nanoTime () - time) + "ns.");
+        time = System.nanoTime ();
+        // TODO: The serializer needs to be recreated every time it is used to reset its state. This can possibly be optimized.
+        String html = new ToHtmlSerializer (new LinkRenderer (), serializerPlugins).toHtml (rootNode);
+        logger.info ("Printing took " + (System.nanoTime () - time) + "ns.");
         return html;
     }
 
@@ -59,9 +65,8 @@ public class MarkdownPlugin extends TemplatePlugin {
             Parser.DefaultParseRunnerProvider,
             parserPlugins
         );
-        List<ToHtmlSerializerPlugin> serializerPlugins = new ArrayList<> ();
+        serializerPlugins = new ArrayList<> ();
         serializerPlugins.add (new TagSerializer (this));
-        serializer = new ToHtmlSerializer (new LinkRenderer (), serializerPlugins);
     }
 
     /**
@@ -73,7 +78,7 @@ public class MarkdownPlugin extends TemplatePlugin {
      * @param sourceString the markdown source to process
      * @return the processed source
      */
-    public char[] prepareSource (String sourceString) {
+    private char[] prepareSource (String sourceString) {
         char[] source = sourceString.toCharArray ();
         char[] out = new char[source.length + 2];
         System.arraycopy (source, 0, out, 0, source.length);
