@@ -7,3 +7,5 @@
   - Filters that wrap around controllers (for example to implement a main page).
   - Section content on some pages supplied by other controllers (see Posts section on user profile page)
   - General permission management and access restriction on a per-controller base (Possibly with annotations?)
+- Post:
+  - Make it possible to create posts with cached content read from an unmanaged file.
