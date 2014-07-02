@@ -17,10 +17,21 @@ and put it inside the root directory.
 5. Download Gradle and put the 'gradle' command in your execution path. Just make sure you can execute it from the command line.
 6. Edit 'tomcat/conf/catalina.properties' and add `"${catalina.base}/collap/plugin/*.jar","${catalina.base}/collap/lib/*.jar"`
 to the 'common.loader' property.
-7. Make sure that the MySQL server is running.
+7. Make sure that the MySQL server is running and that you created a fresh database (Called 'collap' by default).
 8. Build and run collap once by executing 'scripts/run.sh'. The collap config files will be created.
 9. Specify the database login information in 'tomcat/collap/config/hibernate.properties'.
 10. Execute the run script again. Open a browser window and type in 'http://127.0.0.1:8080/collap'. This default URL is not changeable at this point of development (i.e. 'collap').
+
+
+
+
+## Connection to MySQL
+
+### Unix
+
+As the MySQL JDBC driver does not support *unix sockets*, on Unix you must allow an IP connection over a port.
+
+
 
 
 ## Development Directory Structure
