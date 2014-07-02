@@ -1,24 +1,54 @@
 package io.collap.controller.communication;
 
+import java.io.StringWriter;
 import java.io.Writer;
 
-public abstract class Response {
+public class Response {
+
+    protected Writer headWriter;
+    protected Writer contentWriter;
 
     private HttpStatus status;
 
     /** Applicable in case of an error. */
     private String statusMessage;
 
-    protected Response () {
+    public Response () {
         status = HttpStatus.ok;
         statusMessage = "";
     }
 
-    protected Response (HttpStatus status) {
+    public Response (HttpStatus status) {
         this.status = status;
     }
 
-    public abstract Writer getWriter ();
+    public Writer getHeadWriter () {
+        if (headWriter == null) {
+            headWriter = new StringWriter ();
+        }
+        return headWriter;
+    }
+
+    public String getHead () {
+        if (headWriter == null) {
+            return "";
+        }
+        return headWriter.toString ();
+    }
+
+    public Writer getContentWriter () {
+        if (contentWriter == null) {
+            contentWriter = new StringWriter ();
+        }
+        return contentWriter;
+    }
+
+    public String getContent () {
+        if (contentWriter == null) {
+            return "";
+        }
+        return contentWriter.toString ();
+    }
 
     public HttpStatus getStatus () {
         return status;

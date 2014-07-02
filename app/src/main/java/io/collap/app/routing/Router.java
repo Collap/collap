@@ -1,8 +1,6 @@
 package io.collap.app.routing;
 
 import io.collap.Collap;
-import io.collap.controller.Controller;
-import io.collap.controller.communication.HttpResponse;
 import io.collap.controller.communication.HttpStatus;
 import io.collap.controller.communication.Request;
 import io.collap.controller.communication.Response;
@@ -41,12 +39,14 @@ public class Router extends HttpServlet {
 
     private void dispatch (HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)  throws ServletException, IOException {
         Request request = new Request (httpServletRequest);
-        Response response = createResponse (httpServletResponse);
+        Response response = new Response ();
+        configureServletResponse (httpServletResponse);
 
         Session session = collap.getSessionFactory ().getCurrentSession ();
         Transaction transaction = session.beginTransaction ();
 
-        collap.getRootDispatcher ().execute (getRemainingRequestPart (httpServletRequest), request, response);
+        collap.getRootDispatcher ().execute (true, getRemainingRequestPart (httpServletRequest), request, response);
+        httpServletResponse.getWriter ().write (response.getContent ()); // TODO: Unnecessary copying.
 
         try {
             transaction.commit ();
@@ -64,7 +64,7 @@ public class Router extends HttpServlet {
         }
     }
 
-    private Response createResponse (HttpServletResponse httpServletResponse) {
+    private void configureServletResponse (HttpServletResponse httpServletResponse) {
         /* Configure HTTP Servlet response. */
         httpServletResponse.setContentType ("text/html;charset=UTF-8");
 
@@ -72,8 +72,6 @@ public class Router extends HttpServlet {
         httpServletResponse.setHeader ("Pragma", "no-cache");
         httpServletResponse.setHeader ("Cache-Control", "no-cache");
         httpServletResponse.setDateHeader ("Expires", 0);
-
-        return new HttpResponse (httpServletResponse);
     }
 
     private String getRemainingRequestPart (HttpServletRequest request) {

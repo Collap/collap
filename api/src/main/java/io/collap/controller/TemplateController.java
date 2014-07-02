@@ -2,7 +2,7 @@ package io.collap.controller;
 
 import io.collap.resource.TemplatePlugin;
 
-public abstract class TemplateController extends Controller {
+public abstract class TemplateController extends BasicController {
 
     protected TemplatePlugin plugin;
 

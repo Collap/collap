@@ -4,51 +4,51 @@ import io.collap.Collap;
 import io.collap.controller.communication.HttpStatus;
 import io.collap.controller.communication.Request;
 import io.collap.controller.communication.Response;
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.logging.Level;
+import java.util.Map;
 import java.util.logging.Logger;
+
+// TODO: What about the handleError method?
 
 /**
  * The Dispatcher acts as a controller that dispatches the request to a sub-controller
  *   or a default controller.
  */
-public class Dispatcher extends Controller {
+public class Dispatcher extends BasicController {
 
     private static final Logger logger = Logger.getLogger (Dispatcher.class.getName ());
 
     private Collap collap;
 
-    private HashMap<String, Controller> controllers;
+    private Map<String, BasicController> controllers = new HashMap<> ();
+
+    private Wrapper wrapper;
 
     /**
      * This controller is executed when the dispatcher is the last element in the
      * command chain (i.e. nothing after its name in the remaining path).
      * When this is null, a page not found error is sent back.
      */
-    private Controller defaultController;
+    private BasicController defaultController;
 
     public Dispatcher (Collap collap) {
         this (collap, null);
     }
 
-    public Dispatcher (Collap collap, Controller defaultController) {
+    public Dispatcher (Collap collap, BasicController defaultController) {
         this.collap = collap;
         this.defaultController = defaultController;
-        controllers = new HashMap<> ();
     }
 
-    public void registerController (String name, Controller controller) {
+    public void registerController (String name, BasicController controller) {
         // TODO: Handle "already existing" conflicts
         controllers.put (name, controller);
     }
 
     @Override
-    public void execute (String remainingPath, Request request, Response response) throws IOException {
+    public void execute (boolean useWrapper, String remainingPath, Request request, Response response) throws IOException {
         /* Extract the next controller name. */
         int substringEnd = -1;
         int nextSlash = remainingPath.indexOf ('/'); /* Until next controller name. */
@@ -80,7 +80,7 @@ public class Dispatcher extends Controller {
         }
 
         /* Find the appropriate controller. */
-        Controller controller;
+        BasicController controller;
         if (controllerName.length () == 0) { /* The dispatcher is the last controller in the command chain. */
             controller = defaultController;
         }else {
@@ -89,24 +89,44 @@ public class Dispatcher extends Controller {
 
         /* Execute the controller or throw a 404 error. */
         if (controller != null) {
-            controller.execute (remainingPath, request, response);
-            if (response.getStatus () != HttpStatus.ok) {
-                if (controller.handleError (request, response)) {
+            Response controllerResponse;
+            if (wrapper != null) {
+                controllerResponse = new Response ();
+            }else {
+                controllerResponse = response;
+            }
+
+            // TODO: Rework status handling (Currently the controller status is not passed to the wrapper!).
+            controller.execute (useWrapper, remainingPath, request, controllerResponse);
+            if (controllerResponse.getStatus () != HttpStatus.ok) {
+                if (controller.handleError (request, controllerResponse)) {
                     /* The error has been handled. */
-                    response.setStatus (HttpStatus.ok);
+                    controllerResponse.setStatus (HttpStatus.ok);
                 }
+            }
+
+            if (wrapper != null) {
+                wrapper.execute (controllerResponse, request, response);
             }
         }else {
             response.setStatus (HttpStatus.notFound);
         }
     }
 
-    public Controller getDefaultController () {
+    public BasicController getDefaultController () {
         return defaultController;
     }
 
-    public void setDefaultController (Controller defaultController) {
+    public void setDefaultController (BasicController defaultController) {
         this.defaultController = defaultController;
+    }
+
+    public Wrapper getWrapper () {
+        return wrapper;
+    }
+
+    public void setWrapper (Wrapper wrapper) {
+        this.wrapper = wrapper;
     }
 
 }
