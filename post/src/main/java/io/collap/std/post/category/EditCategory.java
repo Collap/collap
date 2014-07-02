@@ -21,11 +21,11 @@ public class EditCategory extends TemplateController {
     }
 
     @Override
-    public void execute (String remainingPath, Request request, Response response) throws IOException {
+    public void execute (boolean useWrapper, String remainingPath, Request request, Response response) throws IOException {
         // TODO: Duplicate code. See post.EditPost.java.
         HttpSession httpSession = request.getHttpRequest ().getSession ();
         if (httpSession == null || httpSession.getAttribute ("user") == null) {
-            response.getWriter ().write ("You need to be logged in!");
+            response.getContentWriter ().write ("You need to be logged in!");
             return;
         }
 
@@ -46,13 +46,13 @@ public class EditCategory extends TemplateController {
             }else {
                 category = (Category) session.get (Category.class, id);
                 if (category == null) {
-                    response.getWriter ().write ("Category not found!");
+                    response.getContentWriter ().write ("Category not found!");
                 }
             }
 
             Map<String, Object> model = new HashMap<> ();
             model.put ("category", category);
-            plugin.renderAndWriteTemplate ("category/Edit.jade", model, response.getWriter ());
+            plugin.renderAndWriteTemplate ("category/Edit.jade", model, response.getContentWriter ());
         }else if (request.getMethod () == Request.Method.post) {
             editCategory (session, request, response);
         }
@@ -61,7 +61,7 @@ public class EditCategory extends TemplateController {
     private void editCategory (Session session, Request request, Response response) throws IOException {
         Long id = request.getLongParameter ("id");
         if (id == null) {
-            response.getWriter ().write ("ID parameter invalid.");
+            response.getContentWriter ().write ("ID parameter invalid.");
             return;
         }
 
@@ -71,7 +71,7 @@ public class EditCategory extends TemplateController {
         }else { /* Update category. */
             category = (Category) session.get (Category.class, id);
             if (category == null) {
-                response.getWriter ().write ("Could not find category!");
+                response.getContentWriter ().write ("Could not find category!");
                 return;
             }
         }
@@ -79,7 +79,7 @@ public class EditCategory extends TemplateController {
         category.setName (request.getStringParameter ("name"));
         session.persist (category);
 
-        response.getWriter ().write ("Updated category successfully.");
+        response.getContentWriter ().write ("Updated category successfully.");
     }
 
 }

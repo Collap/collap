@@ -32,11 +32,11 @@ public class EditPost extends TemplateController {
     }
 
     @Override
-    public void execute (String remainingPath, Request request, Response response) throws IOException {
+    public void execute (boolean useWrapper, String remainingPath, Request request, Response response) throws IOException {
         // TODO: Perform this permission check as method/annotation (See collap-core TODO).
         HttpSession httpSession = request.getHttpRequest ().getSession ();
         if (httpSession == null || httpSession.getAttribute ("user") == null) {
-            response.getWriter ().write ("You need to be logged in!");
+            response.getContentWriter ().write ("You need to be logged in!");
             return;
         }
 
@@ -59,13 +59,14 @@ public class EditPost extends TemplateController {
                         categoryString += category.getName ();
                     }
                     model.put ("categoryString", categoryString);
-                    plugin.renderAndWriteTemplate ("post/Edit", model, response.getWriter ());
+                    plugin.renderAndWriteTemplate ("post/Edit_head", model, response.getHeadWriter ());
+                    plugin.renderAndWriteTemplate ("post/Edit", model, response.getContentWriter ());
                 }else {
-                    response.getWriter ().write ("Insufficient editing permissions!");
+                    response.getContentWriter ().write ("Insufficient editing permissions!");
                 }
             }else {
                 // TODO: Potential source of knowledge for an outsider of which IDs are taken.
-                response.getWriter ().write ("Post not found!");
+                response.getContentWriter ().write ("Post not found!");
             }
         }else if (request.getMethod () == Request.Method.post) {
             editPost (session, request, response);
@@ -76,7 +77,7 @@ public class EditPost extends TemplateController {
         // TODO: Possible validation.
         Long id = request.getLongParameter ("id");
         if (id == null) {
-            response.getWriter ().write ("Hidden 'id' input field supplied a wrong number!");
+            response.getContentWriter ().write ("Hidden 'id' input field supplied a wrong number!");
             return;
         }
 
@@ -93,17 +94,18 @@ public class EditPost extends TemplateController {
         }else {
             post = (Post) session.get (Post.class, id);
             if (post == null) {
-                response.getWriter ().write ("Post could not be found!");
+                response.getContentWriter ().write ("Post could not be found!");
                 return;
             }
 
             /* Validate author. */
             if (!post.getAuthor ().getId ().equals (author.getId ())) {
-                response.getWriter ().write ("Insufficient rights to edit the post!");
+                response.getContentWriter ().write ("Insufficient rights to edit the post!");
                 return;
             }
         }
 
+        // TODO: Escape the HTML in the title field.
         post.setTitle (request.getHttpRequest ().getParameter ("title"));
         post.setContent (request.getHttpRequest ().getParameter ("content"));
         post.setLastEdit (now);
@@ -116,7 +118,7 @@ public class EditPost extends TemplateController {
 
         /* Update post. */
         session.persist (post);
-        response.getWriter ().write ("Post successfully created or updated!");
+        response.getContentWriter ().write ("Post successfully created or updated!");
     }
 
     private void updateCategories (Post post, Request request, Response response) throws IOException {
@@ -180,7 +182,7 @@ public class EditPost extends TemplateController {
 
             /* Display which categories could not be found. */
             if (newNames.size () > 0) {
-                Writer writer = response.getWriter ();
+                Writer writer = response.getContentWriter ();
                 writer.write ("The following categories could not be found and were not added to the post: <br />");
                 for (String categoryName : newNames) {
                     writer.write (categoryName + "<br />");

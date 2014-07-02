@@ -27,17 +27,19 @@ public class Login extends TemplateController {
     }
 
     @Override
-    public void execute (String remainingPath, Request request, Response response) throws IOException {
+    public void execute (boolean useWrapper, String remainingPath, Request request, Response response) throws IOException {
         if (request.getMethod () == Request.Method.get) {
-            plugin.renderAndWriteTemplate ("Login", response.getWriter ());
+            plugin.renderAndWriteTemplate ("Login", response.getContentWriter ());
+            plugin.renderAndWriteTemplate ("Login_head", response.getHeadWriter ());
         }else if (request.getMethod () == Request.Method.post) {
             Map<String, Object> model = new HashMap<> ();
             boolean success = processLogin (request, response, model);
             if (!success) {
-                plugin.renderAndWriteTemplate ("Login", model, response.getWriter ());
+                plugin.renderAndWriteTemplate ("Login", model, response.getContentWriter ());
+                plugin.renderAndWriteTemplate ("Login_head", response.getHeadWriter ());
             }else {
                 // TODO: Route to whatever page.
-                response.getWriter ().write ("Login successful!");
+                response.getContentWriter ().write ("Login successful!");
             }
         }
     }

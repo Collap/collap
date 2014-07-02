@@ -43,7 +43,7 @@ public class Profile extends TemplateController {
     }
 
     @Override
-    public void execute (String remainingPath, Request request, Response response) throws IOException {
+    public void execute (boolean useWrapper, String remainingPath, Request request, Response response) throws IOException {
         long id = -1;
         if (remainingPath.length () > 0) {
             try {
@@ -78,7 +78,7 @@ public class Profile extends TemplateController {
     @Override
     public boolean handleError (Request request, Response response) throws IOException {
         if (response.getStatus () == HttpStatus.notFound) {
-            response.getWriter ().write ("User not found.");
+            response.getContentWriter ().write ("User not found.");
             return true;
         }
 
@@ -114,7 +114,8 @@ public class Profile extends TemplateController {
         Map<String, Object> model = new HashMap<> ();
         model.put ("user", user);
         model.put ("sections", sectionContents);
-        plugin.renderAndWriteTemplate ("Profile", model, response.getWriter ());
+        plugin.renderAndWriteTemplate ("Profile", model, response.getContentWriter ());
+        plugin.renderAndWriteTemplate ("Profile_head", model, response.getHeadWriter ());
     }
 
     public void addSection (Section section) {

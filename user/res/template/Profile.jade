@@ -5,15 +5,9 @@
   |   sections: List<Profile.SectionContent>
   |     A list of sections that are displayed on the user profile page.
 
-!!! 5
-html
-  head
-    title= user.username
-  body
-    h1= user.username
+h1= user.username
 
-    each section in sections
-      div
-        h2= section.name
-        span!= section.content
-
+each section in sections
+  div
+    h2= section.name
+    span!= section.content

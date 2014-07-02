@@ -1,19 +1,13 @@
-!!! 5
-html
-  head
-    title Register
-  body
-    h2 Register
-    form(name="register", action=basePath + "user/register", method="post")
-      label(for="username") Username:
-      input(type="text", id="username", name="username")
+h2 Register
+form(name="register", action=basePath + "user/register", method="post")
+  label(for="username") Username:
+  input(type="text", id="username", name="username")
 
-      br
+  br
 
-      label(for="password") Password:
-      input(type="password", id="password", name="password")
+  label(for="password") Password:
+  input(type="password", id="password", name="password")
 
-      br
+  br
 
-      input(type="submit", value="Register")
-
+  input(type="submit", value="Register")

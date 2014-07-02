@@ -1,1 +1,1 @@
-include 'markdown', 'post', 'user'
+include 'main-wrapper', 'markdown', 'post', 'user'

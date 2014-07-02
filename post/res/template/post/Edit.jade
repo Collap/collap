@@ -6,31 +6,21 @@
   |   categoryString: String
   |     A string of all categories, comma-separated.
 
-existent = post.id >= 0
+form(name="edit", action=basePath + "post/edit", method="post")
+  input(type="hidden", name="id", value=post.id)
 
-!!! 5
-html
-  head
-    if existent
-      title Edit #{post.title}
-    else
-      title Create New Post
-  body
-    form(name="edit", action=basePath + "post/edit", method="post")
-      input(type="hidden", name="id", value=post.id)
+  label(for="title") Title:
+  input(type="text", name="title", value=post.title)
 
-      label(for="title") Title:
-      input(type="text", name="title", value=post.title)
+  br
 
-      br
+  label(for="categories") Categories:
+  input(type="text", name="categories", value=categoryString)
 
-      label(for="categories") Categories:
-      input(type="text", name="categories", value=categoryString)
+  br
 
-      br
+  textarea(name="content", rows="6", cols="50")= post.content
 
-      textarea(name="content", rows="6", cols="50")= post.content
+  br
 
-      br
-
-      input(type="submit", value="Post")
+  input(type="submit", value="Post")

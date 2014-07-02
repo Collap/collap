@@ -3,32 +3,22 @@
   |   errors: List<String>
   |     A list of errors to be displayed above the login form.
 
-!!! 5
-html
-  head
-    title Login
-    style(type="text/css").
-      .error {
-        color: #EE0000;
-      }
+h1 Login
 
-  body
-    h1 Login
+//- Outputs possible login errors
+if errors != null
+  each error in errors
+    p(class="error")= error
 
-    //- Outputs possible login errors
-    if errors != null
-      each error in errors
-        p(class="error")= error
+form(name="login", action=basePath + "user/login", method="post")
+  label(for="username") Username:
+  input(type="text", id="username", name="username")
 
-    form(name="login", action=basePath + "user/login", method="post")
-      label(for="username") Username:
-      input(type="text", id="username", name="username")
+  br
 
-      br
+  label(for="password") Password:
+  input(type="password", id="password", name="password")
 
-      label(for="password") Password:
-      input(type="password", id="password", name="password")
+  br
 
-      br
-
-      input(type="submit", value="Login")
+  input(type="submit", value="Login")

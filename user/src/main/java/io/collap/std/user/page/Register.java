@@ -30,7 +30,7 @@ public class Register extends TemplateController {
     }
 
     @Override
-    public void execute (String remainingPath, Request request, Response response) throws IOException {
+    public void execute (boolean useWrapper, String remainingPath, Request request, Response response) throws IOException {
         if (request.getMethod () == Request.Method.get) {
             showRegistrationForm (request, response);
         }else if (request.getMethod () == Request.Method.post) {
@@ -39,7 +39,8 @@ public class Register extends TemplateController {
     }
 
     private void showRegistrationForm (Request request, Response response) throws IOException {
-        plugin.renderAndWriteTemplate ("Register", response.getWriter ());
+        plugin.renderAndWriteTemplate ("Register", response.getContentWriter ());
+        plugin.renderAndWriteTemplate ("Register_head", response.getHeadWriter ());
     }
 
     private void registerUser (Request request, Response response) throws IOException {
@@ -88,7 +89,7 @@ public class Register extends TemplateController {
         Session session = plugin.getCollap ().getSessionFactory ().getCurrentSession ();
         session.persist (newUser);
         removeReservedUsernameFromList (username);
-        response.getWriter ().write ("User " + username + " created!");
+        response.getContentWriter ().write ("User " + username + " created!");
     }
 
     /**
@@ -125,7 +126,7 @@ public class Register extends TemplateController {
 
     private void registerError (String error, Response response) throws IOException {
         // TODO: Proper error response (Special field in user/Register.html)
-        response.getWriter ().write (error);
+        response.getContentWriter ().write (error);
     }
 
 }

@@ -20,7 +20,7 @@ public class ViewPost extends TemplateController {
     }
 
     @Override
-    public void execute (String remainingPath, Request request, Response response) throws IOException {
+    public void execute (boolean useWrapper, String remainingPath, Request request, Response response) throws IOException {
         if (request.getMethod () != Request.Method.get) {
             return;
         }
@@ -30,7 +30,7 @@ public class ViewPost extends TemplateController {
         /* Get post. */
         Post post = PostUtil.getPostFromDatabaseOrCreate (session, remainingPath, false);
         if (post == null) {
-            response.getWriter ().write ("Post not found!");
+            response.getContentWriter ().write ("Post not found!");
             return;
         }
 
@@ -39,7 +39,8 @@ public class ViewPost extends TemplateController {
         model.put ("post", post);
         model.put ("formattedPublishingDate", DateFormat.getDateInstance ().format (post.getPublishingDate ()));
         model.put ("formattedLastEdit", DateFormat.getDateInstance ().format (post.getLastEdit ()));
-        plugin.renderAndWriteTemplate ("post/View", model, response.getWriter ());
+        plugin.renderAndWriteTemplate ("post/View_head", model, response.getHeadWriter ());
+        plugin.renderAndWriteTemplate ("post/View", model, response.getContentWriter ());
     }
 
 }
