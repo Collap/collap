@@ -30,17 +30,14 @@ public class Register extends TemplateController {
     }
 
     @Override
-    public void execute (boolean useWrapper, String remainingPath, Request request, Response response) throws IOException {
-        if (request.getMethod () == Request.Method.get) {
-            showRegistrationForm (request, response);
-        }else if (request.getMethod () == Request.Method.post) {
-            registerUser (request, response);
-        }
-    }
-
-    private void showRegistrationForm (Request request, Response response) throws IOException {
+    protected void doGet (String remainingPath, Request request, Response response) throws IOException {
         plugin.renderAndWriteTemplate ("Register", response.getContentWriter ());
         plugin.renderAndWriteTemplate ("Register_head", response.getHeadWriter ());
+    }
+
+    @Override
+    protected void doPost (String remainingPath, Request request, Response response) throws IOException {
+        registerUser (request, response);
     }
 
     private void registerUser (Request request, Response response) throws IOException {
@@ -94,6 +91,7 @@ public class Register extends TemplateController {
 
     /**
      * Registers the user name as reserved when returning false.
+     * When this method returns <i>true</i>, the user name is <b>not</b> reserved!
      */
     private boolean isUsernameReserved (String username) {
         String usernameLowercase = username.toLowerCase ();

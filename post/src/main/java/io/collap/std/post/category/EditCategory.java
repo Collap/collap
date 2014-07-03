@@ -6,10 +6,10 @@ import io.collap.controller.communication.Request;
 import io.collap.controller.communication.Response;
 import io.collap.resource.TemplatePlugin;
 import io.collap.std.post.entity.Category;
+import io.collap.std.user.util.Permissions;
 import io.collap.util.ParseUtils;
 import org.hibernate.Session;
 
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,44 +21,45 @@ public class EditCategory extends TemplateController {
     }
 
     @Override
-    public void execute (boolean useWrapper, String remainingPath, Request request, Response response) throws IOException {
-        // TODO: Duplicate code. See post.EditPost.java.
-        HttpSession httpSession = request.getHttpRequest ().getSession ();
-        if (httpSession == null || httpSession.getAttribute ("user") == null) {
+    protected void doGet (String remainingPath, Request request, Response response) throws IOException {
+        if (!Permissions.isUserLoggedIn (request)) {
             response.getContentWriter ().write ("You need to be logged in!");
             return;
         }
 
         Session session = plugin.getCollap ().getSessionFactory ().getCurrentSession ();
+        Long id = ParseUtils.parseLong (remainingPath);
+        Category category;
 
-        if (request.getMethod () == Request.Method.get) {
-            Long id = ParseUtils.parseLong (remainingPath);
-            Category category;
-
-            if (id == null) {
-                if (remainingPath.isEmpty ()) {
-                    category = Category.createTransientCategory ();
-                }else {
-                    response.setStatus (HttpStatus.notFound);
-                    response.setStatusMessage ("Category not found!");
-                    return;
-                }
+        if (id == null) {
+            if (remainingPath.isEmpty ()) {
+                category = Category.createTransientCategory ();
             }else {
-                category = (Category) session.get (Category.class, id);
-                if (category == null) {
-                    response.getContentWriter ().write ("Category not found!");
-                }
+                response.setStatus (HttpStatus.notFound);
+                response.setStatusMessage ("Category not found!");
+                return;
             }
-
-            Map<String, Object> model = new HashMap<> ();
-            model.put ("category", category);
-            plugin.renderAndWriteTemplate ("category/Edit.jade", model, response.getContentWriter ());
-        }else if (request.getMethod () == Request.Method.post) {
-            editCategory (session, request, response);
+        }else {
+            category = (Category) session.get (Category.class, id);
+            if (category == null) {
+                response.getContentWriter ().write ("Category not found!");
+            }
         }
+
+        Map<String, Object> model = new HashMap<> ();
+        model.put ("category", category);
+        plugin.renderAndWriteTemplate ("category/Edit.jade", model, response.getContentWriter ());
+        plugin.renderAndWriteTemplate ("category/Edit_head.jade", model, response.getHeadWriter ());
     }
 
-    private void editCategory (Session session, Request request, Response response) throws IOException {
+    @Override
+    protected void doPost (String remainingPath, Request request, Response response) throws IOException{
+        if (!Permissions.isUserLoggedIn (request)) {
+            response.getContentWriter ().write ("You need to be logged in!");
+            return;
+        }
+
+        Session session = plugin.getCollap ().getSessionFactory ().getCurrentSession ();
         Long id = request.getLongParameter ("id");
         if (id == null) {
             response.getContentWriter ().write ("ID parameter invalid.");

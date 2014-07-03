@@ -27,28 +27,29 @@ public class Login extends TemplateController {
     }
 
     @Override
-    public void execute (boolean useWrapper, String remainingPath, Request request, Response response) throws IOException {
-        if (request.getMethod () == Request.Method.get) {
-            plugin.renderAndWriteTemplate ("Login", response.getContentWriter ());
+    protected void doGet (String remainingPath, Request request, Response response) throws IOException {
+        plugin.renderAndWriteTemplate ("Login", response.getContentWriter ());
+        plugin.renderAndWriteTemplate ("Login_head", response.getHeadWriter ());
+    }
+
+    @Override
+    protected void doPost (String remainingPath, Request request, Response response) throws IOException {
+        Map<String, Object> model = new HashMap<> ();
+        boolean success = processLogin (request, model);
+        if (!success) {
+            plugin.renderAndWriteTemplate ("Login", model, response.getContentWriter ());
             plugin.renderAndWriteTemplate ("Login_head", response.getHeadWriter ());
-        }else if (request.getMethod () == Request.Method.post) {
-            Map<String, Object> model = new HashMap<> ();
-            boolean success = processLogin (request, response, model);
-            if (!success) {
-                plugin.renderAndWriteTemplate ("Login", model, response.getContentWriter ());
-                plugin.renderAndWriteTemplate ("Login_head", response.getHeadWriter ());
-            }else {
-                // TODO: Route to whatever page.
-                response.getContentWriter ().write ("Login successful!");
-            }
+        }else {
+            // TODO: Route to whatever page.
+            response.getContentWriter ().write ("Login successful!");
         }
     }
 
     /**
-     * @param model A model which saves error message from the login process.
+     * @param model A model which saves error messages from the login process in the variable <i>errors</i>.
      * @return Whether the login process was completed successfully and the user is logged in now.
      */
-    private boolean processLogin (Request request, Response response, Map<String, Object> model) {
+    private boolean processLogin (Request request, Map<String, Object> model) {
         // TODO: Cover the situation that the user is already logged in.
 
         String name = request.getHttpRequest ().getParameter ("username");

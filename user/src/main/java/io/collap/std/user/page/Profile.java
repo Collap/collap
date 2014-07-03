@@ -43,7 +43,7 @@ public class Profile extends TemplateController {
     }
 
     @Override
-    public void execute (boolean useWrapper, String remainingPath, Request request, Response response) throws IOException {
+    protected void doGet (String remainingPath, Request request, Response response) throws IOException {
         long id = -1;
         if (remainingPath.length () > 0) {
             try {

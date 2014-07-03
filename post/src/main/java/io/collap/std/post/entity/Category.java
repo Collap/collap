@@ -8,6 +8,9 @@ import javax.persistence.*;
 @Table(name = "post_categories")
 public class Category {
 
+    /**
+     * An ID of -1 indicates a post that has not been added to the database yet.
+     */
     private Long id;
     private String name;
 

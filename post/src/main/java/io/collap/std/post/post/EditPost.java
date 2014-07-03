@@ -9,77 +9,77 @@ import io.collap.std.post.entity.Post;
 import io.collap.std.user.entity.User;
 import io.collap.std.markdown.MarkdownPlugin;
 import io.collap.std.post.util.PostUtil;
+import io.collap.std.user.util.Permissions;
 import org.hibernate.Session;
 
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.*;
 
-/**
- * GET:
- *      Either write a new post or edit a post that already exists.
- *      The remainingPath determines whether a new post is created: When an ID is supplied, the post with that ID is edited.
- *      Otherwise, a new post is created.
- * POST:
- *      Update or add a post.
- * A post with an ID of -1 is considered a non-existent post and signals a newly created post.
- */
 public class EditPost extends TemplateController {
 
     public EditPost (TemplatePlugin plugin) {
         super (plugin);
     }
 
+    /**
+     * Either write a new post or edit a post that already exists.
+     * The remainingPath determines whether a new post is created: When an ID is supplied, the post with that ID is edited.
+     * Otherwise, a new post is created.
+     */
     @Override
-    public void execute (boolean useWrapper, String remainingPath, Request request, Response response) throws IOException {
-        // TODO: Perform this permission check as method/annotation (See collap-core TODO).
-        HttpSession httpSession = request.getHttpRequest ().getSession ();
-        if (httpSession == null || httpSession.getAttribute ("user") == null) {
+    protected void doGet (String remainingPath, Request request, Response response) throws IOException {
+        if (!Permissions.isUserLoggedIn (request)) {
             response.getContentWriter ().write ("You need to be logged in!");
             return;
         }
 
         Session session = plugin.getCollap ().getSessionFactory ().getCurrentSession ();
-
-        if (request.getMethod () == Request.Method.get) {
-            Post post = PostUtil.getPostFromDatabaseOrCreate (session, remainingPath, true);
-            if (post != null) {
-                User author = (User) httpSession.getAttribute ("user");
-                if (post.getId () == -1 || author.getId () == post.getAuthor ().getId ()) {
-                    Map<String, Object> model = new HashMap<> ();
-                    model.put ("post", post);
-                    model.put ("categories", post.getCategories ());
-                    // TODO: The following solution is temporary.
-                    String categoryString = "";
-                    for (Category category : post.getCategories ()) {
-                        if (!categoryString.isEmpty ()) {
-                            categoryString += ",";
-                        }
-                        categoryString += category.getName ();
+        Post post = PostUtil.getPostFromDatabaseOrCreate (session, remainingPath, true);
+        if (post != null) {
+            User author = (User) request.getHttpRequest ().getSession ().getAttribute ("user");
+            if (post.getId () == -1 || author.getId () == post.getAuthor ().getId ()) {
+                Map<String, Object> model = new HashMap<> ();
+                model.put ("post", post);
+                model.put ("categories", post.getCategories ());
+                // TODO: The following solution is temporary.
+                String categoryString = "";
+                for (Category category : post.getCategories ()) {
+                    if (!categoryString.isEmpty ()) {
+                        categoryString += ",";
                     }
-                    model.put ("categoryString", categoryString);
-                    plugin.renderAndWriteTemplate ("post/Edit_head", model, response.getHeadWriter ());
-                    plugin.renderAndWriteTemplate ("post/Edit", model, response.getContentWriter ());
-                }else {
-                    response.getContentWriter ().write ("Insufficient editing permissions!");
+                    categoryString += category.getName ();
                 }
+                model.put ("categoryString", categoryString);
+                plugin.renderAndWriteTemplate ("post/Edit_head", model, response.getHeadWriter ());
+                plugin.renderAndWriteTemplate ("post/Edit", model, response.getContentWriter ());
             }else {
-                // TODO: Potential source of knowledge for an outsider of which IDs are taken.
-                response.getContentWriter ().write ("Post not found!");
+                response.getContentWriter ().write ("Insufficient editing permissions!");
             }
-        }else if (request.getMethod () == Request.Method.post) {
-            editPost (session, request, response);
+        }else {
+            // TODO: Potential source of knowledge for an outsider of which IDs are taken.
+            response.getContentWriter ().write ("Post not found!");
         }
     }
 
-    private void editPost (Session session, Request request, Response response) throws IOException {
+    /**
+     * Update or add a post.
+     */
+    @Override
+    protected void doPost (String remainingPath, Request request, Response response) throws IOException {
+        if (!Permissions.isUserLoggedIn (request)) {
+            response.getContentWriter ().write ("You need to be logged in!");
+            return;
+        }
+
         // TODO: Possible validation.
         Long id = request.getLongParameter ("id");
         if (id == null) {
             response.getContentWriter ().write ("Hidden 'id' input field supplied a wrong number!");
             return;
         }
+
+        Session session = plugin.getCollap ().getSessionFactory ().getCurrentSession ();
 
         /* Note: It is assumed that a check whether a user is logged in already passed. */
         User author = (User) request.getHttpRequest ().getSession ().getAttribute ("user");

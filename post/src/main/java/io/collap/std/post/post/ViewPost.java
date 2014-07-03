@@ -20,11 +20,7 @@ public class ViewPost extends TemplateController {
     }
 
     @Override
-    public void execute (boolean useWrapper, String remainingPath, Request request, Response response) throws IOException {
-        if (request.getMethod () != Request.Method.get) {
-            return;
-        }
-
+    protected void doGet (String remainingPath, Request request, Response response) throws IOException {
         Session session = plugin.getCollap ().getSessionFactory ().getCurrentSession ();
 
         /* Get post. */
