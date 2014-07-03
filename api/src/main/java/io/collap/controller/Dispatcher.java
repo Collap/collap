@@ -10,19 +10,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
-// TODO: What about the handleError method?
-
 /**
  * The Dispatcher acts as a controller that dispatches the request to a sub-controller
  *   or a default controller.
  */
-public class Dispatcher extends BasicController {
+public class Dispatcher implements Controller {
 
     private static final Logger logger = Logger.getLogger (Dispatcher.class.getName ());
 
     private Collap collap;
 
-    private Map<String, BasicController> controllers = new HashMap<> ();
+    private Map<String, Controller> controllers = new HashMap<> ();
 
     private Wrapper wrapper;
 
@@ -31,18 +29,18 @@ public class Dispatcher extends BasicController {
      * command chain (i.e. nothing after its name in the remaining path).
      * When this is null, a page not found error is sent back.
      */
-    private BasicController defaultController;
+    private Controller defaultController;
 
     public Dispatcher (Collap collap) {
         this (collap, null);
     }
 
-    public Dispatcher (Collap collap, BasicController defaultController) {
+    public Dispatcher (Collap collap, Controller defaultController) {
         this.collap = collap;
         this.defaultController = defaultController;
     }
 
-    public void registerController (String name, BasicController controller) {
+    public void registerController (String name, Controller controller) {
         // TODO: Handle "already existing" conflicts
         controllers.put (name, controller);
     }
@@ -80,7 +78,7 @@ public class Dispatcher extends BasicController {
         }
 
         /* Find the appropriate controller. */
-        BasicController controller;
+        Controller controller;
         if (controllerName.length () == 0) { /* The dispatcher is the last controller in the command chain. */
             controller = defaultController;
         }else {
@@ -113,7 +111,13 @@ public class Dispatcher extends BasicController {
         }
     }
 
-    public BasicController getDefaultController () {
+    @Override
+    public boolean handleError (Request request, Response response) throws IOException {
+        // TODO: Implement.
+        return false;
+    }
+
+    public Controller getDefaultController () {
         return defaultController;
     }
 
