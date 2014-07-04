@@ -2,9 +2,11 @@ package io.collap.std.post;
 
 import io.collap.controller.Dispatcher;
 import io.collap.resource.TemplatePlugin;
+import io.collap.std.post.category.DeleteCategory;
 import io.collap.std.post.category.EditCategory;
 import io.collap.std.post.entity.Category;
 import io.collap.std.post.entity.Post;
+import io.collap.std.post.post.DeletePost;
 import io.collap.std.post.post.EditPost;
 import io.collap.std.post.post.PostsUserProfileSection;
 import io.collap.std.post.post.ViewPost;
@@ -24,14 +26,16 @@ public class PostPlugin extends TemplatePlugin {
         postDispatcher.registerController ("edit", editPostController);
         postDispatcher.registerController ("new", editPostController);
         postDispatcher.registerController ("view", new ViewPost (this));
+        postDispatcher.registerController ("delete", new DeletePost (this));
         collap.getRootDispatcher ().registerController ("post", postDispatcher);
 
-        /* post/category/ */
+        /* category/ */
         Dispatcher categoryDispatcher = new Dispatcher (collap);
         EditCategory editCategoryController = new EditCategory (this);
         categoryDispatcher.registerController ("edit", editCategoryController);
         categoryDispatcher.registerController ("new", editCategoryController);
-        postDispatcher.registerController ("category", categoryDispatcher);
+        categoryDispatcher.registerController ("delete", new DeleteCategory (this));
+        collap.getRootDispatcher ().registerController ("category", categoryDispatcher);
 
         /* Add the posts section to the profile page! */
         UserPlugin userPlugin = (UserPlugin) collap.getPluginManager ().getPlugins ().get ("std-user");

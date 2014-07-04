@@ -54,7 +54,7 @@ public class Post {
     // TODO: Eager loading to improve performance?
     // TODO: The author may be nonexistent (After account deletion for example).
     //       Use an "unknown" dummy object instead, so posts are still viewable.
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "authorId")
     public User getAuthor () {
         return author;
@@ -64,7 +64,7 @@ public class Post {
         this.author = author;
     }
 
-    @ManyToMany /* Note: No cascade here. Categories are saved separately. */
+    @ManyToMany(cascade = CascadeType.PERSIST) /* Note: No cascade here. Categories are saved separately. */
     @JoinTable(name = "post_category_links")
     public Set<Category> getCategories () {
         return categories;

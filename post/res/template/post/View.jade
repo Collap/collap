@@ -6,10 +6,22 @@
   |     The publishing date of the post, properly formatted.
   |   formattedLastEdit: String
   |     The last edit of the post, properly formatted.
+  |   viewerHasEditingPermissions: boolean
+  |     Whether the viewer has editing permissions.
 
 h1= post.title
+if viewerHasEditingPermissions
+  p
+    a(href=basePath + "post/edit/" + post.id) (edit)
+    a(href=basePath + "post/delete/" + post.id) (delete)
 p Published on #{formattedPublishingDate}. Last edit: #{formattedLastEdit}.
 div!= post.compiledContent
+if post.categories.size () <= 0
+  p Filed under no categories
+else
+  p Categories:
+    each category in post.categories
+      span= category.name
 p Written by
   a(href=basePath + "user/profile/" + post.author.id) #{post.author.username}
   | .

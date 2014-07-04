@@ -1,8 +1,12 @@
 package io.collap.std.post.entity;
 
-import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.*;
 
 import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import java.util.Set;
 
 @Entity
 @Table(name = "post_categories")
@@ -13,6 +17,11 @@ public class Category {
      */
     private Long id;
     private String name;
+
+    /**
+     * The inverse to the categories attribute in Post.
+     */
+    private Set<Post> posts;
 
     public Category () {
 
@@ -46,6 +55,15 @@ public class Category {
 
     public void setName (String name) {
         this.name = name;
+    }
+
+    @ManyToMany(mappedBy = "categories", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    public Set<Post> getPosts () {
+        return posts;
+    }
+
+    public void setPosts (Set<Post> posts) {
+        this.posts = posts;
     }
 
 }

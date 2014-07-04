@@ -37,8 +37,8 @@ public class EditPost extends TemplateController {
         Session session = plugin.getCollap ().getSessionFactory ().getCurrentSession ();
         Post post = PostUtil.getPostFromDatabaseOrCreate (session, remainingPath, true);
         if (post != null) {
-            User author = (User) request.getHttpRequest ().getSession ().getAttribute ("user");
-            if (post.getId () == -1 || author.getId () == post.getAuthor ().getId ()) {
+            User user = (User) request.getHttpSession ().getAttribute ("user");
+            if (post.getId () == -1 || PostUtil.isUserAuthor (user, post)) {
                 Map<String, Object> model = new HashMap<> ();
                 model.put ("post", post);
                 model.put ("categories", post.getCategories ());
@@ -99,7 +99,7 @@ public class EditPost extends TemplateController {
             }
 
             /* Validate author. */
-            if (!post.getAuthor ().getId ().equals (author.getId ())) {
+            if (!PostUtil.isUserAuthor (author, post)) {
                 response.getContentWriter ().write ("Insufficient rights to edit the post!");
                 return;
             }

@@ -6,21 +6,24 @@ import io.collap.controller.communication.Response;
 import io.collap.resource.TemplatePlugin;
 import io.collap.std.post.entity.Post;
 import io.collap.std.post.util.PostUtil;
+import io.collap.std.user.util.Permissions;
 import org.hibernate.Session;
 
 import java.io.IOException;
-import java.text.DateFormat;
-import java.util.HashMap;
-import java.util.Map;
 
-public class ViewPost extends TemplateController {
+public class DeletePost extends TemplateController {
 
-    public ViewPost (TemplatePlugin plugin) {
+    public DeletePost (TemplatePlugin plugin) {
         super (plugin);
     }
 
     @Override
     protected void doGet (String remainingPath, Request request, Response response) throws IOException {
+        if (!Permissions.isUserLoggedIn (request)) {
+            response.getContentWriter ().write ("You need to be logged in!");
+            return;
+        }
+
         Session session = plugin.getCollap ().getSessionFactory ().getCurrentSession ();
 
         /* Get post. */
@@ -30,14 +33,15 @@ public class ViewPost extends TemplateController {
             return;
         }
 
-        /* Render template. */
-        Map<String, Object> model = new HashMap<> ();
-        model.put ("post", post);
-        model.put ("formattedPublishingDate", DateFormat.getDateInstance ().format (post.getPublishingDate ()));
-        model.put ("formattedLastEdit", DateFormat.getDateInstance ().format (post.getLastEdit ()));
-        model.put ("viewerHasEditingPermissions", PostUtil.isUserAuthor (request, post));
-        plugin.renderAndWriteTemplate ("post/View_head", model, response.getHeadWriter ());
-        plugin.renderAndWriteTemplate ("post/View", model, response.getContentWriter ());
+        /* Check permissions. */
+        if (!PostUtil.isUserAuthor (request, post)) {
+            response.getContentWriter ().write ("Insufficient permissions to delete the post!");
+            return;
+        }
+
+        /* Delete post. */
+        session.delete (post);
+        response.getContentWriter ().write ("Deleted post successfully!");
     }
 
 }

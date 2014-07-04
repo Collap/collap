@@ -4,7 +4,7 @@
   |     The category that is edited.
   |     An id of -1 indicates a non-existent category that will be newly created.
 
-form(name="edit", action=basePath + "post/category/edit", method="post")
+form(name="edit", action=basePath + "category/edit", method="post")
   input(type="hidden", name="id", value=category.id)
 
   label(for="name") Name:
