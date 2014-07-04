@@ -6,10 +6,7 @@ import io.collap.std.post.category.DeleteCategory;
 import io.collap.std.post.category.EditCategory;
 import io.collap.std.post.entity.Category;
 import io.collap.std.post.entity.Post;
-import io.collap.std.post.post.DeletePost;
-import io.collap.std.post.post.EditPost;
-import io.collap.std.post.post.PostsUserProfileSection;
-import io.collap.std.post.post.ViewPost;
+import io.collap.std.post.post.*;
 import io.collap.std.user.UserPlugin;
 import io.collap.std.user.page.Profile;
 import org.hibernate.cfg.Configuration;
@@ -27,6 +24,7 @@ public class PostPlugin extends TemplatePlugin {
         postDispatcher.registerController ("new", editPostController);
         postDispatcher.registerController ("view", new ViewPost (this));
         postDispatcher.registerController ("delete", new DeletePost (this));
+        postDispatcher.registerController ("list", new ListPosts (this));
         collap.getRootDispatcher ().registerController ("post", postDispatcher);
 
         /* category/ */
