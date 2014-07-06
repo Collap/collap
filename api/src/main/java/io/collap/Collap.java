@@ -4,6 +4,8 @@ import io.collap.controller.Dispatcher;
 import io.collap.resource.Plugin;
 import io.collap.resource.PluginManager;
 import io.collap.util.FileUtils;
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
@@ -21,6 +23,9 @@ public class Collap {
     private SessionFactory sessionFactory;
     private PluginManager pluginManager;
     private Dispatcher rootDispatcher;
+
+    private CacheManager cacheManager;
+    private Cache fragmentCache;
 
     private String basePath;
 
@@ -52,6 +57,16 @@ public class Collap {
             logger.log (Level.SEVERE, "Error loading 'collap.properties': ", e);
         }
 
+        /* Initialize cache manager and caches. */
+        try {
+            cacheManager = CacheManager.create (new FileInputStream (new File (StandardDirectories.config, "cache.xml")));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace ();
+            logger.severe ("Cache configuration could not be found! This is mandatory.");
+            throw new RuntimeException ("Cache configuration not found!"); // Note: This stops the execution of collap in tomcat.
+        }
+        fragmentCache = cacheManager.getCache ("fragmentCache");
+
         /* Register plugins. */
         pluginManager = new PluginManager (this);
         pluginManager.registerDirectory (StandardDirectories.plugin);
@@ -75,6 +90,7 @@ public class Collap {
         /* Copy config files. */
         copyConfigFile ("collap.properties");
         copyConfigFile ("hibernate.properties");
+        copyConfigFile ("cache.xml");
     }
 
     /**
@@ -135,6 +151,14 @@ public class Collap {
 
     public String getBasePath () {
         return basePath;
+    }
+
+    public CacheManager getCacheManager () {
+        return cacheManager;
+    }
+
+    public Cache getFragmentCache () {
+        return fragmentCache;
     }
 
 }
