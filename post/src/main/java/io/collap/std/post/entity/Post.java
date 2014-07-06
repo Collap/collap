@@ -51,10 +51,9 @@ public class Post {
         this.id = id;
     }
 
-    // TODO: Eager loading to improve performance?
     // TODO: The author may be nonexistent (After account deletion for example).
     //       Use an "unknown" dummy object instead, so posts are still viewable.
-    @ManyToOne(optional = false, fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+    @ManyToOne(optional = false, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "authorId")
     public User getAuthor () {
         return author;
