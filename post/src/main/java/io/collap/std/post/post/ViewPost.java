@@ -5,6 +5,7 @@ import io.collap.controller.TemplateController;
 import io.collap.controller.communication.Request;
 import io.collap.controller.communication.Response;
 import io.collap.resource.TemplatePlugin;
+import io.collap.std.post.cache.KeyUtils;
 import io.collap.std.post.entity.Post;
 import io.collap.std.post.util.PostUtil;
 import org.hibernate.Session;
@@ -48,7 +49,7 @@ public class ViewPost extends TemplateController implements Cached {
 
     @Override
     public String getElementKey (String remainingPath, Request request) {
-        return plugin.getName () + ":post.ViewPost:" + remainingPath;
+        return KeyUtils.getViewPostKey (plugin.getName (), remainingPath);
     }
 
 }

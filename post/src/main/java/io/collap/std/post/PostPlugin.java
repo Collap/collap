@@ -1,7 +1,9 @@
 package io.collap.std.post;
 
+import io.collap.cache.InvalidatorManager;
 import io.collap.controller.Dispatcher;
 import io.collap.resource.TemplatePlugin;
+import io.collap.std.post.cache.PostInvalidator;
 import io.collap.std.post.category.DeleteCategory;
 import io.collap.std.post.category.EditCategory;
 import io.collap.std.post.entity.Category;
@@ -41,6 +43,10 @@ public class PostPlugin extends TemplatePlugin {
         if (profilePage != null) {
             profilePage.addSection (new PostsUserProfileSection (this));
         }
+
+        /* Register invalidators! */
+        InvalidatorManager invalidatorManager = collap.getInvalidatorManager ();
+        invalidatorManager.addInvalidator (Post.class, new PostInvalidator (this));
     }
 
     @Override

@@ -53,7 +53,7 @@ public class Post {
 
     // TODO: The author may be nonexistent (After account deletion for example).
     //       Use an "unknown" dummy object instead, so posts are still viewable.
-    @ManyToOne(optional = false, cascade = CascadeType.PERSIST)
+    @ManyToOne(optional = false)
     @JoinColumn(name = "authorId")
     public User getAuthor () {
         return author;
@@ -63,7 +63,7 @@ public class Post {
         this.author = author;
     }
 
-    @ManyToMany(cascade = CascadeType.PERSIST) /* Note: No cascade here. Categories are saved separately. */
+    @ManyToMany
     @JoinTable(name = "post_category_links")
     public Set<Category> getCategories () {
         return categories;

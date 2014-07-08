@@ -10,6 +10,8 @@
   |     Whether the viewer has editing permissions.
 
 h1= post.title
+
+//- TODO: The editing links interfere with caching!
 if viewerHasEditingPermissions
   p
     a(href=basePath + "post/edit/" + post.id) (edit)

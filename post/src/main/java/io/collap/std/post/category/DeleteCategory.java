@@ -37,6 +37,7 @@ public class DeleteCategory extends TemplateController {
         Set<Post> posts = category.getPosts ();
         for (Post post : posts) {
             post.getCategories ().remove (category);
+            session.persist (post); /* Required for post cache invalidation! */
         }
 
         session.delete (category);
