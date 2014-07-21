@@ -1,14 +1,16 @@
 package io.collap.std.main_wrapper;
 
-import io.collap.resource.TemplatePlugin;
+import io.collap.resource.Plugin;
+import io.collap.template.TemplateRenderer;
 
-public class MainWrapperPlugin extends TemplatePlugin {
+public class MainWrapperPlugin extends Plugin {
+
+    private TemplateRenderer renderer;
 
     @Override
     public void initialize () {
-        super.initialize ();
-
-        collap.getRootDispatcher ().setWrapper (new MainWrapper (this));
+        renderer = new TemplateRenderer (this);
+        collap.getRootDispatcher ().setWrapper (new MainWrapper (renderer));
     }
 
     @Override

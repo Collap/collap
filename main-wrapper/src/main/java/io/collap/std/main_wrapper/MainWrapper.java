@@ -3,6 +3,7 @@ package io.collap.std.main_wrapper;
 import io.collap.controller.Wrapper;
 import io.collap.controller.communication.Request;
 import io.collap.controller.communication.Response;
+import io.collap.template.TemplateRenderer;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -10,10 +11,10 @@ import java.util.Map;
 
 public class MainWrapper implements Wrapper {
 
-    private MainWrapperPlugin plugin;
+    private TemplateRenderer renderer;
 
-    public MainWrapper (MainWrapperPlugin plugin) {
-        this.plugin = plugin;
+    public MainWrapper (TemplateRenderer renderer) {
+        this.renderer = renderer;
     }
 
     @Override
@@ -21,7 +22,7 @@ public class MainWrapper implements Wrapper {
         Map<String, Object> model = new HashMap<> ();
         model.put ("content", in.getContent ());
         model.put ("head", in.getHead ());
-        plugin.renderAndWriteTemplate ("main", model, out.getContentWriter ());
+        renderer.renderAndWriteTemplate ("main", model, out.getContentWriter ());
     }
 
 }

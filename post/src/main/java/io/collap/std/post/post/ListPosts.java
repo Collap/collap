@@ -3,7 +3,6 @@ package io.collap.std.post.post;
 import io.collap.controller.TemplateController;
 import io.collap.controller.communication.Request;
 import io.collap.controller.communication.Response;
-import io.collap.resource.TemplatePlugin;
 import io.collap.std.post.entity.Post;
 import org.hibernate.Session;
 
@@ -14,8 +13,9 @@ import java.util.Map;
 
 public class ListPosts extends TemplateController {
 
-    public ListPosts (TemplatePlugin plugin) {
-        super (plugin);
+    @Override
+    public void initialize (String remainingPath) {
+
     }
 
     /**
@@ -24,11 +24,9 @@ public class ListPosts extends TemplateController {
      * Possible GET parameters:
      *   - categories: A comma separated list of categories.
      *                 A post with either category is listed.
-     *
-     * @param remainingPath Empty.
      */
     @Override
-    protected void doGet (String remainingPath, Request request, Response response) throws IOException {
+    public void doGet (Response response) throws IOException {
         String categoryString = request.getStringParameter ("categories");
 
         if (categoryString == null || categoryString.isEmpty ()) {
@@ -58,8 +56,8 @@ public class ListPosts extends TemplateController {
         String queryTimeMessage = "Query time: " + (System.nanoTime () - time) + "ns<br>";
         time = System.nanoTime ();
 
-        plugin.renderAndWriteTemplate ("post/List", model, response.getContentWriter ());
-        plugin.renderAndWriteTemplate ("post/List_head", response.getHeadWriter ());
+        renderer.renderAndWriteTemplate ("post/List", model, response.getContentWriter ());
+        renderer.renderAndWriteTemplate ("post/List_head", response.getHeadWriter ());
 
         response.getContentWriter ().write (queryTimeMessage);
         response.getContentWriter ().write ("Render time: " + (System.nanoTime () - time) + "ns");

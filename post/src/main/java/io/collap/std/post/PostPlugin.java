@@ -1,8 +1,8 @@
 package io.collap.std.post;
 
 import io.collap.cache.InvalidatorManager;
-import io.collap.controller.Dispatcher;
-import io.collap.resource.TemplatePlugin;
+import io.collap.controller.*;
+import io.collap.resource.Plugin;
 import io.collap.std.post.cache.PostInvalidator;
 import io.collap.std.post.category.DeleteCategory;
 import io.collap.std.post.category.EditCategory;
@@ -10,38 +10,41 @@ import io.collap.std.post.entity.Category;
 import io.collap.std.post.entity.Post;
 import io.collap.std.post.post.*;
 import io.collap.std.user.UserPlugin;
-import io.collap.std.user.page.Profile;
+import io.collap.template.TemplateRenderer;
 import org.hibernate.cfg.Configuration;
 
-public class PostPlugin extends TemplatePlugin {
+public class PostPlugin extends Plugin {
+
+    private TemplateRenderer renderer;
 
     @Override
     public void initialize () {
-        super.initialize ();
+        renderer = new TemplateRenderer (this);
 
         /* post/ */
         Dispatcher postDispatcher = new Dispatcher (collap);
-        EditPost editPostController = new EditPost (this);
-        postDispatcher.registerController ("edit", editPostController);
-        postDispatcher.registerController ("new", editPostController);
-        postDispatcher.registerController ("view", new ViewPost (this));
-        postDispatcher.registerController ("delete", new DeletePost (this));
-        postDispatcher.registerController ("list", new ListPosts (this));
-        collap.getRootDispatcher ().registerController ("post", postDispatcher);
+        ControllerFactory editPostControllerFactory = new TemplateControllerFactory (EditPost.class, this, renderer);
+        postDispatcher.registerControllerFactory ("edit", editPostControllerFactory);
+        postDispatcher.registerControllerFactory ("new", editPostControllerFactory);
+        postDispatcher.registerControllerFactory ("view", new TemplateControllerFactory (ViewPost.class, this, renderer));
+        postDispatcher.registerControllerFactory ("delete", new TemplateControllerFactory (DeletePost.class, this, renderer));
+        postDispatcher.registerControllerFactory ("list", new TemplateControllerFactory (ListPosts.class, this, renderer));
+        collap.getRootDispatcher ().registerDispatcher ("post", postDispatcher);
 
         /* category/ */
         Dispatcher categoryDispatcher = new Dispatcher (collap);
-        EditCategory editCategoryController = new EditCategory (this);
-        categoryDispatcher.registerController ("edit", editCategoryController);
-        categoryDispatcher.registerController ("new", editCategoryController);
-        categoryDispatcher.registerController ("delete", new DeleteCategory (this));
-        collap.getRootDispatcher ().registerController ("category", categoryDispatcher);
+        ControllerFactory editCategoryControllerFactory = new TemplateControllerFactory (EditCategory.class, this, renderer);
+        categoryDispatcher.registerControllerFactory ("edit", editCategoryControllerFactory);
+        categoryDispatcher.registerControllerFactory ("new", editCategoryControllerFactory);
+        categoryDispatcher.registerControllerFactory ("delete", new TemplateControllerFactory (DeleteCategory.class, this, renderer));
+        collap.getRootDispatcher ().registerDispatcher ("category", categoryDispatcher);
 
         /* Add the posts section to the profile page! */
         UserPlugin userPlugin = (UserPlugin) collap.getPluginManager ().getPlugins ().get ("std-user");
-        Profile profilePage = userPlugin.getProfilePage ();
-        if (profilePage != null) {
-            profilePage.addSection (new PostsUserProfileSection (this));
+        SectionControllerFactory profileSectionControllerFactory = userPlugin.getProfileSectionControllerFactory ();
+        if (profileSectionControllerFactory != null) {
+            profileSectionControllerFactory.addSectionFactory (new TemplateControllerFactory (PostsUserProfileSection.class,
+                    this, renderer));
         }
 
         /* Register invalidators! */

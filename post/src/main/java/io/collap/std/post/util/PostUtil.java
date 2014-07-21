@@ -31,7 +31,7 @@ public class PostUtil {
     }
 
     public static boolean isUserAuthor (Request request, Post post) {
-        User user = (User) request.getHttpSession ().getAttribute ("user");
+        User user = (User) request.getSessionAttribute ("user");
         return user != null && isUserAuthor (user, post);
     }
 

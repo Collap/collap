@@ -1,6 +1,7 @@
 package io.collap.std.markdown;
 
-import io.collap.resource.TemplatePlugin;
+import io.collap.resource.Plugin;
+import io.collap.template.TemplateRenderer;
 import org.parboiled.Parboiled;
 import org.parboiled.parserunners.ProfilingParseRunner;
 import org.pegdown.LinkRenderer;
@@ -16,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-public class MarkdownPlugin extends TemplatePlugin {
+public class MarkdownPlugin extends Plugin {
 
     private final static Logger logger = Logger.getLogger (MarkdownPlugin.class.getName ());
 
@@ -24,13 +25,14 @@ public class MarkdownPlugin extends TemplatePlugin {
      * Note: The Parser is not thread safe!
      * TODO: Pool multiple Parsers and Serializers based on the expected demand.
      */
+    private TemplateRenderer renderer;
     private Parser parser;
     private List<ToHtmlSerializerPlugin> serializerPlugins;
     private ProfilingParseRunner<Node> parseRunner;
 
     @Override
     public void initialize () {
-        super.initialize ();
+        renderer = new TemplateRenderer (this);
     }
 
     @Override
@@ -66,7 +68,7 @@ public class MarkdownPlugin extends TemplatePlugin {
             parserPlugins
         );
         serializerPlugins = new ArrayList<> ();
-        serializerPlugins.add (new TagSerializer (this));
+        serializerPlugins.add (new TagSerializer (renderer));
     }
 
     /**

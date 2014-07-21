@@ -1,5 +1,6 @@
 package io.collap.std.markdown;
 
+import io.collap.template.TemplateRenderer;
 import org.pegdown.Printer;
 import org.pegdown.ast.Node;
 import org.pegdown.ast.Visitor;
@@ -14,10 +15,10 @@ public class TagSerializer implements ToHtmlSerializerPlugin {
 
     private static final Logger logger = Logger.getLogger (TagSerializer.class.getName ());
 
-    private MarkdownPlugin plugin;
+    private TemplateRenderer renderer;
 
-    public TagSerializer (MarkdownPlugin plugin) {
-        this.plugin = plugin;
+    public TagSerializer (TemplateRenderer renderer) {
+        this.renderer = renderer;
     }
 
     @Override
@@ -37,7 +38,7 @@ public class TagSerializer implements ToHtmlSerializerPlugin {
                     long time = System.nanoTime ();
                     Map<String, Object> model = new HashMap<> ();
                     model.put ("attributes", node.getAttributes ());
-                    printer.print (plugin.renderTemplate ("wowhead/ItemLink", model));
+                    printer.print (renderer.renderTemplate ("wowhead/ItemLink", model));
                     logger.info ("Template execution took " + (System.nanoTime () - time) + "ns.");
                 } catch (IOException e) {
                     e.printStackTrace ();

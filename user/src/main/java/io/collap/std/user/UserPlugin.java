@@ -1,31 +1,34 @@
 package io.collap.std.user;
 
 import io.collap.controller.Dispatcher;
-import io.collap.resource.TemplatePlugin;
+import io.collap.controller.SectionControllerFactory;
+import io.collap.controller.TemplateControllerFactory;
+import io.collap.resource.Plugin;
 import io.collap.std.user.entity.User;
 import io.collap.std.user.page.Login;
 import io.collap.std.user.page.Profile;
 import io.collap.std.user.page.Register;
 import io.collap.std.user.util.Validator;
+import io.collap.template.TemplateRenderer;
 import org.hibernate.cfg.Configuration;
 
-public class UserPlugin extends TemplatePlugin {
+public class UserPlugin extends Plugin {
 
+    private TemplateRenderer renderer;
     private Validator validator;
-    private Profile profilePage;
+    private SectionControllerFactory profileSectionControllerFactory;
 
     @Override
     public void initialize () {
-        super.initialize ();
-
+        renderer = new TemplateRenderer (this);
         validator = new Validator ();
-        profilePage = new Profile (this);
+        profileSectionControllerFactory = new SectionControllerFactory (Profile.class, this, renderer);
 
         Dispatcher userDispatcher = new Dispatcher (collap);
-        userDispatcher.registerController ("register", new Register (this));
-        userDispatcher.registerController ("login", new Login (this));
-        userDispatcher.registerController ("profile", profilePage);
-        collap.getRootDispatcher ().registerController ("user", userDispatcher);
+        userDispatcher.registerControllerFactory ("register", new TemplateControllerFactory (Register.class, this, renderer));
+        userDispatcher.registerControllerFactory ("login", new TemplateControllerFactory (Login.class, this, renderer));
+        userDispatcher.registerControllerFactory ("profile", profileSectionControllerFactory);
+        collap.getRootDispatcher ().registerDispatcher ("user", userDispatcher);
     }
 
     @Override
@@ -42,8 +45,8 @@ public class UserPlugin extends TemplatePlugin {
         return validator;
     }
 
-    public Profile getProfilePage () {
-        return profilePage;
+    public SectionControllerFactory getProfileSectionControllerFactory () {
+        return profileSectionControllerFactory;
     }
 
 }

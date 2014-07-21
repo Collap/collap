@@ -2,12 +2,12 @@
   | Mandatory:
   |   user: User
   |     The User this profile belongs to.
-  |   sections: List<Profile.SectionContent>
-  |     A list of sections that are displayed on the user profile page.
+  |   sections: List<Response>
+  |     A list of sections (Responses) that are displayed on the user profile page.
 
 h1= user.username
 
 each section in sections
   div
-    h2= section.name
+    h2= section.head
     span!= section.content

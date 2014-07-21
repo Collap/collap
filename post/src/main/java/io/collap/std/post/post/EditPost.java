@@ -3,7 +3,6 @@ package io.collap.std.post.post;
 import io.collap.controller.TemplateController;
 import io.collap.controller.communication.Request;
 import io.collap.controller.communication.Response;
-import io.collap.resource.TemplatePlugin;
 import io.collap.std.post.entity.Category;
 import io.collap.std.post.entity.Post;
 import io.collap.std.user.entity.User;
@@ -18,8 +17,11 @@ import java.util.*;
 
 public class EditPost extends TemplateController {
 
-    public EditPost (TemplatePlugin plugin) {
-        super (plugin);
+    private String idString;
+
+    @Override
+    public void initialize (String remainingPath) {
+        idString = remainingPath;
     }
 
     /**
@@ -28,16 +30,16 @@ public class EditPost extends TemplateController {
      * Otherwise, a new post is created.
      */
     @Override
-    protected void doGet (String remainingPath, Request request, Response response) throws IOException {
+    public void doGet (Response response) throws IOException {
         if (!Permissions.isUserLoggedIn (request)) {
             response.getContentWriter ().write ("You need to be logged in!");
             return;
         }
 
         Session session = plugin.getCollap ().getSessionFactory ().getCurrentSession ();
-        Post post = PostUtil.getPostFromDatabaseOrCreate (session, remainingPath, true);
+        Post post = PostUtil.getPostFromDatabaseOrCreate (session, idString, true);
         if (post != null) {
-            User user = (User) request.getHttpSession ().getAttribute ("user");
+            User user = (User) request.getSessionAttribute ("user");
             if (post.getId () == -1 || PostUtil.isUserAuthor (user, post)) {
                 Map<String, Object> model = new HashMap<> ();
                 model.put ("post", post);
@@ -51,8 +53,8 @@ public class EditPost extends TemplateController {
                     categoryString += category.getName ();
                 }
                 model.put ("categoryString", categoryString);
-                plugin.renderAndWriteTemplate ("post/Edit_head", model, response.getHeadWriter ());
-                plugin.renderAndWriteTemplate ("post/Edit", model, response.getContentWriter ());
+                renderer.renderAndWriteTemplate ("post/Edit_head", model, response.getHeadWriter ());
+                renderer.renderAndWriteTemplate ("post/Edit", model, response.getContentWriter ());
             }else {
                 response.getContentWriter ().write ("Insufficient editing permissions!");
             }
@@ -66,7 +68,7 @@ public class EditPost extends TemplateController {
      * Update or add a post.
      */
     @Override
-    protected void doPost (String remainingPath, Request request, Response response) throws IOException {
+    public void doPost (Response response) throws IOException {
         if (!Permissions.isUserLoggedIn (request)) {
             response.getContentWriter ().write ("You need to be logged in!");
             return;
@@ -82,7 +84,7 @@ public class EditPost extends TemplateController {
         Session session = plugin.getCollap ().getSessionFactory ().getCurrentSession ();
 
         /* Note: It is assumed that a check whether a user is logged in already passed. */
-        User author = (User) request.getHttpRequest ().getSession ().getAttribute ("user");
+        User author = (User) request.getSessionAttribute ("user");
 
         Date now = new Date ();
         Post post;
@@ -106,8 +108,8 @@ public class EditPost extends TemplateController {
         }
 
         // TODO: Escape the HTML in the title field.
-        post.setTitle (request.getHttpRequest ().getParameter ("title"));
-        post.setContent (request.getHttpRequest ().getParameter ("content"));
+        post.setTitle (request.getStringParameter ("title"));
+        post.setContent (request.getStringParameter ("content"));
         post.setLastEdit (now);
 
         MarkdownPlugin markdownPlugin = (MarkdownPlugin) plugin.getCollap ().getPluginManager ().getPlugins ().get ("std-markdown");
@@ -122,7 +124,7 @@ public class EditPost extends TemplateController {
     }
 
     private void updateCategories (Post post, Request request, Response response) throws IOException {
-        String[] inputNames = request.getHttpRequest ().getParameter ("categories").split (",");
+        String[] inputNames = request.getStringParameter ("categories").split (",");
         Set<Category> categories = post.getCategories ();
 
         /* Trim category names. */

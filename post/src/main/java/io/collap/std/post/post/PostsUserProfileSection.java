@@ -1,9 +1,9 @@
 package io.collap.std.post.post;
 
-import io.collap.resource.TemplatePlugin;
+import io.collap.controller.TemplateController;
+import io.collap.controller.communication.Response;
 import io.collap.std.post.entity.Post;
 import io.collap.std.user.entity.User;
-import io.collap.std.user.page.Profile;
 import org.hibernate.Session;
 
 import java.io.IOException;
@@ -12,16 +12,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class PostsUserProfileSection implements Profile.Section {
+public class PostsUserProfileSection extends TemplateController {
 
-    private TemplatePlugin plugin;
+    @Override
+    public void initialize (String remainingPath) {
 
-    public PostsUserProfileSection (TemplatePlugin plugin) {
-        this.plugin = plugin;
     }
 
     @Override
-    public String getSectionContent (User author) {
+    public void doGet (Response response) throws IOException {
+        User author = (User) request.getParameter ("user");
+
         Session session = plugin.getCollap ().getSessionFactory ().getCurrentSession ();
         List<Object[]> rows = session
                 .createQuery ("select id, title from Post as post where post.author.id = :authorId")
@@ -38,18 +39,8 @@ public class PostsUserProfileSection implements Profile.Section {
 
         Map<String, Object> model = new HashMap<> ();
         model.put ("posts", posts);
-        String content = "";
-        try {
-            content = plugin.renderTemplate ("post/PostsUserProfileSection", model);
-        } catch (IOException e) {
-            e.printStackTrace ();
-        }
-        return content;
-    }
-
-    @Override
-    public String getName () {
-        return "Posts";
+        renderer.renderAndWriteTemplate ("post/PostsUserProfileSection", model, response.getContentWriter ());
+        response.getHeadWriter ().write ("Posts");
     }
 
 }

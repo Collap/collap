@@ -2,9 +2,7 @@ package io.collap.std.post.category;
 
 import io.collap.controller.TemplateController;
 import io.collap.controller.communication.HttpStatus;
-import io.collap.controller.communication.Request;
 import io.collap.controller.communication.Response;
-import io.collap.resource.TemplatePlugin;
 import io.collap.std.post.entity.Category;
 import io.collap.std.user.util.Permissions;
 import io.collap.util.ParseUtils;
@@ -16,23 +14,27 @@ import java.util.Map;
 
 public class EditCategory extends TemplateController {
 
-    public EditCategory (TemplatePlugin plugin) {
-        super (plugin);
+    private String idString;
+
+
+    @Override
+    public void initialize (String remainingPath) {
+        idString = remainingPath;
     }
 
     @Override
-    protected void doGet (String remainingPath, Request request, Response response) throws IOException {
+    public void doGet (Response response) throws IOException {
         if (!Permissions.isUserLoggedIn (request)) {
             response.getContentWriter ().write ("You need to be logged in!");
             return;
         }
 
         Session session = plugin.getCollap ().getSessionFactory ().getCurrentSession ();
-        Long id = ParseUtils.parseLong (remainingPath);
+        Long id = ParseUtils.parseLong (idString);
         Category category;
 
         if (id == null) {
-            if (remainingPath.isEmpty ()) {
+            if (idString.isEmpty ()) {
                 category = Category.createTransientCategory ();
             }else {
                 response.setStatus (HttpStatus.notFound);
@@ -48,12 +50,12 @@ public class EditCategory extends TemplateController {
 
         Map<String, Object> model = new HashMap<> ();
         model.put ("category", category);
-        plugin.renderAndWriteTemplate ("category/Edit.jade", model, response.getContentWriter ());
-        plugin.renderAndWriteTemplate ("category/Edit_head.jade", model, response.getHeadWriter ());
+        renderer.renderAndWriteTemplate ("category/Edit.jade", model, response.getContentWriter ());
+        renderer.renderAndWriteTemplate ("category/Edit_head.jade", model, response.getHeadWriter ());
     }
 
     @Override
-    protected void doPost (String remainingPath, Request request, Response response) throws IOException{
+    public void doPost (Response response) throws IOException{
         if (!Permissions.isUserLoggedIn (request)) {
             response.getContentWriter ().write ("You need to be logged in!");
             return;
