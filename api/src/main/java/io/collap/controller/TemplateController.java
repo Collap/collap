@@ -1,18 +1,13 @@
 package io.collap.controller;
 
-import io.collap.resource.TemplatePlugin;
+import io.collap.template.TemplateRenderer;
 
 public abstract class TemplateController extends BasicController {
 
-    protected TemplatePlugin plugin;
+    protected TemplateRenderer renderer;
 
-    protected TemplateController (TemplatePlugin plugin) {
-        super (plugin.getCollap ());
-        this.plugin = plugin;
-    }
-
-    public TemplatePlugin getPlugin () {
-        return plugin;
+    public void setRenderer (TemplateRenderer renderer) {
+        this.renderer = renderer;
     }
 
 }

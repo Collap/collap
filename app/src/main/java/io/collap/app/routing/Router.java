@@ -1,6 +1,7 @@
 package io.collap.app.routing;
 
 import io.collap.Collap;
+import io.collap.controller.communication.HttpRequest;
 import io.collap.controller.communication.HttpStatus;
 import io.collap.controller.communication.Request;
 import io.collap.controller.communication.Response;
@@ -38,7 +39,7 @@ public class Router extends HttpServlet {
     }
 
     private void dispatch (HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)  throws ServletException, IOException {
-        Request request = new Request (httpServletRequest);
+        Request request = new HttpRequest (httpServletRequest);
         Response response = new Response ();
         configureServletResponse (httpServletResponse);
 

@@ -1,9 +1,12 @@
 package io.collap.controller;
 
 import io.collap.Collap;
+import io.collap.cache.Cached;
+import io.collap.cache.Fragment;
 import io.collap.controller.communication.HttpStatus;
 import io.collap.controller.communication.Request;
 import io.collap.controller.communication.Response;
+import net.sf.ehcache.Element;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -11,16 +14,17 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 /**
- * The Dispatcher acts as a controller that dispatches the request to a sub-controller
- *   or a default controller.
+ * The Dispatcher forwards requests to a dispatcher or controller.
  */
-public class Dispatcher implements Controller {
+public class Dispatcher {
 
     private static final Logger logger = Logger.getLogger (Dispatcher.class.getName ());
 
     private Collap collap;
 
-    private Map<String, Controller> controllers = new HashMap<> ();
+    // TODO: A controller and dispatcher could share a name, this is not intended!
+    private Map<String, ControllerFactory> controllerFactories = new HashMap<> ();
+    private Map<String, Dispatcher> dispatchers = new HashMap<> ();
 
     private Wrapper wrapper;
 
@@ -29,25 +33,28 @@ public class Dispatcher implements Controller {
      * command chain (i.e. nothing after its name in the remaining path).
      * When this is null, a page not found error is sent back.
      */
-    private Controller defaultController;
+    private ControllerFactory defaultControllerFactory;
 
     public Dispatcher (Collap collap) {
         this (collap, null);
     }
 
-    public Dispatcher (Collap collap, Controller defaultController) {
+    public Dispatcher (Collap collap, ControllerFactory defaultControllerFactory) {
         this.collap = collap;
-        this.defaultController = defaultController;
+        this.defaultControllerFactory = defaultControllerFactory;
     }
 
-    public void registerController (String name, Controller controller) {
+    public void registerControllerFactory (String name, ControllerFactory controllerFactory) {
         // TODO: Handle "already existing" conflicts
-        controllers.put (name, controller);
+        controllerFactories.put (name, controllerFactory);
     }
 
-    @Override
+    public void registerDispatcher (String name, Dispatcher dispatcher) {
+        dispatchers.put (name, dispatcher);
+    }
+
     public void execute (boolean useWrapper, String remainingPath, Request request, Response response) throws IOException {
-        /* Extract the next controller name. */
+        /* Extract the next dispatcher/controller name. */
         int substringEnd = -1;
         int nextSlash = remainingPath.indexOf ('/'); /* Until next controller name. */
         if (nextSlash >= 0) {
@@ -77,16 +84,29 @@ public class Dispatcher implements Controller {
             }
         }
 
-        /* Find the appropriate controller. */
-        Controller controller;
-        if (controllerName.length () == 0) { /* The dispatcher is the last controller in the command chain. */
-            controller = defaultController;
+        boolean controllerNameEmpty = controllerName.isEmpty ();
+
+        /* Find the appropriate dispatcher. */
+        if (!controllerNameEmpty) {
+            Dispatcher dispatcher = dispatchers.get (controllerName);
+            if (dispatcher != null) {
+                dispatcher.execute (useWrapper, remainingPath, request, response);
+                return;
+            }
+        }
+
+        /* Find the appropriate controller factory, create a controller object and execute the controller. */
+        ControllerFactory controllerFactory;
+        if (controllerNameEmpty) { /* The dispatcher is last in the command chain. */
+            controllerFactory = defaultControllerFactory;
         }else {
-            controller = controllers.get (controllerName);
+            controllerFactory = controllerFactories.get (controllerName);
         }
 
         /* Execute the controller or throw a 404 error. */
-        if (controller != null) {
+        if (controllerFactory != null) {
+            Controller controller = controllerFactory.createController ();
+
             Response controllerResponse;
             if (wrapper != null) {
                 controllerResponse = new Response ();
@@ -95,9 +115,9 @@ public class Dispatcher implements Controller {
             }
 
             // TODO: Rework status handling (Currently the controller status is not passed to the wrapper!).
-            controller.execute (useWrapper, remainingPath, request, controllerResponse);
+            executeController (controller, remainingPath, request, controllerResponse);
             if (controllerResponse.getStatus () != HttpStatus.ok) {
-                if (controller.handleError (request, controllerResponse)) {
+                if (controller.handleError (controllerResponse)) {
                     /* The error has been handled. */
                     controllerResponse.setStatus (HttpStatus.ok);
                 }
@@ -111,18 +131,54 @@ public class Dispatcher implements Controller {
         }
     }
 
-    @Override
-    public boolean handleError (Request request, Response response) throws IOException {
-        // TODO: Implement.
-        return false;
+    private void executeController (Controller controller, String remainingPath, Request request, Response response) throws IOException {
+        controller.initialize (remainingPath, request);
+
+        boolean useCache = false;
+        String key = null;
+        if (controller instanceof Cached) {
+            Cached cached = (Cached) controller;
+            useCache = cached.shouldResponseBeCached ();
+            if (useCache) {
+                key = cached.getElementKey ();
+            }
+        }
+
+        /* Respond with cached element. */
+        if (useCache) {
+            Element element = collap.getFragmentCache ().get (key);
+            if (element != null) {
+                Fragment fragment = (Fragment) element.getObjectValue ();
+                response.getHeadWriter ().write (fragment.getHead ());
+                response.getContentWriter ().write ("Fetched from cache with key '" + key + "'<br>");
+                response.getContentWriter ().write (fragment.getContent ());
+                return;
+            }
+        }
+
+        if (request.getMethod () == Request.Method.get) {
+            controller.doGet (response);
+        }else if (request.getMethod () == Request.Method.post) {
+            controller.doPost (response);
+        }else {
+            throw new UnsupportedOperationException ("The controller does not support the " + request.getMethod ()
+                + " request method!");
+        }
+
+        /* Add element to cache! */
+        if (useCache) {
+            Fragment fragment = new Fragment (response.getHead (), response.getContent ());
+            Element element = new Element (key, fragment);
+            collap.getFragmentCache ().put (element);
+        }
     }
 
-    public Controller getDefaultController () {
-        return defaultController;
+    public ControllerFactory getDefaultControllerFactory () {
+        return defaultControllerFactory;
     }
 
-    public void setDefaultController (BasicController defaultController) {
-        this.defaultController = defaultController;
+    public void setDefaultControllerFactory (ControllerFactory defaultControllerFactory) {
+        this.defaultControllerFactory = defaultControllerFactory;
     }
 
     public Wrapper getWrapper () {

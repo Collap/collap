@@ -1,32 +1,39 @@
-package io.collap.resource;
+package io.collap.template;
 
 import de.neuland.jade4j.JadeConfiguration;
 import de.neuland.jade4j.template.FileTemplateLoader;
 import de.neuland.jade4j.template.JadeTemplate;
+import io.collap.Collap;
 import io.collap.StandardDirectories;
+import io.collap.resource.Plugin;
 import io.collap.util.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
 
 /**
- * The template loader points to the 'res/template' directory of a plugin.
+ * The implementation must be thread-safe!
  */
-public abstract class TemplatePlugin extends Plugin {
-
-    private static final Map<String, Object> EMPTY_MODEL = new HashMap<> ();
+public class TemplateRenderer {
 
     protected JadeConfiguration jadeConfiguration;
 
-    @Override
-    public void initialize () {
+    public TemplateRenderer (Plugin plugin) {
+        initialize (plugin.getCollap (), plugin.getName ());
+    }
+
+    public TemplateRenderer (Collap collap, String cacheName) {
+        initialize (collap, cacheName);
+    }
+
+    private void initialize (Collap collap, String cacheName) {
         jadeConfiguration = new JadeConfiguration ();
         jadeConfiguration.setCaching (true);
         jadeConfiguration.setPrettyPrint (true);
-        String path = new File (StandardDirectories.resourceCache, name + "/template").getAbsolutePath ();
+        String path = new File (StandardDirectories.resourceCache, cacheName + "/template").getAbsolutePath ();
         FileTemplateLoader loader = new FileTemplateLoader (FileUtils.appendDirectorySeparator (path), "UTF-8");
         jadeConfiguration.setTemplateLoader (loader);
 
@@ -36,7 +43,8 @@ public abstract class TemplatePlugin extends Plugin {
     }
 
     public String renderTemplate (String name) throws IOException {
-        return renderTemplate (name, EMPTY_MODEL);
+        Map<String, Object> emptyModel = Collections.emptyMap ();
+        return renderTemplate (name, emptyModel);
     }
 
     public String renderTemplate (String name, Map<String, Object> model) throws IOException {
@@ -45,7 +53,8 @@ public abstract class TemplatePlugin extends Plugin {
     }
 
     public void renderAndWriteTemplate (String name, Writer writer) throws IOException {
-        renderAndWriteTemplate (name, EMPTY_MODEL, writer);
+        Map<String, Object> emptyModel = Collections.emptyMap ();
+        renderAndWriteTemplate (name, emptyModel, writer);
     }
 
     public void renderAndWriteTemplate (String name, Map<String, Object> model, Writer writer) throws IOException {
