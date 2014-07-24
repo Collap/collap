@@ -23,7 +23,7 @@ public class PostsUserProfileSection extends TemplateController {
     public void doGet (Response response) throws IOException {
         User author = (User) request.getParameter ("user");
 
-        Session session = plugin.getCollap ().getSessionFactory ().getCurrentSession ();
+        Session session = module.getCollap ().getSessionFactory ().getCurrentSession ();
         List<Object[]> rows = session
                 .createQuery ("select id, title from Post as post where post.author.id = :authorId")
                 .setLong ("authorId", author.getId ())

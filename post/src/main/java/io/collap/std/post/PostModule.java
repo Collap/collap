@@ -2,18 +2,18 @@ package io.collap.std.post;
 
 import io.collap.cache.InvalidatorManager;
 import io.collap.controller.*;
-import io.collap.resource.Plugin;
+import io.collap.plugin.Module;
 import io.collap.std.post.cache.PostInvalidator;
 import io.collap.std.post.category.DeleteCategory;
 import io.collap.std.post.category.EditCategory;
 import io.collap.std.post.entity.Category;
 import io.collap.std.post.entity.Post;
 import io.collap.std.post.post.*;
-import io.collap.std.user.UserPlugin;
+import io.collap.std.user.UserModule;
 import io.collap.template.TemplateRenderer;
 import org.hibernate.cfg.Configuration;
 
-public class PostPlugin extends Plugin {
+public class PostModule extends Module {
 
     private TemplateRenderer renderer;
 
@@ -40,8 +40,8 @@ public class PostPlugin extends Plugin {
         collap.getRootDispatcher ().registerDispatcher ("category", categoryDispatcher);
 
         /* Add the posts section to the profile page! */
-        UserPlugin userPlugin = (UserPlugin) collap.getPluginManager ().getPlugins ().get ("std-user");
-        SectionControllerFactory profileSectionControllerFactory = userPlugin.getProfileSectionControllerFactory ();
+        UserModule userModule = (UserModule) collap.getPluginManager ().getPlugins ().get ("std-user");
+        SectionControllerFactory profileSectionControllerFactory = userModule.getProfileSectionControllerFactory ();
         if (profileSectionControllerFactory != null) {
             profileSectionControllerFactory.addSectionFactory (new TemplateControllerFactory (PostsUserProfileSection.class,
                     this, renderer));

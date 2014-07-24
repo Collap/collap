@@ -3,7 +3,7 @@ package io.collap.std.user;
 import io.collap.controller.Dispatcher;
 import io.collap.controller.SectionControllerFactory;
 import io.collap.controller.TemplateControllerFactory;
-import io.collap.resource.Plugin;
+import io.collap.plugin.Module;
 import io.collap.std.user.entity.User;
 import io.collap.std.user.page.Login;
 import io.collap.std.user.page.Profile;
@@ -12,7 +12,7 @@ import io.collap.std.user.util.Validator;
 import io.collap.template.TemplateRenderer;
 import org.hibernate.cfg.Configuration;
 
-public class UserPlugin extends Plugin {
+public class UserModule extends Module {
 
     private TemplateRenderer renderer;
     private Validator validator;

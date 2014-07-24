@@ -59,7 +59,7 @@ public class Login extends TemplateController {
         model.put ("errors", errors);
 
         /* Fetch user from the DB. */
-        Session session = plugin.getCollap ().getSessionFactory ().getCurrentSession ();
+        Session session = module.getCollap ().getSessionFactory ().getCurrentSession ();
         User user = (User) session.createQuery ("from User as user where user.username = ?").setString (0, name).uniqueResult ();
         if (user == null) {
             errors.add ("Invalid username or password!");

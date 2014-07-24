@@ -25,7 +25,7 @@ public class ViewPost extends TemplateController implements Cached {
 
     @Override
     public void doGet (Response response) throws IOException {
-        Session session = plugin.getCollap ().getSessionFactory ().getCurrentSession ();
+        Session session = module.getCollap ().getSessionFactory ().getCurrentSession ();
 
         /* Get post. */
         Post post = PostUtil.getPostFromDatabase (session, idString);
@@ -51,7 +51,7 @@ public class ViewPost extends TemplateController implements Cached {
 
     @Override
     public String getElementKey () {
-        return KeyUtils.getViewPostKey (plugin.getName (), idString);
+        return KeyUtils.getViewPostKey (module.getName (), idString);
     }
 
 }

@@ -1,7 +1,6 @@
 package io.collap.std.post.post;
 
 import io.collap.controller.TemplateController;
-import io.collap.controller.communication.Request;
 import io.collap.controller.communication.Response;
 import io.collap.std.post.entity.Post;
 import org.hibernate.Session;
@@ -37,7 +36,7 @@ public class ListPosts extends TemplateController {
         long time = System.nanoTime ();
 
         String[] categoryNames = categoryString.split (",");
-        Session session = plugin.getCollap ().getSessionFactory ().getCurrentSession ();
+        Session session = module.getCollap ().getSessionFactory ().getCurrentSession ();
         List<Post> posts = session
                 .createQuery (
                                 "select post " +

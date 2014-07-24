@@ -3,10 +3,10 @@ package io.collap.std.post.post;
 import io.collap.controller.TemplateController;
 import io.collap.controller.communication.Request;
 import io.collap.controller.communication.Response;
+import io.collap.std.markdown.MarkdownModule;
 import io.collap.std.post.entity.Category;
 import io.collap.std.post.entity.Post;
 import io.collap.std.user.entity.User;
-import io.collap.std.markdown.MarkdownPlugin;
 import io.collap.std.post.util.PostUtil;
 import io.collap.std.user.util.Permissions;
 import org.hibernate.Session;
@@ -36,7 +36,7 @@ public class EditPost extends TemplateController {
             return;
         }
 
-        Session session = plugin.getCollap ().getSessionFactory ().getCurrentSession ();
+        Session session = module.getCollap ().getSessionFactory ().getCurrentSession ();
         Post post = PostUtil.getPostFromDatabaseOrCreate (session, idString, true);
         if (post != null) {
             User user = (User) request.getSessionAttribute ("user");
@@ -81,7 +81,7 @@ public class EditPost extends TemplateController {
             return;
         }
 
-        Session session = plugin.getCollap ().getSessionFactory ().getCurrentSession ();
+        Session session = module.getCollap ().getSessionFactory ().getCurrentSession ();
 
         /* Note: It is assumed that a check whether a user is logged in already passed. */
         User author = (User) request.getSessionAttribute ("user");
@@ -112,8 +112,8 @@ public class EditPost extends TemplateController {
         post.setContent (request.getStringParameter ("content"));
         post.setLastEdit (now);
 
-        MarkdownPlugin markdownPlugin = (MarkdownPlugin) plugin.getCollap ().getPluginManager ().getPlugins ().get ("std-markdown");
-        post.setCompiledContent (markdownPlugin.convertMarkdownToHTML (post.getContent ()));
+        MarkdownModule markdownModule = (MarkdownModule) module.getCollap ().getPluginManager ().getPlugins ().get ("std-markdown");
+        post.setCompiledContent (markdownModule.convertMarkdownToHTML (post.getContent ()));
 
         /* Update categories. */
         updateCategories (post, request, response);
@@ -171,7 +171,7 @@ public class EditPost extends TemplateController {
         /* Get all newly referenced categories from the database. */
         if (newNames.size () > 0) {
             String query = "from Category as category where category.name in :names";
-            List<Category> newCategories = plugin.getCollap ().getSessionFactory ().getCurrentSession ()
+            List<Category> newCategories = module.getCollap ().getSessionFactory ().getCurrentSession ()
                     .createQuery (query)
                     .setParameterList ("names", newNames)
                     .list ();

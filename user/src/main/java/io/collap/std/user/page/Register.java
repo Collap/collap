@@ -3,8 +3,8 @@ package io.collap.std.user.page;
 import io.collap.controller.TemplateController;
 import io.collap.controller.communication.Request;
 import io.collap.controller.communication.Response;
+import io.collap.std.user.UserModule;
 import io.collap.std.user.entity.User;
-import io.collap.std.user.UserPlugin;
 import io.collap.std.user.util.Validator;
 import io.collap.util.PasswordHash;
 import org.hibernate.Session;
@@ -37,7 +37,7 @@ public class Register extends TemplateController {
         String username = request.getStringParameter ("username");
         String password = request.getStringParameter ("password");
 
-        Validator.ValidationResult userNameValidation = ((UserPlugin) plugin).getValidator ().validateUserName (username);
+        Validator.ValidationResult userNameValidation = ((UserModule) module).getValidator ().validateUserName (username);
         if (!userNameValidation.passed) {
             registerError (userNameValidation.error, response);
             return;
@@ -50,7 +50,7 @@ public class Register extends TemplateController {
         }
 
         /* Check if the requested name is already taken. */
-        Session session = plugin.getCollap ().getSessionFactory ().getCurrentSession ();
+        Session session = module.getCollap ().getSessionFactory ().getCurrentSession ();
         Long count = (Long) session
                 .createQuery ("select count(user) from User as user where user.username = :username")
                 .setString ("username", username)

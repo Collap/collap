@@ -31,11 +31,11 @@ subprojects {
     }
 
     jar {
-    	destinationDir = file ("$rootDir/../plugin")
+    	destinationDir = file ("$rootDir/../module")
         from ('res') {
             into ('/resource/')
         }
-        from ('plugin.yaml') {
+        from ('module.yaml') {
             into ('/')
         }
     }

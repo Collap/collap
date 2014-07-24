@@ -1,14 +1,14 @@
 package io.collap.std.post.cache;
 
 import io.collap.cache.BasicInvalidator;
-import io.collap.resource.Plugin;
+import io.collap.plugin.Module;
 import io.collap.std.post.entity.Post;
 import net.sf.ehcache.Cache;
 
 public class PostInvalidator extends BasicInvalidator {
 
-    public PostInvalidator (Plugin plugin) {
-        super (plugin);
+    public PostInvalidator (Module module) {
+        super (module);
     }
 
     @Override
@@ -16,8 +16,8 @@ public class PostInvalidator extends BasicInvalidator {
         Post post = (Post) entity;
 
         /* Invalidate ViewPost pages. */
-        Cache fragmentCache = plugin.getCollap ().getFragmentCache ();
-        fragmentCache.remove (KeyUtils.getViewPostKey (plugin, post));
+        Cache fragmentCache = module.getCollap ().getFragmentCache ();
+        fragmentCache.remove (KeyUtils.getViewPostKey (module, post));
         post.getId ();
     }
 

@@ -27,7 +27,7 @@ public class DeleteCategory extends TemplateController {
             return;
         }
 
-        Session session = plugin.getCollap ().getSessionFactory ().getCurrentSession ();
+        Session session = module.getCollap ().getSessionFactory ().getCurrentSession ();
         Category category = CategoryUtil.getCategoryFromDatabase (session, idString);
         if (category == null) {
             response.getContentWriter ().write ("Category not found!");

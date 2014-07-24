@@ -47,7 +47,7 @@ public class Profile extends SectionController {
         if (userId == -1) { /* Display logged in user. */
             user = (User) request.getSessionAttribute ("user");
         }else { /* Fetch user from DB. */
-            Session session = plugin.getCollap ().getSessionFactory ().getCurrentSession ();
+            Session session = module.getCollap ().getSessionFactory ().getCurrentSession ();
             user = (User) session.get (User.class, userId);
         }
 

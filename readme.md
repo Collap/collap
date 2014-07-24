@@ -1,1 +1,1 @@
-The plugins generated in this project will be copied to 'plugin' in the parent folder of this project.
+The modules generated in this project will be copied to the 'module' folder in the parent folder of this project.

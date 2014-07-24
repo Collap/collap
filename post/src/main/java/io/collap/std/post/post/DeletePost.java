@@ -25,7 +25,7 @@ public class DeletePost extends TemplateController {
             return;
         }
 
-        Session session = plugin.getCollap ().getSessionFactory ().getCurrentSession ();
+        Session session = module.getCollap ().getSessionFactory ().getCurrentSession ();
 
         /* Get post. */
         Post post = PostUtil.getPostFromDatabase (session, idString);

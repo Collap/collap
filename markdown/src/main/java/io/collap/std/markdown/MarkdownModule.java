@@ -1,7 +1,8 @@
 package io.collap.std.markdown;
 
-import io.collap.resource.Plugin;
+import io.collap.plugin.Module;
 import io.collap.template.TemplateRenderer;
+import org.hibernate.cfg.Configuration;
 import org.parboiled.Parboiled;
 import org.parboiled.parserunners.ProfilingParseRunner;
 import org.pegdown.LinkRenderer;
@@ -17,9 +18,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-public class MarkdownPlugin extends Plugin {
+public class MarkdownModule extends Module {
 
-    private final static Logger logger = Logger.getLogger (MarkdownPlugin.class.getName ());
+    private final static Logger logger = Logger.getLogger (MarkdownModule.class.getName ());
 
     /**
      * Note: The Parser is not thread safe!
@@ -29,6 +30,11 @@ public class MarkdownPlugin extends Plugin {
     private Parser parser;
     private List<ToHtmlSerializerPlugin> serializerPlugins;
     private ProfilingParseRunner<Node> parseRunner;
+
+    @Override
+    public void configureHibernate (Configuration configuration) {
+
+    }
 
     @Override
     public void initialize () {

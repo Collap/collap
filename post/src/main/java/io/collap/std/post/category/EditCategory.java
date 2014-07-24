@@ -29,7 +29,7 @@ public class EditCategory extends TemplateController {
             return;
         }
 
-        Session session = plugin.getCollap ().getSessionFactory ().getCurrentSession ();
+        Session session = module.getCollap ().getSessionFactory ().getCurrentSession ();
         Long id = ParseUtils.parseLong (idString);
         Category category;
 
@@ -61,7 +61,7 @@ public class EditCategory extends TemplateController {
             return;
         }
 
-        Session session = plugin.getCollap ().getSessionFactory ().getCurrentSession ();
+        Session session = module.getCollap ().getSessionFactory ().getCurrentSession ();
         Long id = request.getLongParameter ("id");
         if (id == null) {
             response.getContentWriter ().write ("ID parameter invalid.");
