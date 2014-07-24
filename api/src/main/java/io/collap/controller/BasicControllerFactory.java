@@ -1,24 +1,21 @@
 package io.collap.controller;
 
-import io.collap.resource.Plugin;
+import io.collap.plugin.Module;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * This class requires the controller class to implement Controller (Plugin) as a constructor.
- */
 public class BasicControllerFactory implements ControllerFactory {
 
     private static final Logger logger = Logger.getLogger (BasicControllerFactory.class.getName ());
 
     protected Class<? extends Controller> controllerClass;
-    protected Plugin plugin;
+    protected Module module;
 
-    public BasicControllerFactory (Class<? extends Controller> controllerClass, Plugin plugin) {
+    public BasicControllerFactory (Class<? extends Controller> controllerClass, Module module) {
         this.controllerClass = controllerClass;
-        this.plugin = plugin;
+        this.module = module;
     }
 
     @Override
@@ -38,7 +35,7 @@ public class BasicControllerFactory implements ControllerFactory {
      * Override this method to configure the controller of a specific class.
      */
     protected void configureController (Controller controller) {
-        ((BasicController) controller).setPlugin (plugin);
+        ((BasicController) controller).setModule (module);
     }
 
 }

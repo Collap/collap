@@ -1,13 +1,13 @@
 package io.collap.cache;
 
-import io.collap.resource.Plugin;
+import io.collap.plugin.Module;
 
 public abstract class BasicInvalidator implements Invalidator {
 
-    protected Plugin plugin;
+    protected Module module;
 
-    public BasicInvalidator (Plugin plugin) {
-        this.plugin = plugin;
+    public BasicInvalidator (Module module) {
+        this.module = module;
     }
 
 }

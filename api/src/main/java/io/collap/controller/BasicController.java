@@ -2,7 +2,7 @@ package io.collap.controller;
 
 import io.collap.controller.communication.Request;
 import io.collap.controller.communication.Response;
-import io.collap.resource.Plugin;
+import io.collap.plugin.Module;
 
 import java.io.IOException;
 
@@ -11,7 +11,7 @@ import java.io.IOException;
  */
 public abstract class BasicController implements Controller {
 
-    protected Plugin plugin;
+    protected Module module;
     protected Request request;
 
     @Override
@@ -40,8 +40,8 @@ public abstract class BasicController implements Controller {
         return false;
     }
 
-    public void setPlugin (Plugin plugin) {
-        this.plugin = plugin;
+    public void setModule (Module module) {
+        this.module = module;
     }
 
 }

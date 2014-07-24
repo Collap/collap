@@ -2,8 +2,7 @@ package io.collap;
 
 import io.collap.cache.InvalidatorManager;
 import io.collap.controller.Dispatcher;
-import io.collap.resource.Plugin;
-import io.collap.resource.PluginManager;
+import io.collap.plugin.*;
 import io.collap.util.FileUtils;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
@@ -73,8 +72,11 @@ public class Collap {
         fragmentCache = cacheManager.getCache ("fragmentCache");
 
         /* Register plugins. */
-        pluginManager = new PluginManager (this);
-        pluginManager.registerDirectory (StandardDirectories.plugin);
+        pluginManager = new PluginManager ();
+        pluginManager.registerDirectory (StandardDirectories.module, "jar", new ModuleFactory (pluginManager, this));
+        pluginManager.registerDirectory (StandardDirectories.pack, "zip", new PackFactory (pluginManager));
+        pluginManager.findAllDependencies ();
+        pluginManager.populateAllCaches ();
 
         /* Miscellaneous initializations. */
         rootDispatcher = new Dispatcher (this);
@@ -82,7 +84,7 @@ public class Collap {
         initializeSessionFactory ();
 
         /* Initialize plugins. */
-        pluginManager.initializeAllPlugins ();
+        pluginManager.initializeAll ();
     }
 
     /*
@@ -145,6 +147,7 @@ public class Collap {
     }
 
     public void destroy () {
+        pluginManager.destroyAll ();
         sessionFactory.close ();
     }
 

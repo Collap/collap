@@ -24,12 +24,19 @@ public class FileUtils {
         return "";
     }
 
+    /**
+     * @param expectedFileExtension May be an empty string, in which case any extension is expected.
+     */
     public static ArrayList<File> crawlDirectory (File directory, String expectedFileExtension) {
         ArrayList<File> files = new ArrayList<> ();
         crawlDirectory (directory, expectedFileExtension, files);
         return files;
     }
 
+
+    /**
+     * @param expectedFileExtension May be an empty string, in which case any extension is expected.
+     */
     public static void crawlDirectory (File directory, String expectedFileExtension, ArrayList<File> files) {
         if (!directory.exists () || !directory.isDirectory ()) {
             return;

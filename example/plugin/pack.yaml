@@ -1,0 +1,6 @@
+% There are no pack-specific configuration options.
+% A pack configuration has to be named "pack.yaml"!
+
+
+% Bear in mind that dependencies of the pack are automatically plugins which resource data is replaced
+% by the pack's resources.

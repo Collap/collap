@@ -28,7 +28,7 @@ dependencies {
 
     /* These should be a subset of the compile dependencies. They are copied into the lib folder.
     *  I could not just make compile extend includedJars, as that apparently screws with maven
-    *  dependencies for plugin projects. */
+    *  dependencies for module projects. */
     includedJars dependencyEHCache
     includedJars dependencyHibernate
     includedJars dependencyJade4j

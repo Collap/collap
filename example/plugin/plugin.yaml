@@ -1,0 +1,16 @@
+% This is a configuration file that lists options valid for all plugin configurations.
+% A plugin configuration has to be placed in the root of the plugin zip folder and must be aptly named.
+% Do not name the file "plugin.yaml"!
+
+
+% The name of the plugin is used to identify it. It must be unique, so ensure that it is as specific as possible.
+name: example-plugin
+
+% A dependency is a plugin the current plugin relies upon. The dependency is identified by its plugin name.
+% The dependencies of a plugin are loaded before the current plugin is loaded.
+% The current system does not check for circular dependencies, so be careful with that.
+% This option may be omitted, in which case no dependencies are assumed.
+dependencies:
+  - std-user
+  - std-post
+  - std-markdown

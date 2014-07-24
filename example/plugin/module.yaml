@@ -1,0 +1,8 @@
+% This is an example configuration for a module with all module-specific configuration options.
+% For general plugin configuration options, check "plugin.yaml".
+% A module configuration has to be named "module.yaml"!
+
+
+% Specifies the class that is used as the module class of the module.
+% The class this option points to has to inherit from the Module class.
+mainClass: io.collap.std.example.ExamplePlugin

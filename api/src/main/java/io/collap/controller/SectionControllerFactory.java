@@ -1,6 +1,6 @@
 package io.collap.controller;
 
-import io.collap.resource.Plugin;
+import io.collap.plugin.Module;
 import io.collap.template.TemplateRenderer;
 
 import java.util.ArrayList;
@@ -10,8 +10,8 @@ public class SectionControllerFactory extends TemplateControllerFactory {
 
     protected List<ControllerFactory> sectionFactories = new ArrayList<> ();
 
-    public SectionControllerFactory (Class<? extends Controller> controllerClass, Plugin plugin, TemplateRenderer renderer) {
-        super (controllerClass, plugin, renderer);
+    public SectionControllerFactory (Class<? extends Controller> controllerClass, Module module, TemplateRenderer renderer) {
+        super (controllerClass, module, renderer);
     }
 
     public void addSectionFactory (ControllerFactory sectionFactory) {

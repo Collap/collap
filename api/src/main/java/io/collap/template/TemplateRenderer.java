@@ -5,7 +5,7 @@ import de.neuland.jade4j.template.FileTemplateLoader;
 import de.neuland.jade4j.template.JadeTemplate;
 import io.collap.Collap;
 import io.collap.StandardDirectories;
-import io.collap.resource.Plugin;
+import io.collap.plugin.Module;
 import io.collap.util.FileUtils;
 
 import java.io.File;
@@ -21,8 +21,8 @@ public class TemplateRenderer {
 
     protected JadeConfiguration jadeConfiguration;
 
-    public TemplateRenderer (Plugin plugin) {
-        initialize (plugin.getCollap (), plugin.getName ());
+    public TemplateRenderer (Module module) {
+        initialize (module.getCollap (), module.getName ());
     }
 
     public TemplateRenderer (Collap collap, String cacheName) {
