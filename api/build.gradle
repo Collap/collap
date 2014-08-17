@@ -12,6 +12,7 @@ ext.dependencyHibernate = 'org.hibernate:hibernate-core:4.3.4.Final'
 ext.dependencyJade4j = 'collap-jade4j:jade4j:0.4.2'
 ext.dependencyHikariCP = 'com.zaxxer:HikariCP:1.3.5'
 ext.dependencyYamlbeans = 'com.esotericsoftware.yamlbeans:yamlbeans:1.06'
+ext.dependencyJSR305 = 'com.google.code.findbugs:jsr305:3.0.0' /* @Nullable and @NotNull! */
 
 configurations {
     includedJars
@@ -25,6 +26,7 @@ dependencies {
     compile dependencyJade4j
     compile dependencyHikariCP
     compile dependencyYamlbeans
+    compile dependencyJSR305
 
     /* These should be a subset of the compile dependencies. They are copied into the lib folder.
     *  I could not just make compile extend includedJars, as that apparently screws with maven
@@ -34,6 +36,7 @@ dependencies {
     includedJars dependencyJade4j
     includedJars dependencyHikariCP
     includedJars dependencyYamlbeans
+    includedJars dependencyJSR305
 }
 
 /**
