@@ -1,16 +1,13 @@
 package io.collap.std.user.entity;
 
-import org.hibernate.annotations.GenericGenerator;
-
 import javax.persistence.*;
+import javax.persistence.Entity;
 
 @Entity
 @Table(name = "users")
-public class User {
+public class User extends io.collap.entity.Entity {
 
-    private Long id;
     private String username;
-
     private String passwordHash;
 
     public User () {
@@ -19,17 +16,6 @@ public class User {
 
     public User (String username) {
         this.username = username;
-    }
-
-    @Id
-    @GeneratedValue(generator = "increment")
-    @GenericGenerator(name = "increment", strategy = "increment")
-    public Long getId () {
-        return id;
-    }
-
-    public void setId (Long id) {
-        this.id = id;
     }
 
     @Column(unique = true)

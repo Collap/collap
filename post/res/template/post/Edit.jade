@@ -5,22 +5,23 @@
   |     May be empty (but not null) to allow creating new posts, in which case the id must be -1.
   |   categoryString: String
   |     A string of all categories, comma-separated.
+  |   customEditor: String
+  |     HTML of the custom editor for the specific type of the post.
 
 form(name="edit", action=basePath + "post/edit", method="post")
   input(type="hidden", name="id", value=post.id)
 
-  label(for="title") Title:
-  input(type="text", name="title", value=post.title)
+  //- This field exists for new posts only, it is ignored with already existing posts
+    |   (because their type has already been determined).
+  input(type="hidden", name="typeName", value=post.typeName)
 
-  br
+  p Post type: #{post.typeName}
 
-  label(for="categories") Categories:
-  input(type="text", name="categories", value=categoryString)
+  p
+    label(for="categories") Categories:
+    input(type="text", name="categories", value=categoryString)
 
-  br
-
-  textarea(name="content", rows="6", cols="50")= post.content
-
-  br
+  h2 Type Specific Content
+  div!= customEditor
 
   input(type="submit", value="Post")

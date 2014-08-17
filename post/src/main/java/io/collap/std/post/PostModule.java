@@ -7,19 +7,31 @@ import io.collap.std.post.cache.PostInvalidator;
 import io.collap.std.post.category.DeleteCategory;
 import io.collap.std.post.category.EditCategory;
 import io.collap.std.post.entity.Category;
+import io.collap.std.post.entity.PlainData;
 import io.collap.std.post.entity.Post;
 import io.collap.std.post.post.*;
+import io.collap.std.post.type.PlainType;
+import io.collap.std.post.type.Type;
 import io.collap.std.user.UserModule;
 import io.collap.template.TemplateRenderer;
 import org.hibernate.cfg.Configuration;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class PostModule extends Module {
 
     private TemplateRenderer renderer;
+    private Map<String, Type> postTypes;
 
     @Override
     public void initialize () {
         renderer = new TemplateRenderer (this);
+        postTypes = new HashMap<> ();
+
+        /* Add standard post types! */
+        PlainType plainType = new PlainType (collap, renderer);
+        addPostType (plainType);
 
         /* post/ */
         Dispatcher postDispatcher = new Dispatcher (collap);
@@ -61,6 +73,18 @@ public class PostModule extends Module {
     public void configureHibernate (Configuration cfg) {
         cfg.addAnnotatedClass (Post.class);
         cfg.addAnnotatedClass (Category.class);
+        cfg.addAnnotatedClass (PlainData.class);
+    }
+
+    /**
+     * This method is intended for read use <b>only</b>!
+     */
+    public Map<String, Type> getPostTypes () {
+        return postTypes;
+    }
+
+    public void addPostType (Type type) {
+        postTypes.put (type.getName (), type);
     }
 
 }

@@ -4,25 +4,38 @@ import io.collap.std.user.entity.User;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import javax.persistence.Entity;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 @Table(name = "posts")
-public class Post {
+public class Post extends io.collap.entity.Entity {
 
     /**
      * An ID of -1 indicates a post that has not been added to the database yet.
      */
-    private Long id;
     private User author; // TODO: Allow multiple authors? After all, it's called COLLABORATION.
     private Set<Category> categories;
     private Date publishingDate;
     private Date lastEdit;
+
+    /*
+     * The following fields are <b>compiled</b> fields!
+     */
     private String title;
     private String content;
-    private String compiledContent;
+
+    /*
+     * Corresponds to additional content in the form of types.
+     */
+
+    /** This is currently <b>immutable</b>. */
+    private String typeName;
+
+    /** The type data id links to the correct entry in the table named by typeName. */
+    private Long typeDataId;
 
     public Post () {
 
@@ -38,17 +51,6 @@ public class Post {
         post.setTitle ("");
         post.setContent ("");
         return post;
-    }
-
-    @Id
-    @GeneratedValue(generator = "increment")
-    @GenericGenerator(name = "increment", strategy = "increment")
-    public Long getId () {
-        return id;
-    }
-
-    public void setId (Long id) {
-        this.id = id;
     }
 
     // TODO: The author may be nonexistent (After account deletion for example).
@@ -73,14 +75,6 @@ public class Post {
         this.categories = categories;
     }
 
-    public String getTitle () {
-        return title;
-    }
-
-    public void setTitle (String title) {
-        this.title = title;
-    }
-
     public Date getPublishingDate () {
         return publishingDate;
     }
@@ -97,6 +91,14 @@ public class Post {
         this.lastEdit = lastEdit;
     }
 
+    public String getTitle () {
+        return title;
+    }
+
+    public void setTitle (String title) {
+        this.title = title;
+    }
+
     @Column(columnDefinition="mediumtext")
     public String getContent () {
         return content;
@@ -106,13 +108,20 @@ public class Post {
         this.content = content;
     }
 
-    @Column(columnDefinition="mediumtext")
-    public String getCompiledContent () {
-        return compiledContent;
+    public String getTypeName () {
+        return typeName;
     }
 
-    public void setCompiledContent (String compiledContent) {
-        this.compiledContent = compiledContent;
+    public void setTypeName (String typeName) {
+        this.typeName = typeName;
+    }
+
+    public Long getTypeDataId () {
+        return typeDataId;
+    }
+
+    public void setTypeDataId (Long typeDataId) {
+        this.typeDataId = typeDataId;
     }
 
 }

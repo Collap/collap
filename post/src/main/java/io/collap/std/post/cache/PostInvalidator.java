@@ -18,7 +18,6 @@ public class PostInvalidator extends BasicInvalidator {
         /* Invalidate ViewPost pages. */
         Cache fragmentCache = module.getCollap ().getFragmentCache ();
         fragmentCache.remove (KeyUtils.getViewPostKey (module, post));
-        post.getId ();
     }
 
 }

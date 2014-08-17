@@ -3,9 +3,10 @@ package io.collap.std.post.post;
 import io.collap.controller.TemplateController;
 import io.collap.controller.communication.Request;
 import io.collap.controller.communication.Response;
-import io.collap.std.markdown.MarkdownModule;
+import io.collap.std.post.PostModule;
 import io.collap.std.post.entity.Category;
 import io.collap.std.post.entity.Post;
+import io.collap.std.post.type.Type;
 import io.collap.std.user.entity.User;
 import io.collap.std.post.util.PostUtil;
 import io.collap.std.user.util.Permissions;
@@ -41,9 +42,33 @@ public class EditPost extends TemplateController {
         if (post != null) {
             User user = (User) request.getSessionAttribute ("user");
             if (post.getId () == -1 || PostUtil.isUserAuthor (user, post)) {
+                Map<String, Type> types = ((PostModule) module).getPostTypes ();
+
+                /* Check if type name exists, if not display selection. */
+                String typeName = post.getTypeName ();
+                if (typeName == null) {
+                    typeName = request.getStringParameter ("type");
+                    if (typeName == null) {
+                        /* Display a type selection first! */
+                        Map<String, Object> model = new HashMap<> ();
+                        model.put ("types", types.keySet ());
+                        renderer.renderAndWriteTemplate ("post/SpecifyType", model, response.getContentWriter ());
+                        return;
+                    }else {
+                        post.setTypeName (typeName);
+                    }
+                }
+
+                if (!types.containsKey (typeName)) {
+                    response.getContentWriter ().write ("The post type " + typeName + " does not exist!");
+                    return;
+                }
+
                 Map<String, Object> model = new HashMap<> ();
                 model.put ("post", post);
                 model.put ("categories", post.getCategories ());
+                Type type = types.get (post.getTypeName ());
+                model.put ("customEditor", type.getEditor (post.getTypeDataId ()));
                 // TODO: The following solution is temporary.
                 String categoryString = "";
                 for (Category category : post.getCategories ()) {
@@ -93,6 +118,8 @@ public class EditPost extends TemplateController {
             post.setCategories (new HashSet<Category> ());
             post.setAuthor (author);
             post.setPublishingDate (now);
+            post.setTypeDataId (null);
+            post.setTypeName (request.getStringParameter ("typeName"));
         }else {
             post = (Post) session.get (Post.class, id);
             if (post == null) {
@@ -107,13 +134,11 @@ public class EditPost extends TemplateController {
             }
         }
 
-        // TODO: Escape the HTML in the title field.
-        post.setTitle (request.getStringParameter ("title"));
-        post.setContent (request.getStringParameter ("content"));
         post.setLastEdit (now);
 
-        MarkdownModule markdownModule = (MarkdownModule) module.getCollap ().getPluginManager ().getPlugins ().get ("std-markdown");
-        post.setCompiledContent (markdownModule.convertMarkdownToHTML (post.getContent ()));
+        Type type = ((PostModule) module).getPostTypes ().get (post.getTypeName ());
+        post.setTypeDataId (type.update (post.getTypeDataId (), request));
+        type.compile (post);
 
         /* Update categories. */
         updateCategories (post, request, response);

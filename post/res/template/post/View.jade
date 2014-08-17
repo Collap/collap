@@ -17,7 +17,7 @@ if viewerHasEditingPermissions
     a(href=basePath + "post/edit/" + post.id) (edit)
     a(href=basePath + "post/delete/" + post.id) (delete)
 p Published on #{formattedPublishingDate}. Last edit: #{formattedLastEdit}.
-div!= post.compiledContent
+div!= post.content
 if post.categories.size () <= 0
   p Filed under no categories
 else

@@ -2,7 +2,9 @@ package io.collap.std.post.post;
 
 import io.collap.controller.TemplateController;
 import io.collap.controller.communication.Response;
+import io.collap.std.post.PostModule;
 import io.collap.std.post.entity.Post;
+import io.collap.std.post.type.Type;
 import io.collap.std.post.util.PostUtil;
 import io.collap.std.user.util.Permissions;
 import org.hibernate.Session;
@@ -39,6 +41,10 @@ public class DeletePost extends TemplateController {
             response.getContentWriter ().write ("Insufficient permissions to delete the post!");
             return;
         }
+
+        /* Delete custom post data! */
+        Type type = ((PostModule) module).getPostTypes ().get (post.getTypeName ());
+        type.deleteData (post);
 
         /* Delete post. */
         session.delete (post);
