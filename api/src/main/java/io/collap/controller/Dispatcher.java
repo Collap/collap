@@ -26,6 +26,10 @@ public class Dispatcher {
     private Map<String, ControllerFactory> controllerFactories = new HashMap<> ();
     private Map<String, Dispatcher> dispatchers = new HashMap<> ();
 
+    /**
+     * The wrapper of the current dispatcher. The wrapper is passed down to any child
+     * dispatchers, which use that if their own wrapper is null.
+     */
     private Wrapper wrapper;
 
     /**
@@ -53,7 +57,7 @@ public class Dispatcher {
         dispatchers.put (name, dispatcher);
     }
 
-    public void execute (boolean useWrapper, String remainingPath, Request request, Response response) throws IOException {
+    public void execute (Wrapper parentWrapper, boolean useWrapper, String remainingPath, Request request, Response response) throws IOException {
         /* Extract the next dispatcher/controller name. */
         int substringEnd = -1;
         int nextSlash = remainingPath.indexOf ('/'); /* Until next controller name. */
@@ -86,11 +90,13 @@ public class Dispatcher {
 
         boolean controllerNameEmpty = controllerName.isEmpty ();
 
+        Wrapper usedWrapper = (wrapper != null) ? wrapper : parentWrapper;
+
         /* Find the appropriate dispatcher. */
         if (!controllerNameEmpty) {
             Dispatcher dispatcher = dispatchers.get (controllerName);
             if (dispatcher != null) {
-                dispatcher.execute (useWrapper, remainingPath, request, response);
+                dispatcher.execute (usedWrapper, useWrapper, remainingPath, request, response);
                 return;
             }
         }
@@ -108,7 +114,8 @@ public class Dispatcher {
             Controller controller = controllerFactory.createController ();
 
             Response controllerResponse;
-            if (wrapper != null) {
+
+            if (usedWrapper != null) {
                 controllerResponse = new Response ();
             }else {
                 controllerResponse = response;
@@ -123,8 +130,8 @@ public class Dispatcher {
                 }
             }
 
-            if (wrapper != null) {
-                wrapper.execute (controllerResponse, request, response);
+            if (usedWrapper != null) {
+                usedWrapper.execute (controllerResponse, request, response);
             }
         }else {
             response.setStatus (HttpStatus.notFound);

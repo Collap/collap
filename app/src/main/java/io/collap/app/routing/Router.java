@@ -47,7 +47,7 @@ public class Router extends HttpServlet {
         Transaction transaction = session.beginTransaction ();
 
         // TODO: Cache full response?
-        collap.getRootDispatcher ().execute (true, getRemainingRequestPart (httpServletRequest), request, response);
+        collap.getRootDispatcher ().execute (null, true, getRemainingRequestPart (httpServletRequest), request, response);
         httpServletResponse.getWriter ().write (response.getContent ()); // TODO: Unnecessary copying.
 
         try {
