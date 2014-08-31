@@ -1,8 +1,12 @@
 package io.collap.std.user.page;
 
-import io.collap.controller.TemplateController;
+import io.collap.bryg.Template;
+import io.collap.bryg.environment.Environment;
+import io.collap.bryg.model.Model;
+import io.collap.controller.ModuleController;
 import io.collap.controller.communication.Request;
 import io.collap.controller.communication.Response;
+import io.collap.controller.provider.BrygDependant;
 import io.collap.std.user.entity.User;
 import io.collap.util.PasswordHash;
 import org.hibernate.Session;
@@ -11,34 +15,42 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-public class Login extends TemplateController {
+public class Login extends ModuleController implements BrygDependant {
+
+    /* Dependencies. */
+    private Environment bryg;
+
+    private Template loginTemplate;
+    private Template loginHeadTemplate;
 
     // TODO: Absolute paths for the login template (So it can be included into any page).
     //          Idea: Use a property that points to the path of the current controller.
 
 
     @Override
-    public void initialize (String remainingPath) {
+    public void initialize (Request request, String remainingPath) {
+        super.initialize (request, remainingPath);
 
+        loginTemplate = bryg.getTemplate ("Login");
+        loginHeadTemplate = bryg.getTemplate ("Login_head");
     }
 
     @Override
     public void doGet (Response response) throws IOException {
-        renderer.renderAndWriteTemplate ("Login", response.getContentWriter ());
-        renderer.renderAndWriteTemplate ("Login_head", response.getHeadWriter ());
+        Model model = bryg.createModel ();
+        loginTemplate.render (response.getContentWriter (), model);
+        loginHeadTemplate.render (response.getHeadWriter (), model);
     }
 
     @Override
     public void doPost (Response response) throws IOException {
-        Map<String, Object> model = new HashMap<> ();
+        Model model = bryg.createModel ();
         boolean success = processLogin (request, model);
         if (!success) {
-            renderer.renderAndWriteTemplate ("Login", model, response.getContentWriter ());
-            renderer.renderAndWriteTemplate ("Login_head", response.getHeadWriter ());
+            loginTemplate.render (response.getContentWriter (), model);
+            loginHeadTemplate.render (response.getHeadWriter (), model);
         }else {
             // TODO: Route to whatever page.
             response.getContentWriter ().write ("Login successful!");
@@ -49,14 +61,14 @@ public class Login extends TemplateController {
      * @param model A model which saves error messages from the login process in the variable <i>errors</i>.
      * @return Whether the login process was completed successfully and the user is logged in now.
      */
-    private boolean processLogin (Request request, Map<String, Object> model) {
+    private boolean processLogin (Request request, Model model) {
         // TODO: Cover the situation that the user is already logged in.
 
         String name = request.getStringParameter ("username");
         String password = request.getStringParameter ("password");
 
         List<String> errors = new ArrayList<> ();
-        model.put ("errors", errors);
+        model.setVariable ("errors", errors);
 
         /* Fetch user from the DB. */
         Session session = module.getCollap ().getSessionFactory ().getCurrentSession ();
@@ -84,6 +96,11 @@ public class Login extends TemplateController {
         /* Set session attribute. */
         request.setSessionAttribute ("user", user);
         return true;
+    }
+
+    @Override
+    public void setBryg (Environment environment) {
+        bryg = environment;
     }
 
 }

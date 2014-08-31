@@ -1,12 +1,14 @@
 package io.collap.std.post.post;
 
 import io.collap.cache.Cached;
-import io.collap.controller.TemplateController;
+import io.collap.controller.ModuleController;
 import io.collap.controller.communication.Request;
 import io.collap.controller.communication.Response;
+import io.collap.controller.provider.JadeDependant;
 import io.collap.std.post.cache.KeyUtils;
 import io.collap.std.post.entity.Post;
 import io.collap.std.post.util.PostUtil;
+import io.collap.template.TemplateRenderer;
 import org.hibernate.Session;
 
 import java.io.IOException;
@@ -14,12 +16,15 @@ import java.text.DateFormat;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ViewPost extends TemplateController implements Cached {
+public class ViewPost extends ModuleController implements JadeDependant, Cached {
 
     private String idString;
+    private TemplateRenderer renderer;
 
     @Override
-    public void initialize (String remainingPath) {
+    public void initialize (Request request, String remainingPath) {
+        super.initialize (request, remainingPath);
+
         idString = remainingPath;
     }
 
@@ -52,6 +57,11 @@ public class ViewPost extends TemplateController implements Cached {
     @Override
     public String getElementKey () {
         return KeyUtils.getViewPostKey (module.getName (), idString);
+    }
+
+    @Override
+    public void setRenderer (TemplateRenderer templateRenderer) {
+        renderer = templateRenderer;
     }
 
 }

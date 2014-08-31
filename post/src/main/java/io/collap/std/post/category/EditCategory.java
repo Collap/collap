@@ -1,10 +1,13 @@
 package io.collap.std.post.category;
 
-import io.collap.controller.TemplateController;
+import io.collap.controller.ModuleController;
 import io.collap.controller.communication.HttpStatus;
+import io.collap.controller.communication.Request;
 import io.collap.controller.communication.Response;
+import io.collap.controller.provider.JadeDependant;
 import io.collap.std.post.entity.Category;
 import io.collap.std.user.util.Permissions;
+import io.collap.template.TemplateRenderer;
 import io.collap.util.ParseUtils;
 import org.hibernate.Session;
 
@@ -12,13 +15,15 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class EditCategory extends TemplateController {
+public class EditCategory extends ModuleController implements JadeDependant {
 
     private String idString;
-
+    private TemplateRenderer renderer;
 
     @Override
-    public void initialize (String remainingPath) {
+    public void initialize (Request request, String remainingPath) {
+        super.initialize (request, remainingPath);
+
         idString = remainingPath;
     }
 
@@ -83,6 +88,11 @@ public class EditCategory extends TemplateController {
         session.persist (category);
 
         response.getContentWriter ().write ("Updated category successfully.");
+    }
+
+    @Override
+    public void setRenderer (TemplateRenderer templateRenderer) {
+        renderer = templateRenderer;
     }
 
 }

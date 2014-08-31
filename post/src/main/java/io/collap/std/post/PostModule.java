@@ -2,6 +2,7 @@ package io.collap.std.post;
 
 import io.collap.cache.InvalidatorManager;
 import io.collap.controller.*;
+import io.collap.controller.provider.JadeProvider;
 import io.collap.plugin.Module;
 import io.collap.std.post.cache.PostInvalidator;
 import io.collap.std.post.category.DeleteCategory;
@@ -12,6 +13,7 @@ import io.collap.std.post.entity.Post;
 import io.collap.std.post.post.*;
 import io.collap.std.post.type.PlainType;
 import io.collap.std.post.type.Type;
+import io.collap.std.user.ProfileSectionProvider;
 import io.collap.std.user.UserModule;
 import io.collap.template.TemplateRenderer;
 import org.hibernate.cfg.Configuration;
@@ -19,7 +21,7 @@ import org.hibernate.cfg.Configuration;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PostModule extends Module {
+public class PostModule extends Module implements JadeProvider {
 
     private TemplateRenderer renderer;
     private Map<String, Type> postTypes;
@@ -35,28 +37,29 @@ public class PostModule extends Module {
 
         /* post/ */
         Dispatcher postDispatcher = new Dispatcher (collap);
-        ControllerFactory editPostControllerFactory = new TemplateControllerFactory (EditPost.class, this, renderer);
+        ControllerFactory editPostControllerFactory = new ProviderControllerFactory (EditPost.class, this);
         postDispatcher.registerControllerFactory ("edit", editPostControllerFactory);
         postDispatcher.registerControllerFactory ("new", editPostControllerFactory);
-        postDispatcher.registerControllerFactory ("view", new TemplateControllerFactory (ViewPost.class, this, renderer));
-        postDispatcher.registerControllerFactory ("delete", new TemplateControllerFactory (DeletePost.class, this, renderer));
-        postDispatcher.registerControllerFactory ("list", new TemplateControllerFactory (ListPosts.class, this, renderer));
+        postDispatcher.registerControllerFactory ("view", new ProviderControllerFactory (ViewPost.class, this));
+        postDispatcher.registerControllerFactory ("delete", new ProviderControllerFactory (DeletePost.class, this));
+        postDispatcher.registerControllerFactory ("list", new ProviderControllerFactory (ListPosts.class, this));
         collap.getRootDispatcher ().registerDispatcher ("post", postDispatcher);
 
         /* category/ */
         Dispatcher categoryDispatcher = new Dispatcher (collap);
-        ControllerFactory editCategoryControllerFactory = new TemplateControllerFactory (EditCategory.class, this, renderer);
+        ControllerFactory editCategoryControllerFactory = new ProviderControllerFactory (EditCategory.class, this);
         categoryDispatcher.registerControllerFactory ("edit", editCategoryControllerFactory);
         categoryDispatcher.registerControllerFactory ("new", editCategoryControllerFactory);
-        categoryDispatcher.registerControllerFactory ("delete", new TemplateControllerFactory (DeleteCategory.class, this, renderer));
+        categoryDispatcher.registerControllerFactory ("delete", new ProviderControllerFactory (DeleteCategory.class, this));
         collap.getRootDispatcher ().registerDispatcher ("category", categoryDispatcher);
 
         /* Add the posts section to the profile page! */
         UserModule userModule = (UserModule) collap.getPluginManager ().getPlugins ().get ("std-user");
-        SectionControllerFactory profileSectionControllerFactory = userModule.getProfileSectionControllerFactory ();
-        if (profileSectionControllerFactory != null) {
-            profileSectionControllerFactory.addSectionFactory (new TemplateControllerFactory (PostsUserProfileSection.class,
-                    this, renderer));
+        ProfileSectionProvider profileSections = userModule.getProfileSections ();
+        if (profileSections != null) {
+            profileSections.getSectionControllerFactories ().add (
+                    new ProviderControllerFactory (PostsUserProfileSection.class, this)
+            );
         }
 
         /* Register invalidators! */
@@ -85,6 +88,11 @@ public class PostModule extends Module {
 
     public void addPostType (Type type) {
         postTypes.put (type.getName (), type);
+    }
+
+    @Override
+    public TemplateRenderer getRenderer () {
+        return renderer;
     }
 
 }

@@ -1,8 +1,10 @@
 package io.collap.std.post.post;
 
-import io.collap.controller.TemplateController;
+import io.collap.controller.ModuleController;
 import io.collap.controller.communication.Response;
+import io.collap.controller.provider.JadeDependant;
 import io.collap.std.post.entity.Post;
+import io.collap.template.TemplateRenderer;
 import org.hibernate.Session;
 
 import java.io.IOException;
@@ -10,12 +12,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ListPosts extends TemplateController {
+public class ListPosts extends ModuleController implements JadeDependant {
 
-    @Override
-    public void initialize (String remainingPath) {
-
-    }
+    private TemplateRenderer renderer;
 
     /**
      * Posts are sorted by timestamp.
@@ -60,6 +59,11 @@ public class ListPosts extends TemplateController {
 
         response.getContentWriter ().write (queryTimeMessage);
         response.getContentWriter ().write ("Render time: " + (System.nanoTime () - time) + "ns");
+    }
+
+    @Override
+    public void setRenderer (TemplateRenderer templateRenderer) {
+        renderer = templateRenderer;
     }
 
 }

@@ -1,6 +1,7 @@
 package io.collap.std.post.post;
 
-import io.collap.controller.TemplateController;
+import io.collap.controller.ModuleController;
+import io.collap.controller.communication.Request;
 import io.collap.controller.communication.Response;
 import io.collap.std.post.PostModule;
 import io.collap.std.post.entity.Post;
@@ -11,12 +12,14 @@ import org.hibernate.Session;
 
 import java.io.IOException;
 
-public class DeletePost extends TemplateController {
+public class DeletePost extends ModuleController {
 
     private String idString;
 
     @Override
-    public void initialize (String remainingPath) {
+    public void initialize (Request request, String remainingPath) {
+        super.initialize (request, remainingPath);
+
         idString = remainingPath;
     }
 

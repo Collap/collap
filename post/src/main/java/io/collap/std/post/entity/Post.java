@@ -1,7 +1,6 @@
 package io.collap.std.post.entity;
 
 import io.collap.std.user.entity.User;
-import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import javax.persistence.Entity;

@@ -1,24 +1,32 @@
 package io.collap.std.user.page;
 
-import io.collap.controller.Controller;
-import io.collap.controller.SectionController;
+import io.collap.bryg.Template;
+import io.collap.bryg.environment.Environment;
+import io.collap.bryg.model.Model;
+import io.collap.controller.ModuleController;
 import io.collap.controller.communication.HttpStatus;
 import io.collap.controller.communication.InternalRequest;
+import io.collap.controller.communication.Request;
 import io.collap.controller.communication.Response;
+import io.collap.controller.provider.BrygDependant;
+import io.collap.controller.provider.SectionDependant;
+import io.collap.controller.section.Section;
 import io.collap.std.user.entity.User;
 import org.hibernate.Session;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * This controller shows the profile of a user. If the remainingPath is an integer, the user with the integer as the ID
  *  is displayed. Otherwise, if a user is logged in, their own profile is shown.
  */
-public class Profile extends SectionController {
+public class Profile extends ModuleController implements SectionDependant, BrygDependant {
+
+    /* Dependencies. */
+    private List<Section> sections;
+    private Environment bryg;
 
     /* Init. */
     private long userId = -1;
@@ -27,12 +35,9 @@ public class Profile extends SectionController {
     private User user;
 
     @Override
-    protected void configureSectionRequest (InternalRequest request) {
-        request.setParameter ("user", user);
-    }
+    public void initialize (Request request, String remainingPath) {
+        super.initialize (request, remainingPath);
 
-    @Override
-    public void initialize (String remainingPath) {
         if (remainingPath.length () > 0) {
             try {
                 userId = Long.parseLong (remainingPath);
@@ -71,15 +76,32 @@ public class Profile extends SectionController {
 
     public void displayUser (User user, Response response) throws IOException {
         List<Response> responses = new ArrayList<> ();
-        for (Controller section : sections) {
-            responses.add (executeSection (section));
+        for (Section section : sections) {
+            responses.add (section.execute ());
         }
 
-        Map<String, Object> model = new HashMap<> ();
-        model.put ("user", user);
-        model.put ("sections", responses);
-        renderer.renderAndWriteTemplate ("Profile", model, response.getContentWriter ());
-        renderer.renderAndWriteTemplate ("Profile_head", model, response.getHeadWriter ());
+        Model model = bryg.createModel ();
+        model.setVariable ("user", user);
+        model.setVariable ("sections", responses);
+        Template profile = bryg.getTemplate ("Profile");
+        profile.render (response.getContentWriter (), model);
+        Template profileHead = bryg.getTemplate ("Profile_head");
+        profileHead.render (response.getHeadWriter (), model);
+    }
+
+    @Override
+    public void configureSectionRequest (InternalRequest request) {
+        request.setParameter ("user", user);
+    }
+
+    @Override
+    public void setSections (List<Section> sections) {
+        this.sections = sections;
+    }
+
+    @Override
+    public void setBryg (Environment environment) {
+        bryg = environment;
     }
 
 }

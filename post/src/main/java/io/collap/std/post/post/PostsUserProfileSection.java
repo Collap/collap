@@ -1,9 +1,11 @@
 package io.collap.std.post.post;
 
-import io.collap.controller.TemplateController;
+import io.collap.controller.ModuleController;
 import io.collap.controller.communication.Response;
+import io.collap.controller.provider.JadeDependant;
 import io.collap.std.post.entity.Post;
 import io.collap.std.user.entity.User;
+import io.collap.template.TemplateRenderer;
 import org.hibernate.Session;
 
 import java.io.IOException;
@@ -12,12 +14,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class PostsUserProfileSection extends TemplateController {
+public class PostsUserProfileSection extends ModuleController implements JadeDependant {
 
-    @Override
-    public void initialize (String remainingPath) {
-
-    }
+    private TemplateRenderer renderer;
 
     @Override
     public void doGet (Response response) throws IOException {
@@ -41,6 +40,11 @@ public class PostsUserProfileSection extends TemplateController {
         model.put ("posts", posts);
         renderer.renderAndWriteTemplate ("post/PostsUserProfileSection", model, response.getContentWriter ());
         response.getHeadWriter ().write ("Posts");
+    }
+
+    @Override
+    public void setRenderer (TemplateRenderer templateRenderer) {
+        renderer = templateRenderer;
     }
 
 }

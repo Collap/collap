@@ -1,33 +1,43 @@
 package io.collap.std.user;
 
+import io.collap.Collap;
+import io.collap.bryg.EnvironmentConfigurator;
+import io.collap.bryg.EnvironmentCreator;
+import io.collap.bryg.ModuleSourceLoader;
+import io.collap.bryg.compiler.resolver.ClassResolver;
+import io.collap.bryg.environment.Environment;
+import io.collap.bryg.loader.SourceLoader;
+import io.collap.bryg.model.GlobalVariableModel;
 import io.collap.controller.Dispatcher;
-import io.collap.controller.SectionControllerFactory;
-import io.collap.controller.TemplateControllerFactory;
+import io.collap.controller.ProviderControllerFactory;
+import io.collap.controller.provider.BrygProvider;
 import io.collap.plugin.Module;
 import io.collap.std.user.entity.User;
 import io.collap.std.user.page.Login;
 import io.collap.std.user.page.Profile;
 import io.collap.std.user.page.Register;
 import io.collap.std.user.util.Validator;
-import io.collap.template.TemplateRenderer;
 import org.hibernate.cfg.Configuration;
 
-public class UserModule extends Module {
+public class UserModule extends Module implements BrygProvider, EnvironmentConfigurator {
 
-    private TemplateRenderer renderer;
+    public static final String VERSION = "0.1.1";
+    public static final String ARTIFACT_NAME = "collap-std-user-" + VERSION;
+
+    private Environment bryg;
     private Validator validator;
-    private SectionControllerFactory profileSectionControllerFactory;
+    private ProfileSectionProvider profileSections = new ProfileSectionProvider ();
 
     @Override
     public void initialize () {
-        renderer = new TemplateRenderer (this);
+        bryg = new EnvironmentCreator (collap, this).create ();
+
         validator = new Validator ();
-        profileSectionControllerFactory = new SectionControllerFactory (Profile.class, this, renderer);
 
         Dispatcher userDispatcher = new Dispatcher (collap);
-        userDispatcher.registerControllerFactory ("register", new TemplateControllerFactory (Register.class, this, renderer));
-        userDispatcher.registerControllerFactory ("login", new TemplateControllerFactory (Login.class, this, renderer));
-        userDispatcher.registerControllerFactory ("profile", profileSectionControllerFactory);
+        userDispatcher.registerControllerFactory ("register", new ProviderControllerFactory (Register.class, this));
+        userDispatcher.registerControllerFactory ("login", new ProviderControllerFactory (Login.class, this));
+        userDispatcher.registerControllerFactory ("profile", new ProviderControllerFactory (Profile.class, this, profileSections));
         collap.getRootDispatcher ().registerDispatcher ("user", userDispatcher);
     }
 
@@ -45,8 +55,36 @@ public class UserModule extends Module {
         return validator;
     }
 
-    public SectionControllerFactory getProfileSectionControllerFactory () {
-        return profileSectionControllerFactory;
+    public ProfileSectionProvider getProfileSections () {
+        return profileSections;
+    }
+
+    @Override
+    public Environment getBryg () {
+        return bryg;
+    }
+
+    @Override
+    public SourceLoader getSourceLoader () {
+        return new ModuleSourceLoader (this);
+    }
+
+    @Override
+    public void configureConfiguration (io.collap.bryg.compiler.Configuration configuration) {
+        configuration.setPrintBytecode (false);
+    }
+
+    @Override
+    public void configureClassResolver (ClassResolver classResolver) {
+        classResolver.getIncludedJarFiles ().add (ARTIFACT_NAME + ".jar");
+        classResolver.getIncludedJarFiles ().add (Collap.ARTIFACT_NAME + ".jar");
+        classResolver.getRootPackageFilter ().addSubpackageFilter ("io.collap.std.user.entity");
+        classResolver.getRootPackageFilter ().addSubpackageFilter ("io.collap.controller.communication");
+    }
+
+    @Override
+    public void configureGlobalVariableModel (GlobalVariableModel globalVariableModel) {
+
     }
 
 }

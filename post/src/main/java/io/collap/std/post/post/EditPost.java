@@ -1,8 +1,9 @@
 package io.collap.std.post.post;
 
-import io.collap.controller.TemplateController;
+import io.collap.controller.ModuleController;
 import io.collap.controller.communication.Request;
 import io.collap.controller.communication.Response;
+import io.collap.controller.provider.JadeDependant;
 import io.collap.std.post.PostModule;
 import io.collap.std.post.entity.Category;
 import io.collap.std.post.entity.Post;
@@ -10,18 +11,22 @@ import io.collap.std.post.type.Type;
 import io.collap.std.user.entity.User;
 import io.collap.std.post.util.PostUtil;
 import io.collap.std.user.util.Permissions;
+import io.collap.template.TemplateRenderer;
 import org.hibernate.Session;
 
 import java.io.IOException;
 import java.io.Writer;
 import java.util.*;
 
-public class EditPost extends TemplateController {
+public class EditPost extends ModuleController implements JadeDependant {
 
     private String idString;
+    private TemplateRenderer renderer;
 
     @Override
-    public void initialize (String remainingPath) {
+    public void initialize (Request request, String remainingPath) {
+        super.initialize (request, remainingPath);
+
         idString = remainingPath;
     }
 
@@ -217,6 +222,11 @@ public class EditPost extends TemplateController {
                 writer.write ("<br />");
             }
         }
+    }
+
+    @Override
+    public void setRenderer (TemplateRenderer templateRenderer) {
+        renderer = templateRenderer;
     }
 
 }

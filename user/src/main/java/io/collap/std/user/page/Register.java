@@ -1,8 +1,11 @@
 package io.collap.std.user.page;
 
-import io.collap.controller.TemplateController;
+import io.collap.bryg.environment.Environment;
+import io.collap.bryg.model.Model;
+import io.collap.controller.ModuleController;
 import io.collap.controller.communication.Request;
 import io.collap.controller.communication.Response;
+import io.collap.controller.provider.BrygDependant;
 import io.collap.std.user.UserModule;
 import io.collap.std.user.entity.User;
 import io.collap.std.user.util.Validator;
@@ -13,17 +16,16 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 
-public class Register extends TemplateController {
+public class Register extends ModuleController implements BrygDependant {
 
-    @Override
-    public void initialize (String s) {
-
-    }
+    /* Dependencies. */
+    private Environment bryg;
 
     @Override
     public void doGet (Response response) throws IOException {
-        renderer.renderAndWriteTemplate ("Register", response.getContentWriter ());
-        renderer.renderAndWriteTemplate ("Register_head", response.getHeadWriter ());
+        Model model = bryg.createModel ();
+        bryg.getTemplate ("Register").render (response.getContentWriter (), model);
+        bryg.getTemplate ("Register_head").render (response.getHeadWriter (), model);
     }
 
     @Override
@@ -82,6 +84,11 @@ public class Register extends TemplateController {
     private void registerError (String error, Response response) throws IOException {
         // TODO: Proper error response (Special field in user/Register.html)
         response.getContentWriter ().write (error);
+    }
+
+    @Override
+    public void setBryg (Environment environment) {
+        bryg = environment;
     }
 
 }
