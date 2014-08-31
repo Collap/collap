@@ -9,7 +9,7 @@ import javax.persistence.MappedSuperclass;
 @MappedSuperclass
 public class Entity {
 
-    private Long id;
+    protected Long id;
 
     @Id
     @GeneratedValue(generator = "increment")
