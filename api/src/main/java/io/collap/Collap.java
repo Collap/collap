@@ -1,5 +1,9 @@
 package io.collap;
 
+import io.collap.bryg.compiler.library.BasicLibrary;
+import io.collap.bryg.compiler.library.Library;
+import io.collap.bryg.compiler.resolver.ClassNameFinder;
+import io.collap.bryg.compiler.resolver.ClassResolver;
 import io.collap.cache.InvalidatorManager;
 import io.collap.controller.Dispatcher;
 import io.collap.plugin.*;
@@ -21,6 +25,9 @@ import java.util.logging.Logger;
 
 public class Collap {
 
+    public static final String VERSION = "0.1.1";
+    public static final String ARTIFACT_NAME = "collap-api-" + VERSION;
+
     private static final Logger logger = Logger.getLogger (Collap.class.getName ());
 
     private SessionFactory sessionFactory;
@@ -32,6 +39,9 @@ public class Collap {
     private InvalidatorManager invalidatorManager;
 
     private String basePath;
+
+    private ClassResolver brygClassResolver;
+    private Library brygLibrary;
 
     public void initialize () {
         StandardDirectories.initialize ();
@@ -70,6 +80,11 @@ public class Collap {
             throw new RuntimeException ("Cache configuration not found!"); // Note: This stops the execution of collap in tomcat.
         }
         fragmentCache = cacheManager.getCache ("fragmentCache");
+
+        /* Prepare bryg. */
+        brygLibrary = new BasicLibrary ();
+        brygClassResolver = new ClassResolver ();
+        brygClassResolver.resolveClassNames (); /* Just resolve standard java packages. */
 
         /* Register plugins. */
         pluginManager = new PluginManager ();
@@ -126,6 +141,7 @@ public class Collap {
 
             Configuration cfg = new Configuration ();
             cfg.addProperties (properties);
+            cfg.addPackage ("io.collap.entity");
 
             /* Let plugins configure Hibernate. */
             for (Plugin plugin : pluginManager.getPlugins ().values ()) {
@@ -177,6 +193,14 @@ public class Collap {
 
     public InvalidatorManager getInvalidatorManager () {
         return invalidatorManager;
+    }
+
+    public ClassResolver getBrygClassResolver () {
+        return brygClassResolver;
+    }
+
+    public Library getBrygLibrary () {
+        return brygLibrary;
     }
 
 }
