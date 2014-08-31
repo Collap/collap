@@ -139,7 +139,7 @@ public class Dispatcher {
     }
 
     private void executeController (Controller controller, String remainingPath, Request request, Response response) throws IOException {
-        controller.initialize (remainingPath, request);
+        controller.initialize (request, remainingPath);
 
         boolean useCache = false;
         String key = null;

@@ -16,7 +16,7 @@ import java.io.IOException;
 public interface Controller {
 
     // TODO: Turn "remainingPath" into a proper argument (with a fitting type) to the controller.
-    public void initialize (String remainingPath, Request request);
+    public void initialize (Request request, String remainingPath);
 
     public void doGet (Response response) throws IOException;
 
