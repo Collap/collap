@@ -1,20 +1,19 @@
 package io.collap.std.post.post;
 
+import io.collap.bryg.environment.Environment;
+import io.collap.bryg.model.Model;
 import io.collap.controller.ModuleController;
 import io.collap.controller.communication.Response;
-import io.collap.controller.provider.JadeDependant;
+import io.collap.controller.provider.BrygDependant;
 import io.collap.std.post.entity.Post;
-import io.collap.template.TemplateRenderer;
 import org.hibernate.Session;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-public class ListPosts extends ModuleController implements JadeDependant {
+public class ListPosts extends ModuleController implements BrygDependant {
 
-    private TemplateRenderer renderer;
+    private Environment bryg;
 
     /**
      * Posts are sorted by timestamp.
@@ -48,22 +47,22 @@ public class ListPosts extends ModuleController implements JadeDependant {
                 .setMaxResults (20)
                 .list ();
 
-        Map<String, Object> model = new HashMap<> ();
-        model.put ("posts", posts);
+        Model model = bryg.createModel ();
+        model.setVariable ("posts", posts);
 
         String queryTimeMessage = "Query time: " + (System.nanoTime () - time) + "ns<br>";
         time = System.nanoTime ();
 
-        renderer.renderAndWriteTemplate ("post/List", model, response.getContentWriter ());
-        renderer.renderAndWriteTemplate ("post/List_head", response.getHeadWriter ());
+        bryg.getTemplate ("post.List").render (response.getContentWriter (), model);
+        bryg.getTemplate ("post.List_head").render (response.getHeadWriter (), model);
 
         response.getContentWriter ().write (queryTimeMessage);
         response.getContentWriter ().write ("Render time: " + (System.nanoTime () - time) + "ns");
     }
 
     @Override
-    public void setRenderer (TemplateRenderer templateRenderer) {
-        renderer = templateRenderer;
+    public void setBryg (Environment environment) {
+        bryg = environment;
     }
 
 }

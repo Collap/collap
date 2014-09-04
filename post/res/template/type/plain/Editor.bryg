@@ -1,0 +1,9 @@
+; The data that is associated with the post of the specific type.
+in PlainData data
+
+p
+  label(for 'title'): Title:
+  input(type 'text', name 'title', value data.title)
+
+p
+  textarea(name 'source', rows 6, cols 50) data.source

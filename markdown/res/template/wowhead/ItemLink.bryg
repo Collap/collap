@@ -1,0 +1,5 @@
+in Map<String, String> attributes
+
+val id = attributes.get ('id')
+
+a(rel 'nofollow', href 'http://wowhead.com/item=' + id): Item \{id}

@@ -1,0 +1,10 @@
+; The collection of available types.
+in Collection<String> types
+
+p: Please specify a post type first!
+
+form(name 'specifyType', action basePath + 'post/edit', method 'get')
+  select(name 'type')
+    each type in types
+      option(value type) type
+  input(type 'submit', value 'Select')

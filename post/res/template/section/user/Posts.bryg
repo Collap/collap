@@ -1,0 +1,7 @@
+; A list of posts the user has written.
+; Only the id, title and publishing date of the post need to be set.
+in List<Post> post
+
+each post in posts
+  a(href basePath + "post/view/" + post.id) \{post.title}
+  br

@@ -1,0 +1,16 @@
+; The category that is edited.
+; An id of -1 indicates a non-existent category that will be newly created.
+in Category category
+
+form(name 'edit', action basePath + 'category/edit', method 'post')
+  input(type 'hidden', name 'id', value category.id)
+
+  label(for 'name'): Name:
+  input(type 'text', name 'name', value category.name)
+
+  br
+
+  val submitText = 'Edit'
+  if category.id < 0
+    submitText = 'Create'
+  input(type 'submit', value submitText)

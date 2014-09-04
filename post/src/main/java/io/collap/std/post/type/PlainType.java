@@ -1,25 +1,24 @@
 package io.collap.std.post.type;
 
 import io.collap.Collap;
+import io.collap.bryg.environment.Environment;
+import io.collap.bryg.model.Model;
 import io.collap.controller.communication.Request;
 import io.collap.entity.Entity;
 import io.collap.std.markdown.MarkdownModule;
 import io.collap.std.post.entity.PlainData;
 import io.collap.std.post.entity.Post;
-import io.collap.template.TemplateRenderer;
 
 import javax.annotation.Nullable;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.StringWriter;
 
 public class PlainType extends BasicType {
 
-    private TemplateRenderer renderer;
+    private Environment bryg;
 
-    public PlainType (Collap collap, TemplateRenderer renderer) {
+    public PlainType (Collap collap, Environment bryg) {
         super (collap);
-        this.renderer = renderer;
+        this.bryg = bryg;
     }
 
     @Override
@@ -36,13 +35,12 @@ public class PlainType extends BasicType {
             data = PlainData.createTransientPlainData ();
         }
 
-        Map<String, Object> model = new HashMap<> ();
-        model.put ("data", data);
-        try {
-            return renderer.renderTemplate ("type/plain/Editor", model);
-        } catch (IOException e) {
-            throw new RuntimeException ("Plain/Editor template not found!", e);
-        }
+        Model model = bryg.createModel ();
+        model.setVariable ("data", data);
+
+        StringWriter writer = new StringWriter ();
+        bryg.getTemplate ("type.plain.Editor").render (writer, model);
+        return writer.toString ();
     }
 
     @Override

@@ -1,5 +1,12 @@
 package io.collap.std.markdown;
 
+import io.collap.bryg.EnvironmentConfigurator;
+import io.collap.bryg.EnvironmentCreator;
+import io.collap.bryg.ModuleSourceLoader;
+import io.collap.bryg.compiler.resolver.ClassResolver;
+import io.collap.bryg.environment.Environment;
+import io.collap.bryg.loader.SourceLoader;
+import io.collap.bryg.model.GlobalVariableModel;
 import io.collap.plugin.Module;
 import io.collap.template.TemplateRenderer;
 import org.hibernate.cfg.Configuration;
@@ -18,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-public class MarkdownModule extends Module {
+public class MarkdownModule extends Module implements EnvironmentConfigurator {
 
     private final static Logger logger = Logger.getLogger (MarkdownModule.class.getName ());
 
@@ -26,7 +33,7 @@ public class MarkdownModule extends Module {
      * Note: The Parser is not thread safe!
      * TODO: Pool multiple Parsers and Serializers based on the expected demand.
      */
-    private TemplateRenderer renderer;
+    private Environment bryg;
     private Parser parser;
     private List<ToHtmlSerializerPlugin> serializerPlugins;
     private ProfilingParseRunner<Node> parseRunner;
@@ -38,7 +45,7 @@ public class MarkdownModule extends Module {
 
     @Override
     public void initialize () {
-        renderer = new TemplateRenderer (this);
+        bryg = new EnvironmentCreator (collap, this).create ();
     }
 
     @Override
@@ -74,7 +81,7 @@ public class MarkdownModule extends Module {
             parserPlugins
         );
         serializerPlugins = new ArrayList<> ();
-        serializerPlugins.add (new TagSerializer (renderer));
+        serializerPlugins.add (new TagSerializer (bryg));
     }
 
     /**
@@ -93,6 +100,26 @@ public class MarkdownModule extends Module {
         out[source.length] = '\n';
         out[source.length + 1] = '\n';
         return out;
+    }
+
+    @Override
+    public SourceLoader getSourceLoader () {
+        return new ModuleSourceLoader (this);
+    }
+
+    @Override
+    public void configureConfiguration (io.collap.bryg.compiler.Configuration configuration) {
+
+    }
+
+    @Override
+    public void configureClassResolver (ClassResolver classResolver) {
+
+    }
+
+    @Override
+    public void configureGlobalVariableModel (GlobalVariableModel globalVariableModel) {
+
     }
 
 }

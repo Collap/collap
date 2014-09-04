@@ -1,24 +1,23 @@
 package io.collap.std.post.category;
 
+import io.collap.bryg.environment.Environment;
+import io.collap.bryg.model.Model;
 import io.collap.controller.ModuleController;
 import io.collap.controller.communication.HttpStatus;
 import io.collap.controller.communication.Request;
 import io.collap.controller.communication.Response;
-import io.collap.controller.provider.JadeDependant;
+import io.collap.controller.provider.BrygDependant;
 import io.collap.std.post.entity.Category;
 import io.collap.std.user.util.Permissions;
-import io.collap.template.TemplateRenderer;
 import io.collap.util.ParseUtils;
 import org.hibernate.Session;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
-public class EditCategory extends ModuleController implements JadeDependant {
+public class EditCategory extends ModuleController implements BrygDependant {
 
     private String idString;
-    private TemplateRenderer renderer;
+    private Environment bryg;
 
     @Override
     public void initialize (Request request, String remainingPath) {
@@ -50,13 +49,14 @@ public class EditCategory extends ModuleController implements JadeDependant {
             category = (Category) session.get (Category.class, id);
             if (category == null) {
                 response.getContentWriter ().write ("Category not found!");
+                return;
             }
         }
 
-        Map<String, Object> model = new HashMap<> ();
-        model.put ("category", category);
-        renderer.renderAndWriteTemplate ("category/Edit.jade", model, response.getContentWriter ());
-        renderer.renderAndWriteTemplate ("category/Edit_head.jade", model, response.getHeadWriter ());
+        Model model = bryg.createModel ();
+        model.setVariable ("category", category);
+        bryg.getTemplate ("category.Edit"). render (response.getContentWriter (), model);
+        bryg.getTemplate ("category.Edit_head").render (response.getHeadWriter (), model);
     }
 
     @Override
@@ -91,8 +91,8 @@ public class EditCategory extends ModuleController implements JadeDependant {
     }
 
     @Override
-    public void setRenderer (TemplateRenderer templateRenderer) {
-        renderer = templateRenderer;
+    public void setBryg (Environment environment) {
+        bryg = environment;
     }
 
 }

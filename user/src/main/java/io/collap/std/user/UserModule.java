@@ -71,7 +71,7 @@ public class UserModule extends Module implements BrygProvider, EnvironmentConfi
 
     @Override
     public void configureConfiguration (io.collap.bryg.compiler.Configuration configuration) {
-        configuration.setPrintBytecode (false);
+
     }
 
     @Override

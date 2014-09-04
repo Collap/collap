@@ -1,8 +1,15 @@
 package io.collap.std.post;
 
+import io.collap.bryg.EnvironmentConfigurator;
+import io.collap.bryg.EnvironmentCreator;
+import io.collap.bryg.ModuleSourceLoader;
+import io.collap.bryg.compiler.resolver.ClassResolver;
+import io.collap.bryg.environment.Environment;
+import io.collap.bryg.loader.SourceLoader;
+import io.collap.bryg.model.GlobalVariableModel;
 import io.collap.cache.InvalidatorManager;
 import io.collap.controller.*;
-import io.collap.controller.provider.JadeProvider;
+import io.collap.controller.provider.BrygProvider;
 import io.collap.plugin.Module;
 import io.collap.std.post.cache.PostInvalidator;
 import io.collap.std.post.category.DeleteCategory;
@@ -15,24 +22,26 @@ import io.collap.std.post.type.PlainType;
 import io.collap.std.post.type.Type;
 import io.collap.std.user.ProfileSectionProvider;
 import io.collap.std.user.UserModule;
-import io.collap.template.TemplateRenderer;
 import org.hibernate.cfg.Configuration;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class PostModule extends Module implements JadeProvider {
+public class PostModule extends Module implements BrygProvider, EnvironmentConfigurator {
 
-    private TemplateRenderer renderer;
+    private static final String VERSION = "0.1.1";
+    private static final String ARTIFACT_NAME = "collap-std-post-" + VERSION;
+
+    private Environment bryg;
     private Map<String, Type> postTypes;
 
     @Override
     public void initialize () {
-        renderer = new TemplateRenderer (this);
+        bryg = new EnvironmentCreator (collap, this).create ();
         postTypes = new HashMap<> ();
 
         /* Add standard post types! */
-        PlainType plainType = new PlainType (collap, renderer);
+        PlainType plainType = new PlainType (collap, bryg);
         addPostType (plainType);
 
         /* post/ */
@@ -91,8 +100,29 @@ public class PostModule extends Module implements JadeProvider {
     }
 
     @Override
-    public TemplateRenderer getRenderer () {
-        return renderer;
+    public Environment getBryg () {
+        return bryg;
+    }
+
+    @Override
+    public SourceLoader getSourceLoader () {
+        return new ModuleSourceLoader (this);
+    }
+
+    @Override
+    public void configureConfiguration (io.collap.bryg.compiler.Configuration configuration) {
+
+    }
+
+    @Override
+    public void configureClassResolver (ClassResolver classResolver) {
+        classResolver.getIncludedJarFiles ().add (ARTIFACT_NAME + ".jar");
+        classResolver.getRootPackageFilter ().addSubpackageFilter (Category.class.getPackage ().getName ());
+    }
+
+    @Override
+    public void configureGlobalVariableModel (GlobalVariableModel globalVariableModel) {
+
     }
 
 }

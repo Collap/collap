@@ -1,25 +1,23 @@
 package io.collap.std.post.post;
 
+import io.collap.bryg.environment.Environment;
+import io.collap.bryg.model.Model;
 import io.collap.cache.Cached;
 import io.collap.controller.ModuleController;
 import io.collap.controller.communication.Request;
 import io.collap.controller.communication.Response;
-import io.collap.controller.provider.JadeDependant;
+import io.collap.controller.provider.BrygDependant;
 import io.collap.std.post.cache.KeyUtils;
 import io.collap.std.post.entity.Post;
 import io.collap.std.post.util.PostUtil;
-import io.collap.template.TemplateRenderer;
 import org.hibernate.Session;
 
 import java.io.IOException;
-import java.text.DateFormat;
-import java.util.HashMap;
-import java.util.Map;
 
-public class ViewPost extends ModuleController implements JadeDependant, Cached {
+public class ViewPost extends ModuleController implements BrygDependant, Cached {
 
     private String idString;
-    private TemplateRenderer renderer;
+    private Environment bryg;
 
     @Override
     public void initialize (Request request, String remainingPath) {
@@ -40,13 +38,13 @@ public class ViewPost extends ModuleController implements JadeDependant, Cached 
         }
 
         /* Render template. */
-        Map<String, Object> model = new HashMap<> ();
-        model.put ("post", post);
-        model.put ("formattedPublishingDate", DateFormat.getDateInstance ().format (post.getPublishingDate ()));
-        model.put ("formattedLastEdit", DateFormat.getDateInstance ().format (post.getLastEdit ()));
-        model.put ("viewerHasEditingPermissions", PostUtil.isUserAuthor (request, post));
-        renderer.renderAndWriteTemplate ("post/View_head", model, response.getHeadWriter ());
-        renderer.renderAndWriteTemplate ("post/View", model, response.getContentWriter ());
+        Model model = bryg.createModel ();
+        model.setVariable ("post", post);
+        // model.put ("formattedPublishingDate", DateFormat.getDateInstance ().format (post.getPublishingDate ()));
+        // model.put ("formattedLastEdit", DateFormat.getDateInstance ().format (post.getLastEdit ()));
+        model.setVariable ("allowEdit", PostUtil.isUserAuthor (request, post));
+        bryg.getTemplate ("post.View_head").render (response.getHeadWriter (), model);
+        bryg.getTemplate ("post.View").render (response.getContentWriter (), model);
     }
 
     @Override
@@ -60,8 +58,8 @@ public class ViewPost extends ModuleController implements JadeDependant, Cached 
     }
 
     @Override
-    public void setRenderer (TemplateRenderer templateRenderer) {
-        renderer = templateRenderer;
+    public void setBryg (Environment environment) {
+        bryg = environment;
     }
 
 }

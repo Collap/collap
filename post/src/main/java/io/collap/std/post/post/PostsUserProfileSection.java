@@ -1,22 +1,21 @@
 package io.collap.std.post.post;
 
+import io.collap.bryg.environment.Environment;
+import io.collap.bryg.model.Model;
 import io.collap.controller.ModuleController;
 import io.collap.controller.communication.Response;
-import io.collap.controller.provider.JadeDependant;
+import io.collap.controller.provider.BrygDependant;
 import io.collap.std.post.entity.Post;
 import io.collap.std.user.entity.User;
-import io.collap.template.TemplateRenderer;
 import org.hibernate.Session;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-public class PostsUserProfileSection extends ModuleController implements JadeDependant {
+public class PostsUserProfileSection extends ModuleController implements BrygDependant {
 
-    private TemplateRenderer renderer;
+    private Environment bryg;
 
     @Override
     public void doGet (Response response) throws IOException {
@@ -36,15 +35,15 @@ public class PostsUserProfileSection extends ModuleController implements JadeDep
             posts.add (post);
         }
 
-        Map<String, Object> model = new HashMap<> ();
-        model.put ("posts", posts);
-        renderer.renderAndWriteTemplate ("post/PostsUserProfileSection", model, response.getContentWriter ());
+        Model model = bryg.createModel ();
+        model.setVariable ("posts", posts);
+        bryg.getTemplate ("section.user.Posts").render (response.getContentWriter (), model);
         response.getHeadWriter ().write ("Posts");
     }
 
     @Override
-    public void setRenderer (TemplateRenderer templateRenderer) {
-        renderer = templateRenderer;
+    public void setBryg (Environment environment) {
+        bryg = environment;
     }
 
 }

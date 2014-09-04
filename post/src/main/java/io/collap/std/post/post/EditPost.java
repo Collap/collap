@@ -1,9 +1,11 @@
 package io.collap.std.post.post;
 
+import io.collap.bryg.environment.Environment;
+import io.collap.bryg.model.Model;
 import io.collap.controller.ModuleController;
 import io.collap.controller.communication.Request;
 import io.collap.controller.communication.Response;
-import io.collap.controller.provider.JadeDependant;
+import io.collap.controller.provider.BrygDependant;
 import io.collap.std.post.PostModule;
 import io.collap.std.post.entity.Category;
 import io.collap.std.post.entity.Post;
@@ -11,17 +13,16 @@ import io.collap.std.post.type.Type;
 import io.collap.std.user.entity.User;
 import io.collap.std.post.util.PostUtil;
 import io.collap.std.user.util.Permissions;
-import io.collap.template.TemplateRenderer;
 import org.hibernate.Session;
 
 import java.io.IOException;
 import java.io.Writer;
 import java.util.*;
 
-public class EditPost extends ModuleController implements JadeDependant {
+public class EditPost extends ModuleController implements BrygDependant {
 
+    private Environment bryg;
     private String idString;
-    private TemplateRenderer renderer;
 
     @Override
     public void initialize (Request request, String remainingPath) {
@@ -55,9 +56,9 @@ public class EditPost extends ModuleController implements JadeDependant {
                     typeName = request.getStringParameter ("type");
                     if (typeName == null) {
                         /* Display a type selection first! */
-                        Map<String, Object> model = new HashMap<> ();
-                        model.put ("types", types.keySet ());
-                        renderer.renderAndWriteTemplate ("post/SpecifyType", model, response.getContentWriter ());
+                        Model model = bryg.createModel ();
+                        model.setVariable ("types", types.keySet ());
+                        bryg.getTemplate ("post.SpecifyType").render (response.getContentWriter (), model);
                         return;
                     }else {
                         post.setTypeName (typeName);
@@ -69,22 +70,12 @@ public class EditPost extends ModuleController implements JadeDependant {
                     return;
                 }
 
-                Map<String, Object> model = new HashMap<> ();
-                model.put ("post", post);
-                model.put ("categories", post.getCategories ());
+                Model model = bryg.createModel ();
+                model.setVariable ("post", post);
                 Type type = types.get (post.getTypeName ());
-                model.put ("customEditor", type.getEditor (post.getTypeDataId ()));
-                // TODO: The following solution is temporary.
-                String categoryString = "";
-                for (Category category : post.getCategories ()) {
-                    if (!categoryString.isEmpty ()) {
-                        categoryString += ",";
-                    }
-                    categoryString += category.getName ();
-                }
-                model.put ("categoryString", categoryString);
-                renderer.renderAndWriteTemplate ("post/Edit_head", model, response.getHeadWriter ());
-                renderer.renderAndWriteTemplate ("post/Edit", model, response.getContentWriter ());
+                model.setVariable ("customEditorSource", type.getEditor (post.getTypeDataId ()));
+                bryg.getTemplate ("post.Edit_head").render (response.getHeadWriter (), model);
+                bryg.getTemplate ("post.Edit").render (response.getContentWriter (), model);
             }else {
                 response.getContentWriter ().write ("Insufficient editing permissions!");
             }
@@ -225,8 +216,8 @@ public class EditPost extends ModuleController implements JadeDependant {
     }
 
     @Override
-    public void setRenderer (TemplateRenderer templateRenderer) {
-        renderer = templateRenderer;
+    public void setBryg (Environment environment) {
+        bryg = environment;
     }
 
 }
