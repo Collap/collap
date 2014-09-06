@@ -5,6 +5,8 @@ import io.collap.bryg.compiler.resolver.ClassResolver;
 import io.collap.bryg.loader.SourceLoader;
 import io.collap.bryg.model.GlobalVariableModel;
 
+import javax.annotation.Nullable;
+
 public interface EnvironmentConfigurator {
 
     public SourceLoader getSourceLoader ();
@@ -12,5 +14,7 @@ public interface EnvironmentConfigurator {
     public void configureConfiguration (Configuration configuration);
     public void configureClassResolver (ClassResolver resolver);
     public void configureGlobalVariableModel (GlobalVariableModel globalVariableModel);
+
+    public @Nullable String getArtifactName ();
 
 }

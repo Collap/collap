@@ -21,6 +21,8 @@ public class ProviderControllerFactory implements ControllerFactory {
 
     }
 
+    // TODO: Move to their own class files.
+
     private static List<DependencySetter> dependencySetters = new ArrayList<DependencySetter> () {{
         add (new DependencySetter<ModuleProvider, ModuleDependant> () {
             @Override

@@ -12,6 +12,15 @@ import io.collap.bryg.loader.SourceLoader;
 import io.collap.bryg.loader.TemplateClassLoader;
 import io.collap.bryg.model.GlobalVariableModel;
 
+/**
+ * This creator automatically:
+ *   - Includes the collap-api jar and the artifact jar of the configurator,
+ *     if provided.
+ *   - Adds the collap/module and collap/lib directories to the finder paths.
+ * Additionally, the following global variables are declared:
+ *   - String basePath: The base path to the root dispatcher.
+ * The EnvironmentConfigurator can further configure the bryg environment.
+ */
 public class EnvironmentCreator {
 
     private Collap collap;
@@ -32,6 +41,14 @@ public class EnvironmentCreator {
         ClassNameFinder classNameFinder = classResolver.getFinder ();
         classNameFinder.addPath (StandardDirectories.module.getPath () + "/*");
         classNameFinder.addPath (StandardDirectories.base.getPath () + "/lib/*");
+
+        /* Include api jar and configurator jar. */
+        classResolver.includeJar (Collap.ARTIFACT_NAME + ".jar");
+        String artifactName = environmentConfigurator.getArtifactName ();
+        if (artifactName != null) {
+            classResolver.includeJar (artifactName + ".jar");
+        }
+
         environmentConfigurator.configureClassResolver (classResolver);
         classResolver.resolveClassNames ();
 
