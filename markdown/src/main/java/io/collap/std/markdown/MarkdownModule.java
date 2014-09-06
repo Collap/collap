@@ -8,7 +8,6 @@ import io.collap.bryg.environment.Environment;
 import io.collap.bryg.loader.SourceLoader;
 import io.collap.bryg.model.GlobalVariableModel;
 import io.collap.plugin.Module;
-import io.collap.template.TemplateRenderer;
 import org.hibernate.cfg.Configuration;
 import org.parboiled.Parboiled;
 import org.parboiled.parserunners.ProfilingParseRunner;
