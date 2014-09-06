@@ -10,6 +10,7 @@ h1 post.title
 if allowEdit
   p
     a(href basePath + 'post/edit/' + post.id): (edit)
+    ' '
     a(href basePath + 'post/delete/' + post.id): (delete)
 p: Published on \{post.publishingDate}. Last edit: \{post.lastEdit}.
 
