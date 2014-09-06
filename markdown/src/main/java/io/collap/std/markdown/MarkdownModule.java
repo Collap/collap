@@ -20,6 +20,7 @@ import org.pegdown.ast.RootNode;
 import org.pegdown.plugins.PegDownPlugins;
 import org.pegdown.plugins.ToHtmlSerializerPlugin;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -119,6 +120,11 @@ public class MarkdownModule extends Module implements EnvironmentConfigurator {
     @Override
     public void configureGlobalVariableModel (GlobalVariableModel globalVariableModel) {
 
+    }
+
+    @Override
+    public @Nullable String getArtifactName () {
+        return null;
     }
 
 }

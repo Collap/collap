@@ -1,15 +1,16 @@
 package io.collap.std.user;
 
-import io.collap.Collap;
 import io.collap.bryg.EnvironmentConfigurator;
 import io.collap.bryg.EnvironmentCreator;
 import io.collap.bryg.ModuleSourceLoader;
 import io.collap.bryg.compiler.resolver.ClassResolver;
 import io.collap.bryg.environment.Environment;
+import io.collap.bryg.example.Post;
 import io.collap.bryg.loader.SourceLoader;
 import io.collap.bryg.model.GlobalVariableModel;
 import io.collap.controller.Dispatcher;
 import io.collap.controller.ProviderControllerFactory;
+import io.collap.controller.communication.Response;
 import io.collap.controller.provider.BrygProvider;
 import io.collap.plugin.Module;
 import io.collap.std.user.entity.User;
@@ -18,6 +19,8 @@ import io.collap.std.user.page.Profile;
 import io.collap.std.user.page.Register;
 import io.collap.std.user.util.Validator;
 import org.hibernate.cfg.Configuration;
+
+import javax.annotation.Nullable;
 
 public class UserModule extends Module implements BrygProvider, EnvironmentConfigurator {
 
@@ -76,15 +79,18 @@ public class UserModule extends Module implements BrygProvider, EnvironmentConfi
 
     @Override
     public void configureClassResolver (ClassResolver classResolver) {
-        classResolver.getIncludedJarFiles ().add (ARTIFACT_NAME + ".jar");
-        classResolver.getIncludedJarFiles ().add (Collap.ARTIFACT_NAME + ".jar");
-        classResolver.getRootPackageFilter ().addSubpackageFilter ("io.collap.std.user.entity");
-        classResolver.getRootPackageFilter ().addSubpackageFilter ("io.collap.controller.communication");
+        classResolver.getRootPackageFilter ().addSubpackageFilter (Post.class.getPackage ().getName ());
+        classResolver.getRootPackageFilter ().addSubpackageFilter (Response.class.getPackage ().getName ());
     }
 
     @Override
     public void configureGlobalVariableModel (GlobalVariableModel globalVariableModel) {
 
+    }
+
+    @Override
+    public @Nullable String getArtifactName () {
+        return ARTIFACT_NAME;
     }
 
 }

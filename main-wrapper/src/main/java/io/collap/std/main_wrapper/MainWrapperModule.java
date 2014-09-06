@@ -11,6 +11,8 @@ import io.collap.controller.provider.BrygProvider;
 import io.collap.plugin.Module;
 import org.hibernate.cfg.Configuration;
 
+import javax.annotation.Nullable;
+
 public class MainWrapperModule extends Module implements BrygProvider, EnvironmentConfigurator {
 
     private Environment bryg;
@@ -54,6 +56,11 @@ public class MainWrapperModule extends Module implements BrygProvider, Environme
     @Override
     public void configureGlobalVariableModel (GlobalVariableModel globalVariableModel) {
 
+    }
+
+    @Override
+    public @Nullable String getArtifactName () {
+        return null;
     }
 
 }

@@ -24,6 +24,7 @@ import io.collap.std.user.ProfileSectionProvider;
 import io.collap.std.user.UserModule;
 import org.hibernate.cfg.Configuration;
 
+import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -116,13 +117,17 @@ public class PostModule extends Module implements BrygProvider, EnvironmentConfi
 
     @Override
     public void configureClassResolver (ClassResolver classResolver) {
-        classResolver.getIncludedJarFiles ().add (ARTIFACT_NAME + ".jar");
         classResolver.getRootPackageFilter ().addSubpackageFilter (Category.class.getPackage ().getName ());
     }
 
     @Override
     public void configureGlobalVariableModel (GlobalVariableModel globalVariableModel) {
 
+    }
+
+    @Override
+    public @Nullable String getArtifactName () {
+        return ARTIFACT_NAME;
     }
 
 }
