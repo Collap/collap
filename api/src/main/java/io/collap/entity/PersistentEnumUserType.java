@@ -67,7 +67,6 @@ public class PersistentEnumUserType implements UserType, ParameterizedType {
     @Override
     public Object nullSafeGet (ResultSet rs, String[] names, SessionImplementor session, Object owner)
             throws HibernateException, SQLException {
-
         int id = rs.getInt (names[0]);
         if (rs.wasNull ()) {
             return null;
@@ -84,7 +83,11 @@ public class PersistentEnumUserType implements UserType, ParameterizedType {
 
     @Override
     public void nullSafeSet (PreparedStatement st, Object value, int index, SessionImplementor session) throws HibernateException, SQLException {
-
+        if (value == null) {
+            st.setNull (index, sqlTypes ()[0]);
+        }else {
+            st.setInt (index, ((PersistentEnum) value).getId ());
+        }
     }
 
     @Override
