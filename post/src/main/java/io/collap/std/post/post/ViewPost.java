@@ -16,22 +16,20 @@ import java.io.IOException;
 
 public class ViewPost extends ModuleController implements BrygDependant, Cached {
 
-    private String idString;
+    private Post post;
     private Environment bryg;
 
     @Override
     public void initialize (Request request, String remainingPath) {
         super.initialize (request, remainingPath);
 
-        idString = remainingPath;
+        /* Get post. */
+        Session session = module.getCollap ().getSessionFactory ().getCurrentSession ();
+        post = PostUtil.getPostFromDatabase (session, remainingPath);
     }
 
     @Override
     public void doGet (Response response) throws IOException {
-        Session session = module.getCollap ().getSessionFactory ().getCurrentSession ();
-
-        /* Get post. */
-        Post post = PostUtil.getPostFromDatabase (session, idString);
         if (post == null) {
             response.getContentWriter ().write ("Post not found!");
             return;
@@ -49,12 +47,13 @@ public class ViewPost extends ModuleController implements BrygDependant, Cached 
 
     @Override
     public boolean shouldResponseBeCached () {
-        return request.getMethod () == Request.Method.get;
+        return request.getMethod () == Request.Method.get
+                && !PostUtil.isUserAuthor (request, post); /* Don't cache the author interface! */
     }
 
     @Override
     public String getElementKey () {
-        return KeyUtils.getViewPostKey (module.getName (), idString);
+        return KeyUtils.getViewPostKey (module.getName (), post.getId ().toString ());
     }
 
     @Override

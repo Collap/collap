@@ -10,7 +10,7 @@ public class KeyUtils {
     }
 
     public static String getViewPostKey (String pluginName, String idString) {
-        return pluginName + ":post.ViewPost:" +idString;
+        return pluginName + ":post.ViewPost:" + idString;
     }
 
 }
