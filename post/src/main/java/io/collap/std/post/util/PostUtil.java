@@ -6,6 +6,8 @@ import io.collap.std.user.entity.User;
 import io.collap.util.ParseUtils;
 import org.hibernate.Session;
 
+import javax.annotation.Nullable;
+
 public class PostUtil {
 
     // TODO: Find a solution with less duplicate code.
@@ -35,8 +37,8 @@ public class PostUtil {
         return user != null && isUserAuthor (user, post);
     }
 
-    public static boolean isUserAuthor (User user, Post post) {
-        return user.getId ().equals (post.getAuthor ().getId ());
+    public static boolean isUserAuthor (@Nullable User user, Post post) {
+        return user != null && user.getId ().equals (post.getAuthor ().getId ());
     }
 
 }

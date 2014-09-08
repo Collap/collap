@@ -48,6 +48,7 @@ public class ViewPost extends ModuleController implements BrygDependant, Cached 
     @Override
     public boolean shouldResponseBeCached () {
         return request.getMethod () == Request.Method.get
+                && post != null
                 && !PostUtil.isUserAuthor (request, post); /* Don't cache the author interface! */
     }
 
