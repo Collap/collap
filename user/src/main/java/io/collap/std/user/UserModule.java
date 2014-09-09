@@ -79,6 +79,7 @@ public class UserModule extends Module implements BrygProvider, EnvironmentConfi
 
     @Override
     public void configureClassResolver (ClassResolver classResolver) {
+        classResolver.getRootPackageFilter ().addSubpackageFilter (User.class.getPackage ().getName ());
         classResolver.getRootPackageFilter ().addSubpackageFilter (Post.class.getPackage ().getName ());
         classResolver.getRootPackageFilter ().addSubpackageFilter (Response.class.getPackage ().getName ());
     }
