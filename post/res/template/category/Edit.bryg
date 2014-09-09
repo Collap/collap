@@ -10,7 +10,7 @@ form(name 'edit', action basePath + 'category/edit', method 'post')
 
   br
 
-  val submitText = 'Edit'
+  mut submitText = 'Edit'
   if category.id < 0
     submitText = 'Create'
   input(type 'submit', value submitText)
