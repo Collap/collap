@@ -14,6 +14,7 @@ import io.collap.controller.provider.BrygProvider;
 import io.collap.plugin.Module;
 import io.collap.std.user.entity.User;
 import io.collap.std.user.page.Login;
+import io.collap.std.user.page.Logout;
 import io.collap.std.user.page.Profile;
 import io.collap.std.user.page.Register;
 import io.collap.std.user.util.Validator;
@@ -39,6 +40,7 @@ public class UserModule extends Module implements BrygProvider, EnvironmentConfi
         Dispatcher userDispatcher = new Dispatcher (collap);
         userDispatcher.registerControllerFactory ("register", new ProviderControllerFactory (Register.class, this));
         userDispatcher.registerControllerFactory ("login", new ProviderControllerFactory (Login.class, this));
+        userDispatcher.registerControllerFactory ("logout", new ProviderControllerFactory (Logout.class, this));
         userDispatcher.registerControllerFactory ("profile", new ProviderControllerFactory (Profile.class, this, profileSections));
         collap.getRootDispatcher ().registerDispatcher ("user", userDispatcher);
     }
