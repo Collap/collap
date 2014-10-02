@@ -80,23 +80,6 @@ public class ProviderControllerFactory implements ControllerFactory {
                 return SectionDependant.class;
             }
         });
-
-        add (new DependencySetter<JadeProvider, JadeDependant> () {
-            @Override
-            public void setDependency (JadeProvider provider, JadeDependant dependant) {
-                dependant.setRenderer (provider.getRenderer ());
-            }
-
-            @Override
-            public Class<JadeProvider> getProviderType () {
-                return JadeProvider.class;
-            }
-
-            @Override
-            public Class<JadeDependant> getDependantType () {
-                return JadeDependant.class;
-            }
-        });
     }};
 
     private Class<? extends Controller> controllerClass;
