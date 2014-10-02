@@ -5,7 +5,6 @@ import io.collap.bryg.EnvironmentCreator;
 import io.collap.bryg.ModuleSourceLoader;
 import io.collap.bryg.compiler.resolver.ClassResolver;
 import io.collap.bryg.environment.Environment;
-import io.collap.bryg.example.Post;
 import io.collap.bryg.loader.SourceLoader;
 import io.collap.bryg.model.GlobalVariableModel;
 import io.collap.controller.Dispatcher;
@@ -80,7 +79,6 @@ public class UserModule extends Module implements BrygProvider, EnvironmentConfi
     @Override
     public void configureClassResolver (ClassResolver classResolver) {
         classResolver.getRootPackageFilter ().addSubpackageFilter (User.class.getPackage ().getName ());
-        classResolver.getRootPackageFilter ().addSubpackageFilter (Post.class.getPackage ().getName ());
         classResolver.getRootPackageFilter ().addSubpackageFilter (Response.class.getPackage ().getName ());
     }
 
