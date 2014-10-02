@@ -53,6 +53,7 @@ public class Login extends ModuleController implements BrygDependant {
             loginHeadTemplate.render (response.getHeadWriter (), model);
         }else {
             // TODO: Route to whatever page.
+            response.getHeadWriter ().write ("<title>Login</title>");
             response.getContentWriter ().write ("Login successful!");
         }
     }
