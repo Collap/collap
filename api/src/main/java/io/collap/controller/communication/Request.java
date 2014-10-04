@@ -1,5 +1,8 @@
 package io.collap.controller.communication;
 
+import javax.annotation.Nullable;
+import javax.servlet.http.HttpSession;
+
 public interface Request {
 
     public enum Method {
@@ -21,5 +24,8 @@ public interface Request {
 
     public Object getSessionAttribute (String name);
     public void setSessionAttribute (String name, Object value);
+
+    @Nullable
+    public HttpSession getHttpSession ();
 
 }

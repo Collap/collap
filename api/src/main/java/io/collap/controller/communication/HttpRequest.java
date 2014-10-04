@@ -1,5 +1,6 @@
 package io.collap.controller.communication;
 
+import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -31,6 +32,12 @@ public class HttpRequest extends BasicRequest {
     public void setSessionAttribute (String name, Object value) {
         HttpSession httpSession = httpRequest.getSession (true);
         httpSession.setAttribute (name, value);
+    }
+
+    @Nullable
+    @Override
+    public HttpSession getHttpSession () {
+        return httpRequest.getSession ();
     }
 
 }

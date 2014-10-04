@@ -18,8 +18,15 @@ public class Section {
         this.controller = controller;
     }
 
-    public Response execute () throws IOException {
-        InternalRequest sectionRequest = new InternalRequest (Request.Method.get);
+    public Response execute (Request parentRequest) throws IOException {
+        /* Pass session if possible. */
+        InternalRequest sectionRequest;
+        if (parentRequest.getHttpSession () != null) {
+            sectionRequest =  new InternalRequest (Request.Method.get, parentRequest.getHttpSession ());
+        }else {
+            sectionRequest = new InternalRequest (Request.Method.get);
+        }
+
         Response sectionResponse = new Response ();
         dependant.configureSectionRequest (sectionRequest);
 
