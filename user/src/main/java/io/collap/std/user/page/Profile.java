@@ -77,7 +77,7 @@ public class Profile extends ModuleController implements SectionDependant, BrygD
     public void displayUser (User user, Response response) throws IOException {
         List<Response> responses = new ArrayList<> ();
         for (Section section : sections) {
-            responses.add (section.execute ());
+            responses.add (section.execute (request));
         }
 
         Model model = bryg.createModel ();
