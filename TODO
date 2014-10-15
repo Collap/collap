@@ -1,3 +1,6 @@
+Example module:
+	Add a pack that slightly changes one of the templates.
+
 - Copy default config files to tomcat/collap/config if this folder has not been created yet.
 - "Of course, there's no way to test http or https in the template". Make that happen.
 - The build scripts are twice or triple.
@@ -22,6 +25,12 @@
   - Does the type have to be changeable?
 
 
+
+
+- The names of the std plugins differ from the archive name.
+
+
+
 icyveins/scripts/page.rb Line: 236 (Tag prefixes for markdown)
 json/redirect
 script/deploy.rb Line: 549 (Redirect diagnosis)
@@ -31,6 +40,13 @@ Global Redirection!
 
 Potentially: Use JRuby for code reuse!
 
+
+
+A test plugin type!
+
+
+
+Bug: Plain type data is not always deleted!
 
 
 

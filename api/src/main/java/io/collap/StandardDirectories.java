@@ -13,6 +13,8 @@ public class StandardDirectories {
     public static File module;
     public static File pack;
 
+    public static File log;
+
     public static void initialize () {
         base = new File ("collap");
 
@@ -22,6 +24,8 @@ public class StandardDirectories {
         config = new File (base, "config" + File.separator);
         module = new File (base, "module" + File.separator);
         pack = new File (base, "pack" + File.separator);
+
+        log = new File (base, "log" + File.separator);
     }
 
     public static void install () {
@@ -33,6 +37,8 @@ public class StandardDirectories {
         config.mkdir ();
         module.mkdir ();
         pack.mkdir ();
+
+        log.mkdir ();
     }
 
 }

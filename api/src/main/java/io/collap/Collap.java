@@ -2,7 +2,6 @@ package io.collap;
 
 import io.collap.bryg.compiler.library.BasicLibrary;
 import io.collap.bryg.compiler.library.Library;
-import io.collap.bryg.compiler.resolver.ClassNameFinder;
 import io.collap.bryg.compiler.resolver.ClassResolver;
 import io.collap.cache.InvalidatorManager;
 import io.collap.controller.Dispatcher;
@@ -20,10 +19,14 @@ import org.hibernate.internal.SessionFactoryImpl;
 
 import java.io.*;
 import java.util.Properties;
+import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 public class Collap {
+
+    public static Logger rollbackLogger = Logger.getLogger ("collap-RollbackLog");
 
     public static final String VERSION = "0.1.1";
     public static final String ARTIFACT_NAME = "collap-api-" + VERSION;
@@ -57,6 +60,15 @@ public class Collap {
                 e.printStackTrace ();
             } */
             install ();
+        }
+
+        try {
+            FileHandler fileHandler = new FileHandler (new File (StandardDirectories.log, "rollback.log").getAbsolutePath ());
+            rollbackLogger.addHandler (fileHandler);
+            SimpleFormatter formatter = new SimpleFormatter ();
+            fileHandler.setFormatter(formatter);
+        } catch (IOException e) {
+            logger.log (Level.SEVERE, "Could not initialize the rollback logger.", e);
         }
 
         /* Read collap config. */

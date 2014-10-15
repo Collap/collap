@@ -1,6 +1,7 @@
 package io.collap.app.routing;
 
 import io.collap.Collap;
+import io.collap.StandardDirectories;
 import io.collap.controller.communication.HttpRequest;
 import io.collap.controller.communication.HttpStatus;
 import io.collap.controller.communication.Request;
@@ -53,12 +54,14 @@ public class Router extends HttpServlet {
         try {
             transaction.commit ();
         } catch (HibernateException e) {
+            // TODO: Implement controller callback?
+
             transaction.rollback ();
+
             String message = "A transaction failed to commit!";
             response.setStatus (HttpStatus.internalServerError);
             response.setStatusMessage (message);
-            logger.log (Level.SEVERE, message, e);
-            // TODO: Implement controller callback?
+            Collap.rollbackLogger.log (Level.SEVERE, message, e);
         }
 
         if (response.getStatus () != HttpStatus.ok) {
