@@ -12,8 +12,8 @@ public class Entity {
     protected Long id;
 
     @Id
-    @GeneratedValue(generator = "increment")
-    @GenericGenerator(name = "increment", strategy = "increment")
+    @GeneratedValue(generator = "auto_id")
+    @GenericGenerator(name = "auto_id", strategy = "native")
     public Long getId () {
         return id;
     }
