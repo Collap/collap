@@ -1,1 +1,3 @@
 include 'api', 'app'
+include 'std:format', 'std:main-wrapper', 'std:markdown', 'std:post', 'std:user'
+

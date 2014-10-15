@@ -1,11 +1,5 @@
 apply plugin: 'idea'
 
-idea {
-    project {
-        languageLevel = '1.7'
-    }
-}
-
 subprojects {
   apply plugin: 'maven'
   apply plugin: 'java'
@@ -23,7 +17,7 @@ subprojects {
   }
 
   dependencies {
-      compile 'collap-core:collap-api:0.1.1'
+      compile project (':api')
   }
 
   task copyDependencies (type: Copy) {
