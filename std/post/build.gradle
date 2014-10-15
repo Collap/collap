@@ -1,0 +1,13 @@
+archivesBaseName = 'collap-std-post'
+version = '0.1.1'
+
+dependencies {
+    compile project (':user')
+    compile project (':markdown')
+}
+
+jar {
+    manifest {
+        attributes 'Implementation-Title': archivesBaseName, 'Implementation-Version': version
+    }
+}

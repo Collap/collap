@@ -1,0 +1,16 @@
+archivesBaseName = 'collap-std-markdown'
+version = '0.1.1'
+
+ext.dependencyPegdown = 'org.pegdown:pegdown:1.4.2'
+
+dependencies {
+    compile dependencyPegdown
+
+    includedJars dependencyPegdown
+}
+
+jar {
+    manifest {
+        attributes 'Implementation-Title': archivesBaseName, 'Implementation-Version': version
+    }
+}

@@ -1,0 +1,5 @@
+name: std-post
+mainClass: io.collap.std.post.PostModule
+dependencies:
+  - std-user
+  - std-markdown

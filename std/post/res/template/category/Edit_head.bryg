@@ -1,0 +1,7 @@
+; See Edit.bryg.
+in Category category
+
+if category.id >= 0
+  title: Edit Category
+else
+  title: New Category

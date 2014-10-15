@@ -1,0 +1,7 @@
+; The posts to be listed in the correct order.
+in List<Post> posts
+
+each post, index in posts
+  if index > 0
+    hr
+  @post.Preview (post post)

@@ -1,0 +1,10 @@
+; The HTML source of the head part.
+in String headSrc
+
+; The HTML source of the content part.
+in String content
+
+: <!DOCTYPE html>
+html
+  head headSrc
+  body content

@@ -1,0 +1,44 @@
+apply plugin: 'idea'
+
+idea {
+    project {
+        languageLevel = '1.7'
+    }
+}
+
+subprojects {
+  apply plugin: 'maven'
+  apply plugin: 'java'
+  apply plugin: 'idea'
+  
+  sourceCompatibility = 1.7
+
+  repositories {
+      mavenCentral ()
+      mavenLocal ()
+  }
+
+  configurations {
+      includedJars
+  }
+
+  dependencies {
+      compile 'collap-core:collap-api:0.1.1'
+  }
+
+  task copyDependencies (type: Copy) {
+      from configurations.includedJars
+      into "$rootDir/../lib"
+  }
+
+  jar {
+    destinationDir = file ("$rootDir/../module")
+      from ('res') {
+          into ('/resource/')
+      }
+      from ('module.yaml') {
+          into ('/')
+      }
+  }
+
+}

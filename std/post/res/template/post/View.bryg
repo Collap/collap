@@ -1,0 +1,26 @@
+; The viewed post.
+in Post post
+
+; Whether the viewer has editing permissions.
+in boolean allowEdit
+
+h1 post.title
+
+p: Published on \{post.publishingDate}. Last edit: \{post.lastEdit}.
+
+hr
+div post.content
+hr
+
+if post.categories.size () <= 0
+  p: Filed under no categories
+else
+  p
+    b: Categories:
+    each Category category in post.categories
+      ' ' + category.name
+
+p
+  'Written by '
+  a(href basePath + 'user/profile/' + post.author.id) post.author.username
+  :.

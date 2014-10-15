@@ -1,0 +1,12 @@
+; The User this profile belongs to.
+in User user
+
+; A list of sections (Responses) that are displayed on the user profile page.
+in List<Response> sections
+
+h1 user.username
+
+each section in sections
+  div
+    h2 section.getHead ()
+    section.getContent ()

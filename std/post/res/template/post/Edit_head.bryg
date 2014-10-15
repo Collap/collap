@@ -1,0 +1,7 @@
+; See Edit.bryg.
+in Post post
+
+if post.id >= 0
+  title: Edit \{post.title}
+else
+  title: Create New Post

@@ -1,0 +1,7 @@
+; The post to be previewed.
+in Post post
+
+section
+  h2 a(href basePath + 'post/view/' + post.id) post.title
+  small(style 'font-size: 0.8em;') post.lastEdit
+  post.content
