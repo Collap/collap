@@ -3,6 +3,7 @@ package io.collap.std.user.page;
 import io.collap.bryg.Template;
 import io.collap.bryg.environment.Environment;
 import io.collap.bryg.model.Model;
+import io.collap.cache.Cached;
 import io.collap.controller.ModuleController;
 import io.collap.controller.communication.HttpStatus;
 import io.collap.controller.communication.InternalRequest;
@@ -11,6 +12,7 @@ import io.collap.controller.communication.Response;
 import io.collap.controller.provider.BrygDependant;
 import io.collap.controller.provider.SectionDependant;
 import io.collap.controller.section.Section;
+import io.collap.std.user.cache.KeyUtil;
 import io.collap.std.user.entity.User;
 import org.hibernate.Session;
 
@@ -22,7 +24,7 @@ import java.util.List;
  * This controller shows the profile of a user. If the remainingPath is an integer, the user with the integer as the ID
  *  is displayed. Otherwise, if a user is logged in, their own profile is shown.
  */
-public class Profile extends ModuleController implements SectionDependant, BrygDependant {
+public class Profile extends ModuleController implements Cached, SectionDependant, BrygDependant {
 
     /* Dependencies. */
     private List<Section> sections;
@@ -102,6 +104,17 @@ public class Profile extends ModuleController implements SectionDependant, BrygD
     @Override
     public void setBryg (Environment environment) {
         bryg = environment;
+    }
+
+    @Override
+    public boolean shouldResponseBeCached () {
+        return request.getMethod () == Request.Method.get
+                && userId >= 0;
+    }
+
+    @Override
+    public String getElementKey () {
+        return KeyUtil.userProfile (userId);
     }
 
 }

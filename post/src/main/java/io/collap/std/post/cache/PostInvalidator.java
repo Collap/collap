@@ -5,19 +5,19 @@ import io.collap.plugin.Module;
 import io.collap.std.post.entity.Post;
 import net.sf.ehcache.Cache;
 
-public class PostInvalidator extends BasicInvalidator {
+import java.util.Set;
+
+public class PostInvalidator extends BasicInvalidator<Post> {
 
     public PostInvalidator (Module module) {
         super (module);
     }
 
     @Override
-    public void invalidate (Object entity) {
-        Post post = (Post) entity;
-
+    public void invalidate (Post post, Set<String> changedProperties) {
         /* Invalidate ViewPost pages. */
         Cache fragmentCache = module.getCollap ().getFragmentCache ();
-        fragmentCache.remove (KeyUtils.getViewPostKey (module, post));
+        fragmentCache.remove (KeyUtils.viewPost (post));
     }
 
 }

@@ -4,6 +4,7 @@ import io.collap.bryg.environment.Environment;
 import io.collap.bryg.model.Model;
 import io.collap.cache.Cached;
 import io.collap.controller.ModuleController;
+import io.collap.controller.communication.HttpStatus;
 import io.collap.controller.communication.Request;
 import io.collap.controller.communication.Response;
 import io.collap.controller.provider.BrygDependant;
@@ -16,22 +17,24 @@ import java.io.IOException;
 
 public class ViewPost extends ModuleController implements BrygDependant, Cached {
 
-    private Post post;
     private Environment bryg;
+    private String idString;
 
     @Override
     public void initialize (Request request, String remainingPath) {
         super.initialize (request, remainingPath);
 
-        /* Get post. */
-        Session session = module.getCollap ().getSessionFactory ().getCurrentSession ();
-        post = PostUtil.getPostFromDatabase (session, remainingPath);
+        idString = remainingPath;
     }
 
     @Override
     public void doGet (Response response) throws IOException {
+        /* Get post. */
+        Session session = module.getCollap ().getSessionFactory ().getCurrentSession ();
+        Post post = PostUtil.getPostFromDatabase (session, idString);
+
         if (post == null) {
-            response.getContentWriter ().write ("Post not found!");
+            response.setStatus (HttpStatus.notFound);
             return;
         }
 
@@ -46,15 +49,19 @@ public class ViewPost extends ModuleController implements BrygDependant, Cached 
     }
 
     @Override
+    public boolean handleError (Response response) throws IOException {
+        response.getContentWriter ().write ("Post not found!");
+        return true;
+    }
+
+    @Override
     public boolean shouldResponseBeCached () {
-        return request.getMethod () == Request.Method.get
-                && post != null
-                && !PostUtil.isUserAuthor (request, post); /* Don't cache the author interface! */
+        return request.getMethod () == Request.Method.get;
     }
 
     @Override
     public String getElementKey () {
-        return KeyUtils.getViewPostKey (module.getName (), post.getId ().toString ());
+        return KeyUtils.viewPost (idString);
     }
 
     @Override

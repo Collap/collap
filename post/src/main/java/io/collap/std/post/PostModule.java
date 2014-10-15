@@ -12,6 +12,7 @@ import io.collap.controller.*;
 import io.collap.controller.provider.BrygProvider;
 import io.collap.plugin.Module;
 import io.collap.std.post.cache.PostInvalidator;
+import io.collap.std.post.cache.UserProfileSectionInvalidator;
 import io.collap.std.post.category.DeleteCategory;
 import io.collap.std.post.category.EditCategory;
 import io.collap.std.post.entity.Category;
@@ -30,8 +31,8 @@ import java.util.Map;
 
 public class PostModule extends Module implements BrygProvider, EnvironmentConfigurator {
 
-    private static final String VERSION = "0.1.1";
-    private static final String ARTIFACT_NAME = "collap-std-post-" + VERSION;
+    public static final String VERSION = "0.1.1";
+    public static final String ARTIFACT_NAME = "collap-std-post-" + VERSION;
 
     private Environment bryg;
     private Map<String, Type> postTypes;
@@ -75,6 +76,8 @@ public class PostModule extends Module implements BrygProvider, EnvironmentConfi
         /* Register invalidators! */
         InvalidatorManager invalidatorManager = collap.getInvalidatorManager ();
         invalidatorManager.addInvalidator (Post.class, new PostInvalidator (this));
+        invalidatorManager.addInvalidator (Post.class,
+                new UserProfileSectionInvalidator (this));
     }
 
     @Override
