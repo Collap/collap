@@ -22,4 +22,17 @@ public class Entity {
         this.id = id;
     }
 
+    @Override
+    public int hashCode () {
+        return id.hashCode ();
+    }
+
+    @Override
+    public boolean equals (Object obj) {
+        if (obj instanceof Entity) {
+            return id.equals (((Entity) obj).getId ());
+        }
+        return false;
+    }
+
 }

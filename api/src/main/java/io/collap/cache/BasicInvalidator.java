@@ -2,7 +2,7 @@ package io.collap.cache;
 
 import io.collap.plugin.Module;
 
-public abstract class BasicInvalidator implements Invalidator {
+public abstract class BasicInvalidator<T> implements Invalidator<T> {
 
     protected Module module;
 

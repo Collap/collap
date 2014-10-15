@@ -172,8 +172,8 @@ public class Dispatcher {
                 + " request method!");
         }
 
-        /* Add element to cache! */
-        if (useCache) {
+        /* Add element to cache if the response was okay. */
+        if (useCache && response.getStatus () == HttpStatus.ok) {
             Fragment fragment = new Fragment (response.getHead (), response.getContent ());
             Element element = new Element (key, fragment);
             collap.getFragmentCache ().put (element);

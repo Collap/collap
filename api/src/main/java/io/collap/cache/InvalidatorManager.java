@@ -1,14 +1,15 @@
 package io.collap.cache;
 
-import org.hibernate.HibernateException;
-import org.hibernate.event.spi.*;
-import org.hibernate.persister.entity.EntityPersister;
+import io.collap.entity.Entity;
+import org.hibernate.EmptyInterceptor;
+import org.hibernate.type.Type;
 
+import java.io.Serializable;
 import java.util.*;
 import java.util.logging.Logger;
 
 // TODO: Check thread-safety!
-public class InvalidatorManager implements PostDeleteEventListener, PersistEventListener {
+public class InvalidatorManager extends EmptyInterceptor {
 
     private static final Logger logger = Logger.getLogger (InvalidatorManager.class.getName ());
 
@@ -27,37 +28,71 @@ public class InvalidatorManager implements PostDeleteEventListener, PersistEvent
         return invalidatorsMap.get (entityClass);
     }
 
-    public void invalidate (Object entity) {
+    public void invalidate (Object entity, Set<String> changedProperties) {
         Class<?> cl = entity.getClass ();
         List<Invalidator> invalidators = invalidatorsMap.get (cl);
         if (invalidators != null) {
             for (Invalidator invalidator : invalidators) {
-                invalidator.invalidate (entity);
+                invalidator.invalidate (entity, changedProperties);
             }
         }
     }
 
-    @Override
-    public void onPostDelete (PostDeleteEvent event) {
-        logger.info ("onPostDelete: " + event.getEntity ().getClass ());
-        invalidate (event.getEntity ());
+    /**
+     * @return Whether at least one invalidator is registered for the Entity class.
+     */
+    private boolean hasInvalidator (Object entity) {
+        return invalidatorsMap.containsKey (entity.getClass ());
     }
 
     @Override
-    public void onPersist (PersistEvent event) throws HibernateException {
-        logger.info ("onPersist: " + event.getEntityName ());
-        invalidate (event.getObject ());
-    }
+    public boolean onSave (Object entity, Serializable id, Object[] state, String[] propertyNames, Type[] types) {
+        if (!hasInvalidator (entity)) {
+            return false;
+        }
 
-    @Override
-    public void onPersist (PersistEvent event, Map createdAlready) throws HibernateException {
-        logger.info ("onPersist: " + event.getEntityName ());
-        invalidate (event.getObject ());
-    }
+        logger.info ("On save: " + entity.getClass ());
 
-    @Override
-    public boolean requiresPostCommitHanding (EntityPersister persister) {
+        invalidate (entity, new HashSet<> (Arrays.asList (propertyNames)));
+
         return false;
+    }
+
+    @Override
+    public boolean onFlushDirty (Object entity, Serializable id, Object[] currentState, Object[] previousState, String[] propertyNames, Type[] types) {
+        if (!hasInvalidator (entity)) {
+            return false;
+        }
+
+        logger.info ("On flush dirty: " + ((Entity) entity).getId () + " [" + entity.getClass () + "]");
+
+        int numProps = currentState.length;
+        Set<String> changedProps = new HashSet<> ();
+        for (int i = 0; i < numProps; ++i) {
+            Object current = currentState[i];
+            Object previous = previousState[i];
+
+            if (current == null) continue;
+
+            if (!current.equals (previous)) {
+                changedProps.add (propertyNames[i]);
+            }
+        }
+
+        invalidate (entity, changedProps);
+
+        return false;
+    }
+
+    @Override
+    public void onDelete (Object entity, Serializable id, Object[] state, String[] propertyNames, Type[] types) {
+        if (!hasInvalidator (entity)) {
+            return;
+        }
+
+        logger.info ("On Delete: " + ((Entity) entity).getId ());
+
+        invalidate (entity, new HashSet<> (Arrays.asList (propertyNames)));
     }
 
 }

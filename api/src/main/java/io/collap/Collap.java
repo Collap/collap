@@ -13,9 +13,6 @@ import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.event.service.spi.EventListenerRegistry;
-import org.hibernate.event.spi.EventType;
-import org.hibernate.internal.SessionFactoryImpl;
 
 import java.io.*;
 import java.util.Properties;
@@ -162,13 +159,9 @@ public class Collap {
 
             StandardServiceRegistryBuilder standardServiceRegistryBuilder = new StandardServiceRegistryBuilder ();
             standardServiceRegistryBuilder.applySettings (cfg.getProperties ());
+            cfg.setInterceptor (invalidatorManager);
             StandardServiceRegistry registry = standardServiceRegistryBuilder.build ();
             sessionFactory = cfg.buildSessionFactory (registry);
-
-            // TODO: Use Integrator as intended by Hibernate 4.x!
-            EventListenerRegistry eventListenerRegistry = ((SessionFactoryImpl) sessionFactory).getServiceRegistry ().getService (EventListenerRegistry.class);
-            eventListenerRegistry.getEventListenerGroup (EventType.POST_DELETE).appendListener (invalidatorManager);
-            eventListenerRegistry.getEventListenerGroup (EventType.PERSIST).appendListener (invalidatorManager);
         }catch (Exception e) {
             logger.log (Level.SEVERE, "Error: ", e);
         }
