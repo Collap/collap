@@ -10,24 +10,13 @@ Example module:
   - Custom tags (addable by every plugin) like <wow:ShouldersOfWhatever>
   - The editor should have a plain text editing field and a preview, but also buttons to add custom tags.
 - Core:
-  - Filters that wrap around controllers (for example to implement a main page).
-  - Section content on some pages supplied by other controllers (see Posts section on user profile page)
   - General permission management and access restriction on a per-controller base (Possibly with annotations?)
-  - Add an ownPath variable to jade4j that points to the current controller path!
+  - Add an ownPath variable to bryg that points to the current controller path!
 - Post:
   - Make it possible to create posts with cached content read from an unmanaged file.
   - Add head/meta support for posts!
-
-  - Create different types of posts (each with a different table) [e.g. hearthstone deck(budget, type, decklink/card information, extra)].
-  - Common fields: compiled content
-
-
   - Does the type have to be changeable?
-
-
-
-
-- The names of the std plugins differ from the archive name.
+  - The names of the std plugins differ from the archive name.
 
 
 
