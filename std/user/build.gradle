@@ -1,9 +1,9 @@
-archivesBaseName = 'collap-std-user'
+archivesBaseName = 'user'
 version = '0.1.1'
 
 jar {
     manifest {
-        attributes 'Implementation-Title': archivesBaseName, 'Implementation-Version': version
+        attributes 'Implementation-Title': 'collap-std-' + archivesBaseName, 'Implementation-Version': version
     }
 }
 

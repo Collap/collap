@@ -2,6 +2,7 @@ package io.collap.std.post.type;
 
 import io.collap.Collap;
 import io.collap.bryg.environment.Environment;
+import io.collap.bryg.model.BasicModel;
 import io.collap.bryg.model.Model;
 import io.collap.controller.communication.Request;
 import io.collap.entity.Entity;
@@ -10,6 +11,7 @@ import io.collap.std.post.entity.PlainData;
 import io.collap.std.post.entity.Post;
 
 import javax.annotation.Nullable;
+import java.io.IOException;
 import java.io.StringWriter;
 
 public class PlainType extends BasicType {
@@ -29,13 +31,13 @@ public class PlainType extends BasicType {
     }
 
     @Override
-    protected String getEditor (@Nullable Entity dataEntity) {
+    protected String getEditor (@Nullable Entity dataEntity) throws IOException {
         PlainData data = (PlainData) dataEntity;
         if (data == null) {
             data = PlainData.createTransientPlainData ();
         }
 
-        Model model = bryg.createModel ();
+        Model model = new BasicModel ();
         model.setVariable ("data", data);
 
         StringWriter writer = new StringWriter ();

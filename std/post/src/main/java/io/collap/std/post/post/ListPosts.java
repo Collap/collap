@@ -1,6 +1,7 @@
 package io.collap.std.post.post;
 
 import io.collap.bryg.environment.Environment;
+import io.collap.bryg.model.BasicModel;
 import io.collap.bryg.model.Model;
 import io.collap.controller.ModuleController;
 import io.collap.controller.communication.Response;
@@ -47,7 +48,7 @@ public class ListPosts extends ModuleController implements BrygDependant {
                 .setMaxResults (20)
                 .list ();
 
-        Model model = bryg.createModel ();
+        Model model = new BasicModel ();
         model.setVariable ("posts", posts);
 
         String queryTimeMessage = "Query time: " + (System.nanoTime () - time) + "ns<br>";

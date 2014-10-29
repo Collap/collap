@@ -1,8 +1,9 @@
 package io.collap.std.user.page;
 
-import io.collap.bryg.Template;
 import io.collap.bryg.environment.Environment;
+import io.collap.bryg.model.BasicModel;
 import io.collap.bryg.model.Model;
+import io.collap.bryg.template.Template;
 import io.collap.controller.ModuleController;
 import io.collap.controller.communication.Request;
 import io.collap.controller.communication.Response;
@@ -39,14 +40,14 @@ public class Login extends ModuleController implements BrygDependant {
 
     @Override
     public void doGet (Response response) throws IOException {
-        Model model = bryg.createModel ();
+        Model model = new BasicModel ();
         loginTemplate.render (response.getContentWriter (), model);
         loginHeadTemplate.render (response.getHeadWriter (), model);
     }
 
     @Override
     public void doPost (Response response) throws IOException {
-        Model model = bryg.createModel ();
+        Model model = new BasicModel ();
         boolean success = processLogin (request, model);
         if (!success) {
             loginTemplate.render (response.getContentWriter (), model);

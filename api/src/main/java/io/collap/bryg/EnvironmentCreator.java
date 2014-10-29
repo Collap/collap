@@ -3,13 +3,11 @@ package io.collap.bryg;
 import io.collap.Collap;
 import io.collap.StandardDirectories;
 import io.collap.bryg.compiler.Configuration;
-import io.collap.bryg.compiler.StandardCompiler;
 import io.collap.bryg.compiler.resolver.ClassNameFinder;
 import io.collap.bryg.compiler.resolver.ClassResolver;
 import io.collap.bryg.environment.Environment;
 import io.collap.bryg.environment.StandardEnvironment;
 import io.collap.bryg.loader.SourceLoader;
-import io.collap.bryg.loader.TemplateClassLoader;
 import io.collap.bryg.model.GlobalVariableModel;
 
 /**
@@ -35,6 +33,8 @@ public class EnvironmentCreator {
         SourceLoader loader = environmentConfigurator.getSourceLoader ();
 
         Configuration configuration = new Configuration ();
+        configuration.setPrintAst (true);
+        configuration.setPrintBytecode (true);
         environmentConfigurator.configureConfiguration (configuration);
 
         ClassResolver classResolver = new ClassResolver (collap.getBrygClassResolver ());
@@ -56,11 +56,8 @@ public class EnvironmentCreator {
         globalVariableModel.declareVariable ("basePath", String.class, collap.getBasePath ());
         environmentConfigurator.configureGlobalVariableModel (globalVariableModel);
 
-        io.collap.bryg.compiler.Compiler compiler = new StandardCompiler (configuration, collap.getBrygLibrary (),
-                classResolver, globalVariableModel);
-        TemplateClassLoader classLoader = new TemplateClassLoader (compiler, loader);
-
-        return new StandardEnvironment (classLoader, globalVariableModel);
+        return new StandardEnvironment (configuration, collap.getBrygLibrary (), classResolver,
+                loader, globalVariableModel);
     }
 
 }

@@ -1,6 +1,7 @@
 package io.collap.std.post.category;
 
 import io.collap.bryg.environment.Environment;
+import io.collap.bryg.model.BasicModel;
 import io.collap.bryg.model.Model;
 import io.collap.controller.ModuleController;
 import io.collap.controller.communication.HttpStatus;
@@ -53,7 +54,7 @@ public class EditCategory extends ModuleController implements BrygDependant {
             }
         }
 
-        Model model = bryg.createModel ();
+        Model model = new BasicModel ();
         model.setVariable ("category", category);
         bryg.getTemplate ("category.Edit"). render (response.getContentWriter (), model);
         bryg.getTemplate ("category.Edit_head").render (response.getHeadWriter (), model);

@@ -1,6 +1,7 @@
 package io.collap.std.post.post;
 
 import io.collap.bryg.environment.Environment;
+import io.collap.bryg.model.BasicModel;
 import io.collap.bryg.model.Model;
 import io.collap.cache.Cached;
 import io.collap.controller.ModuleController;
@@ -39,7 +40,7 @@ public class ViewPost extends ModuleController implements BrygDependant, Cached 
         }
 
         /* Render template. */
-        Model model = bryg.createModel ();
+        Model model = new BasicModel ();
         model.setVariable ("post", post);
         // model.put ("formattedPublishingDate", DateFormat.getDateInstance ().format (post.getPublishingDate ()));
         // model.put ("formattedLastEdit", DateFormat.getDateInstance ().format (post.getLastEdit ()));

@@ -7,6 +7,7 @@ import io.collap.std.post.entity.Post;
 import org.hibernate.Session;
 
 import javax.annotation.Nullable;
+import java.io.IOException;
 
 public abstract class BasicType implements Type {
 
@@ -44,7 +45,7 @@ public abstract class BasicType implements Type {
     protected abstract void update (Entity data, Request request);
 
     @Override
-    public final String getEditor (@Nullable Long dataId) {
+    public final String getEditor (@Nullable Long dataId)  throws IOException {
         Session session = collap.getSessionFactory ().getCurrentSession ();
         Entity data;
         if (dataId != null) {
@@ -59,16 +60,16 @@ public abstract class BasicType implements Type {
     /**
      * @param data null means the data does not exist.
      */
-    protected abstract String getEditor (@Nullable Entity data);
+    protected abstract String getEditor (@Nullable Entity data) throws IOException;
 
     @Override
-    public final void compile (Post post) {
+    public final void compile (Post post) throws IOException {
         Session session = collap.getSessionFactory ().getCurrentSession ();
         Entity entity = (Entity) session.get (getDataClass (), post.getTypeDataId ());
         compile (entity, post);
     }
 
-    protected abstract void compile (Entity entity, Post post);
+    protected abstract void compile (Entity entity, Post post) throws IOException;
 
     @Override
     public void deleteData (Post post) {

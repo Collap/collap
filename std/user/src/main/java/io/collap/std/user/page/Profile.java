@@ -1,8 +1,9 @@
 package io.collap.std.user.page;
 
-import io.collap.bryg.Template;
 import io.collap.bryg.environment.Environment;
+import io.collap.bryg.model.BasicModel;
 import io.collap.bryg.model.Model;
+import io.collap.bryg.template.Template;
 import io.collap.cache.Cached;
 import io.collap.controller.ModuleController;
 import io.collap.controller.communication.HttpStatus;
@@ -82,7 +83,7 @@ public class Profile extends ModuleController implements Cached, SectionDependan
             responses.add (section.execute (request));
         }
 
-        Model model = bryg.createModel ();
+        Model model = new BasicModel ();
         model.setVariable ("user", user);
         model.setVariable ("sections", responses);
         Template profile = bryg.getTemplate ("Profile");

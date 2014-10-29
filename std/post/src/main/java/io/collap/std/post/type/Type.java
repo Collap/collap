@@ -18,12 +18,12 @@ public interface Type {
     /**
      * @param dataId This parameter is nullable because an editor should exist for non-existent post data.
      */
-    public String getEditor (@Nullable Long dataId);
+    public String getEditor (@Nullable Long dataId) throws IOException;
 
     /**
      * This method should set post.content and post.title!
      */
-    public void compile (Post post);
+    public void compile (Post post) throws IOException;
 
     /**
      * Deletes the data associated to the post.

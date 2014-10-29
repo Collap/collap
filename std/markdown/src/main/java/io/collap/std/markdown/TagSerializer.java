@@ -1,12 +1,14 @@
 package io.collap.std.markdown;
 
 import io.collap.bryg.environment.Environment;
+import io.collap.bryg.model.BasicModel;
 import io.collap.bryg.model.Model;
 import org.pegdown.Printer;
 import org.pegdown.ast.Node;
 import org.pegdown.ast.Visitor;
 import org.pegdown.plugins.ToHtmlSerializerPlugin;
 
+import java.io.IOException;
 import java.util.logging.Logger;
 
 public class TagSerializer implements ToHtmlSerializerPlugin {
@@ -33,9 +35,13 @@ public class TagSerializer implements ToHtmlSerializerPlugin {
         if (node.getPrefix ().equals ("wow")) {
             if (node.getName ().equals ("item")) {
                 long time = System.nanoTime ();
-                Model model = bryg.createModel ();
+                Model model = new BasicModel ();
                 model.setVariable ("attributes", node.getAttributes ());
-                bryg.getTemplate ("wowhead.ItemLink").render (new PrinterWriter (printer), model);
+                try {
+                    bryg.getTemplate ("wowhead.ItemLink").render (new PrinterWriter (printer), model);
+                }catch (IOException e) {
+                    e.printStackTrace (); // TODO: Handle
+                }
                 logger.info ("Template execution took " + (System.nanoTime () - time) + "ns.");
             }
         }

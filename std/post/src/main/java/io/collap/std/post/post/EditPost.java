@@ -1,6 +1,7 @@
 package io.collap.std.post.post;
 
 import io.collap.bryg.environment.Environment;
+import io.collap.bryg.model.BasicModel;
 import io.collap.bryg.model.Model;
 import io.collap.controller.ModuleController;
 import io.collap.controller.communication.Request;
@@ -56,7 +57,7 @@ public class EditPost extends ModuleController implements BrygDependant {
                     typeName = request.getStringParameter ("type");
                     if (typeName == null) {
                         /* Display a type selection first! */
-                        Model model = bryg.createModel ();
+                        Model model = new BasicModel ();
                         model.setVariable ("types", types.keySet ());
                         bryg.getTemplate ("post.SpecifyType").render (response.getContentWriter (), model);
                         return;
@@ -70,7 +71,7 @@ public class EditPost extends ModuleController implements BrygDependant {
                     return;
                 }
 
-                Model model = bryg.createModel ();
+                Model model = new BasicModel ();
                 model.setVariable ("post", post);
                 Type type = types.get (post.getTypeName ());
                 model.setVariable ("customEditorSource", type.getEditor (post.getTypeDataId ()));

@@ -1,3 +1,7 @@
+TOP Priority: Try to separate frontend (bryg, JSON) and backend (models).
+
+
+
 Example module:
 	Add a pack that slightly changes one of the templates.
 
@@ -41,49 +45,3 @@ Bug: Plain type data is not always deleted!
 
 1. Implement post type for decks, raids, etc.
 2. Put the @@@ tags into DB (syntax: <hs:id>)! Also: How can the tags be used in jade/bryg (Probably with some extra processor)?
-
-
-
-
-
-
-- Check:
-24-Jul-2014 18:11:01.744 SEVERE [localhost-startStop-1] org.apache.catalina.core.StandardContext.listenerStart Exception sending context initialized event to listener instance of class io.collap.app.StartupListener
- net.sf.ehcache.CacheException: Unable to create CacheManagerPeerListener. Initial cause was marcos-mbp.fritz.box: marcos-mbp.fritz.box: nodename nor servname provided, or not known
-	at net.sf.ehcache.distribution.RMICacheManagerPeerListenerFactory.doCreateCachePeerListener(RMICacheManagerPeerListenerFactory.java:104)
-	at net.sf.ehcache.distribution.RMICacheManagerPeerListenerFactory.createCachePeerListener(RMICacheManagerPeerListenerFactory.java:84)
-	at net.sf.ehcache.config.ConfigurationHelper.createCachePeerListeners(ConfigurationHelper.java:163)
-	at net.sf.ehcache.CacheManager.configure(CacheManager.java:748)
-	at net.sf.ehcache.CacheManager.doInit(CacheManager.java:463)
-	at net.sf.ehcache.CacheManager.init(CacheManager.java:387)
-	at net.sf.ehcache.CacheManager.<init>(CacheManager.java:263)
-	at net.sf.ehcache.CacheManager.newInstance(CacheManager.java:1078)
-	at net.sf.ehcache.CacheManager.newInstance(CacheManager.java:1022)
-	at net.sf.ehcache.CacheManager.create(CacheManager.java:997)
-	at io.collap.Collap.initialize(Collap.java:66)
-	at io.collap.app.StartupListener.contextInitialized(StartupListener.java:16)
-	at org.apache.catalina.core.StandardContext.listenerStart(StandardContext.java:4739)
-	at org.apache.catalina.core.StandardContext.startInternal(StandardContext.java:5159)
-	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:150)
-	at org.apache.catalina.core.ContainerBase.addChildInternal(ContainerBase.java:726)
-	at org.apache.catalina.core.ContainerBase.addChild(ContainerBase.java:702)
-	at org.apache.catalina.core.StandardHost.addChild(StandardHost.java:697)
-	at org.apache.catalina.startup.HostConfig.deployWAR(HostConfig.java:976)
-	at org.apache.catalina.startup.HostConfig$DeployWar.run(HostConfig.java:1762)
-	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:471)
-	at java.util.concurrent.FutureTask.run(FutureTask.java:262)
-	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
-	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:615)
-	at java.lang.Thread.run(Thread.java:744)
-Caused by: java.net.UnknownHostException: marcos-mbp.fritz.box: marcos-mbp.fritz.box: nodename nor servname provided, or not known
-	at java.net.InetAddress.getLocalHost(InetAddress.java:1473)
-	at net.sf.ehcache.distribution.RMICacheManagerPeerListener.calculateHostAddress(RMICacheManagerPeerListener.java:167)
-	at net.sf.ehcache.distribution.RMICacheManagerPeerListener.<init>(RMICacheManagerPeerListener.java:124)
-	at net.sf.ehcache.distribution.RMICacheManagerPeerListenerFactory.doCreateCachePeerListener(RMICacheManagerPeerListenerFactory.java:102)
-	... 24 more
-Caused by: java.net.UnknownHostException: marcos-mbp.fritz.box: nodename nor servname provided, or not known
-	at java.net.Inet6AddressImpl.lookupAllHostAddr(Native Method)
-	at java.net.InetAddress$1.lookupAllHostAddr(InetAddress.java:901)
-	at java.net.InetAddress.getAddressesFromNameService(InetAddress.java:1293)
-	at java.net.InetAddress.getLocalHost(InetAddress.java:1469)
-	... 27 more

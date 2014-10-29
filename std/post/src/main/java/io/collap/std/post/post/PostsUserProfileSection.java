@@ -1,6 +1,7 @@
 package io.collap.std.post.post;
 
 import io.collap.bryg.environment.Environment;
+import io.collap.bryg.model.BasicModel;
 import io.collap.bryg.model.Model;
 import io.collap.controller.ModuleController;
 import io.collap.controller.communication.Response;
@@ -35,7 +36,7 @@ public class PostsUserProfileSection extends ModuleController implements BrygDep
             posts.add (post);
         }
 
-        Model model = bryg.createModel ();
+        Model model = new BasicModel ();
         model.setVariable ("posts", posts);
         bryg.getTemplate ("section.user.Posts").render (response.getContentWriter (), model);
         response.getHeadWriter ().write ("Posts");

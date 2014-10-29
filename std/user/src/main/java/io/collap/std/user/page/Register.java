@@ -1,6 +1,7 @@
 package io.collap.std.user.page;
 
 import io.collap.bryg.environment.Environment;
+import io.collap.bryg.model.BasicModel;
 import io.collap.bryg.model.Model;
 import io.collap.controller.ModuleController;
 import io.collap.controller.communication.Request;
@@ -23,7 +24,7 @@ public class Register extends ModuleController implements BrygDependant {
 
     @Override
     public void doGet (Response response) throws IOException {
-        Model model = bryg.createModel ();
+        Model model = new BasicModel ();
         bryg.getTemplate ("Register").render (response.getContentWriter (), model);
         bryg.getTemplate ("Register_head").render (response.getHeadWriter (), model);
     }
