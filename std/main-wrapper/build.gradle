@@ -2,7 +2,5 @@ archivesBaseName = 'main-wrapper'
 version = '0.1.1'
 
 jar {
-    manifest {
-        attributes 'Implementation-Title': 'collap-std-' + archivesBaseName, 'Implementation-Version': version
-    }
+    baseName = 'collap-std-main-wrapper'
 }

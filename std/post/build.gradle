@@ -7,7 +7,5 @@ dependencies {
 }
 
 jar {
-    manifest {
-        attributes 'Implementation-Title': 'collap-std-' + archivesBaseName, 'Implementation-Version': version
-    }
+    baseName = 'collap-std-post'
 }

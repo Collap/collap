@@ -1,40 +1,41 @@
 apply plugin: 'idea'
 
 subprojects {
-  apply plugin: 'maven'
-  apply plugin: 'java'
-  apply plugin: 'idea'
 
-  group = 'io.collap.std'
+    apply plugin: 'maven'
+    apply plugin: 'java'
+    apply plugin: 'idea'
 
-  sourceCompatibility = 1.7
+    group = 'io.collap.std'
 
-  repositories {
+    sourceCompatibility = 1.7
+
+    repositories {
       mavenCentral ()
       mavenLocal ()
-  }
+    }
 
-  configurations {
+    configurations {
       includedJars
-  }
+    }
 
-  dependencies {
-      compile project (':api')
-  }
+    dependencies {
+        compile project (':api')
+    }
 
-  task copyDependencies (type: Copy) {
-      from configurations.includedJars
-      into "$rootDir/../lib"
-  }
+    task copyDependencies (type: Copy) {
+        from configurations.includedJars
+        into "$rootDir/../lib"
+    }
 
-  jar {
-    destinationDir = file ("$rootDir/../module")
-      from ('res') {
+    jar {
+        destinationDir = file ("$rootDir/../module")
+        from ('res') {
           into ('/resource/')
-      }
-      from ('module.yaml') {
+        }
+        from ('module.yaml') {
           into ('/')
-      }
-  }
+        }
+    }
 
 }

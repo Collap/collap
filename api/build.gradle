@@ -13,7 +13,7 @@ ext.dependencyHibernate = 'org.hibernate:hibernate-core:4.3.4.Final'
 ext.dependencyHikariCP = 'com.zaxxer:HikariCP:1.3.5'
 ext.dependencyYamlbeans = 'com.esotericsoftware.yamlbeans:yamlbeans:1.06'
 ext.dependencyJSR305 = 'com.google.code.findbugs:jsr305:3.0.0' /* @Nullable and @NotNull! */
-ext.dependencyBryg = 'io.collap.bryg:bryg:0.3-dev'
+ext.dependencyBryg = 'io.collap.bryg:bryg:0.3'
 
 configurations {
     includedJars
@@ -49,8 +49,6 @@ task copyDependencies (type: Copy) {
 }
 
 jar {
+	baseName = 'collap-api'
     destinationDir = file ("$rootDir/../lib")
-    manifest {
-        attributes 'Implementation-Title': 'collap-' + archivesBaseName, 'Implementation-Version': version
-    }
 }
