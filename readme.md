@@ -8,9 +8,8 @@ A collaboration platform. More details soon.
 To set up a general collap development environment, follow these steps:
 
 1. Create a directory that will hold the whole collap environment (Further called 'root directory').
-2. Clone this repository to the directory 'collap-core' within the root directory.
-Repeat this step with any other plugin repository you wish to add. Also clone the [collap-std](https://github.com/Collap/collap-std) and
-[scripts](https://github.com/Collap/scripts) repositories.
+2. Clone this repository to the directory 'collap' within the root directory.
+Repeat this step with any other plugin repository you wish to add. Also clone the [scripts](https://github.com/Collap/scripts) repository.
 3. Get the bryg jar required by the current version of collap and install it to your local maven repository (You can build it from source [here](https://github.com/Collap/bryg)).
 4. Download Tomcat 8.0.5, rename the folder to 'tomcat' (or change the script files in 'scripts'), and put it inside the root directory.
 5. Download the MySQL JDBC connector jar (https://dev.mysql.com/downloads/connector/j/) and put it into tomcat's 'lib' folder.
@@ -39,8 +38,7 @@ As the MySQL JDBC driver does not support *unix sockets*, on Unix you must allow
 The directory structure for development is the following:
 
     root
-        collap-core
-        collap-std
+        collap
         lib
         module
         scripts
